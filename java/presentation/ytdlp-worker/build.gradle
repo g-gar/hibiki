@@ -1,0 +1,4 @@
+dependencies {
+    implementation project(':orchestrator')
+    implementation project(':packages:yt-dlp')
+}

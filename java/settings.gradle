@@ -1,0 +1,21 @@
+rootProject.name = 'hibiki'
+
+include 'orchestrator'
+
+// Autodiscovery for modules
+def discoverModules(String parentDir) {
+    if (!file(parentDir).exists()) return
+    file(parentDir).listFiles().findAll { it.isDirectory() && (new File(it, 'build.gradle').exists() || new File(it, 'build.gradle.kts').exists()) }.each {
+        include "${parentDir}:${it.name}"
+    }
+}
+
+discoverModules('core')
+discoverModules('features')
+discoverModules('packages')
+discoverModules('presentation')
+
+include 'testing:contracts'
+include 'testing:unit'
+include 'testing:integration'
+include 'testing:e2e'
