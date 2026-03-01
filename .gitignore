@@ -1,2 +1,7 @@
 java/**/build
 java/**/.gradle
+
+*.class
+build/
+target/
+out/
