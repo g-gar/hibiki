@@ -3,7 +3,25 @@ plugins {
     id 'io.spring.dependency-management'
 }
 
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
 dependencies {
-    implementation project(':orchestrator')
+    implementation project(':core:shared')
+    implementation project(':core:identity')
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    
+    // Auth Dependencies leaked from identity module
+    implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
+    
+    // Mapping & Lombok
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    compileOnly 'org.projectlombok:lombok:1.18.42'
+    annotationProcessor 'org.projectlombok:lombok:1.18.42'
 }

@@ -1,7 +1,5 @@
 rootProject.name = 'hibiki'
 
-include 'orchestrator'
-
 // Autodiscovery for modules
 def discoverModules(String parentDir) {
     if (!file(parentDir).exists()) return
