@@ -1,3 +1,8 @@
 dependencies {
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
     // Id3v2 dependencies
+    implementation 'io.projectreactor:reactor-core'
+    implementation 'org.springframework:spring-core'
 }
