@@ -1,10 +1,6 @@
 dependencies {
     implementation project(':core:shared')
-    
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.83'
-    implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
+    implementation project(':packages:jwt')
     
     implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
     implementation 'io.projectreactor:reactor-core'

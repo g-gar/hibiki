@@ -1,7 +1,8 @@
 package com.ggar.hibiki.core.identity.model;
 
 import com.ggar.hibiki.core.shared.mediator.Query;
-import io.jsonwebtoken.Claims;
+
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ValidateTokenQuery implements Query<Claims> {
+public class ValidateTokenQuery implements Query<Map<String, Object>> {
     private String token;
 }
