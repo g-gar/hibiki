@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(':core:shared')
+
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.83'
+
+    implementation 'org.springframework:spring-context'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'io.projectreactor:reactor-core'
+}
