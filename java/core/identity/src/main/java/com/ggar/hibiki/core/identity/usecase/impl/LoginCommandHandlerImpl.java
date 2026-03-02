@@ -3,8 +3,8 @@ package com.ggar.hibiki.core.identity.usecase.impl;
 import com.ggar.hibiki.core.identity.model.AuthResponse;
 import com.ggar.hibiki.core.identity.model.LoginRequest;
 import com.ggar.hibiki.core.identity.persistence.repository.UserRepository;
-import com.ggar.hibiki.core.identity.provider.JwtProvider;
 import com.ggar.hibiki.core.identity.usecase.LoginCommandHandler;
+import com.ggar.hibiki.packages.jwt.signer.JwtSigner;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -12,11 +12,11 @@ import reactor.core.publisher.Mono;
 public class LoginCommandHandlerImpl implements LoginCommandHandler {
 
     private final UserRepository userRepository;
-    private final JwtProvider jwtProvider;
+    private final JwtSigner jwtSigner;
 
-    public LoginCommandHandlerImpl(UserRepository userRepository, JwtProvider jwtProvider) {
+    public LoginCommandHandlerImpl(UserRepository userRepository, JwtSigner jwtSigner) {
         this.userRepository = userRepository;
-        this.jwtProvider = jwtProvider;
+        this.jwtSigner = jwtSigner;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class LoginCommandHandlerImpl implements LoginCommandHandler {
         return userRepository.findByUsername(request.getUsername())
                 .filter(user -> user.getPassword().equals(request.getPassword())) // TODO: Use password hashing
                 .switchIfEmpty(Mono.error(new RuntimeException("Invalid credentials")))
-                .flatMap(user -> jwtProvider.generateToken(user.getId())
+                .flatMap(user -> jwtSigner.generateToken(user.getId())
                         .map(token -> AuthResponse.builder()
                                 .token(token)
                                 .userId(user.getId())

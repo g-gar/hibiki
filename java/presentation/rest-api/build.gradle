@@ -14,10 +14,7 @@ jar {
 dependencies {
     implementation project(':core:shared')
     implementation project(':core:identity')
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    
-    // Auth Dependencies leaked from identity module
-    implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
     
     // Mapping & Lombok
     implementation 'org.mapstruct:mapstruct:1.6.3'

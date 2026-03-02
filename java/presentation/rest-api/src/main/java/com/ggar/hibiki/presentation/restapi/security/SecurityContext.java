@@ -1,8 +1,9 @@
 package com.ggar.hibiki.presentation.restapi.security;
 
-import io.jsonwebtoken.Claims;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 public class SecurityContext {
 
@@ -10,7 +11,8 @@ public class SecurityContext {
         return Mono.justOrEmpty((String) exchange.getAttribute("userId"));
     }
 
-    public static Mono<Claims> getClaims(ServerWebExchange exchange) {
-        return Mono.justOrEmpty((Claims) exchange.getAttribute("userClaims"));
+    @SuppressWarnings("unchecked")
+    public static Mono<Map<String, Object>> getClaims(ServerWebExchange exchange) {
+        return Mono.justOrEmpty((Map<String, Object>) exchange.getAttribute("userClaims"));
     }
 }
