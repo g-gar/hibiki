@@ -8,7 +8,7 @@ import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
-import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
+import com.ggar.hibiki.core.identity.persistence.generator.UuidV7IdGenerator;
 
 import java.util.Set;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(UUIDStringGenerator.class)
+    @GeneratedValue(UuidV7IdGenerator.class)
     private String id;
 
     @Property("username")
