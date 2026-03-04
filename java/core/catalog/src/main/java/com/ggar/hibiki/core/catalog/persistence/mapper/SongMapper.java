@@ -5,7 +5,10 @@ import com.ggar.hibiki.core.catalog.persistence.entity.SongEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = { ArtistMapper.class, AlbumMapper.class })
+import org.mapstruct.ReportingPolicy;
+
+@Mapper(componentModel = "spring", uses = { ArtistMapper.class,
+        AlbumMapper.class }, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface SongMapper {
     Song toDomain(SongEntity entity);
 
