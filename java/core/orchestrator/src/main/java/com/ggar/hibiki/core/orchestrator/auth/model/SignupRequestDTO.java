@@ -1,4 +1,4 @@
-package com.ggar.hibiki.presentation.restapi.model;
+package com.ggar.hibiki.core.orchestrator.auth.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

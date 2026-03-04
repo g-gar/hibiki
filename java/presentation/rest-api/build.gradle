@@ -12,8 +12,10 @@ jar {
 }
 
 dependencies {
+    implementation project(':core:orchestrator')
     implementation project(':core:shared')
-    implementation project(':core:identity')
+    implementation project(':core:identity') // Keeping identity temporarily for AuthResponse model until moved
+    implementation project(':core:orchestrator')
     implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
     
     // Mapping & Lombok

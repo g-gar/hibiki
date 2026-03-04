@@ -36,14 +36,24 @@ public class JjwtSigner implements JwtSigner {
 
     @Override
     public Mono<String> generateToken(String subject) {
-        return generateToken(subject, new HashMap<>());
+        return generateToken(subject, new HashMap<>(), this.expirationTime);
     }
 
     @Override
     public Mono<String> generateToken(String subject, Map<String, Object> claims) {
+        return generateToken(subject, claims, this.expirationTime);
+    }
+
+    @Override
+    public Mono<String> generateToken(String subject, long expirationTime) {
+        return generateToken(subject, new HashMap<>(), expirationTime);
+    }
+
+    @Override
+    public Mono<String> generateToken(String subject, Map<String, Object> claims, long expirationTime) {
         return Mono.fromCallable(() -> {
             try {
-                logger.debug("Generating JWT token for subject: {}", subject);
+                logger.debug("Generating JWT token for subject: {} with duration {} ms", subject, expirationTime);
                 Date now = new Date();
                 Date expiryDate = new Date(now.getTime() + expirationTime);
 
