@@ -1,8 +1,10 @@
 package com.ggar.hibiki.features.devices.infrastructure.persistence.entity;
 
+import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
+import com.ggar.hibiki.features.devices.infrastructure.persistence.generator.UuidV7IdGenerator;
 
 import java.time.Instant;
 
@@ -10,6 +12,7 @@ import java.time.Instant;
 public class DeviceEntity {
 
     @Id
+    @GeneratedValue(UuidV7IdGenerator.class)
     private String id;
 
     @Property("userId")

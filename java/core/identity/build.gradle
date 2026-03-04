@@ -1,6 +1,7 @@
 dependencies {
     implementation project(':core:shared')
     implementation project(':packages:jwt')
+    implementation project(':packages:uuid')
     
     implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
     implementation 'io.projectreactor:reactor-core'
