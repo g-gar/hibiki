@@ -1,5 +1,6 @@
 package com.ggar.hibiki.core.identity.model;
 
+import com.ggar.hibiki.core.shared.mediator.Command;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,9 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponse {
-    private String token;
+public class RefreshAuthRequest implements Command<AuthResponse> {
     private String refreshToken;
-    private String userId;
-    private String username;
+    private String deviceId;
 }

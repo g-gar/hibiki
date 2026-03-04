@@ -1,4 +1,4 @@
-package com.ggar.hibiki.presentation.restapi.model;
+package com.ggar.hibiki.core.orchestrator.devices.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequestDTO {
-    private String username;
-    private String password;
+public class RevokeDeviceRequestDTO {
+    private String userId;
+    private String deviceId;
 }

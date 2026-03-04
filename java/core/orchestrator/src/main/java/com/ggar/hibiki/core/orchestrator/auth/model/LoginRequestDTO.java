@@ -1,21 +1,16 @@
-package com.ggar.hibiki.core.identity.model;
+package com.ggar.hibiki.core.orchestrator.auth.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.ggar.hibiki.core.shared.mediator.Command;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest implements Command<AuthResponse> {
+public class LoginRequestDTO {
     private String username;
     private String password;
-
-    // Device Tracking Info
     private String deviceId;
-    private String ip;
-    private String userAgent;
 }
