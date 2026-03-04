@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.ggar.hibiki.core'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    // Shared core (Mediator & Commands)
+    implementation project(':core:shared')
+
+    // Domain Modules we orchestrate
+    implementation project(':core:identity')
+    implementation project(':features:devices')
+
+    // Add Spring Context for @Service annotations and Reactor Core for Mono/Flux
+    implementation 'org.springframework:spring-context'
+    implementation 'io.projectreactor:reactor-core'
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+    // Lombok (optional since usually it goes via shared plugin, but explicitly needed for mapper config)
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    // If you use DTOs from rest-api directly
+    // Wait, typically DTOs belong in the presentation layer. To prevent cyclic dependencies,
+    // the presentation layer will depend on orchestrator and pass its DTOs.
+    // However, if the mapping occurs in orchestrator, orchestrator needs the DTOs from presentation.
+    // If you extract DTOs into a separate module (presentation-models), good. If not, maybe rest-api relies on orchestrator models, or orchestrator relies on rest-api.
+    // Since rest-api will depend on orchestrator, we must define the input/output models IN the orchestrator. Let's do that to stick to Clean Architecture principles.
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

@@ -13,4 +13,9 @@ import com.ggar.hibiki.core.shared.mediator.Command;
 public class LoginRequest implements Command<AuthResponse> {
     private String username;
     private String password;
+
+    // Device Tracking Info
+    private String deviceId;
+    private String ip;
+    private String userAgent;
 }

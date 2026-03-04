@@ -55,7 +55,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}",
+                            "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\",\n  \"deviceId\": \"f47ac10b-58cc-4372-a567-0e02b2c3d479\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -75,6 +75,91 @@
                         }
                     },
                     "response": []
+                }
+            ]
+        },
+        {
+            "name": "Devices",
+            "item": [
+                {
+                    "name": "Get Devices",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/devices?userId=testuser_id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "devices"
+                            ],
+                            "query": [
+                                {
+                                    "key": "userId",
+                                    "value": "testuser_id"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Register Device",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": \"f47ac10b-58cc-4372-a567-0e02b2c3d479\",\n  \"userId\": \"testuser_id\",\n  \"name\": \"Testing PC\",\n  \"type\": \"DESKTOP\",\n  \"userAgent\": \"PostmanRuntime/7.28.0\",\n  \"ip\": \"127.0.0.1\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/devices",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "devices"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Revoke Device",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/devices/f47ac10b-58cc-4372-a567-0e02b2c3d479?userId=testuser_id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "devices",
+                                "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                            ],
+                            "query": [
+                                {
+                                    "key": "userId",
+                                    "value": "testuser_id"
+                                }
+                            ]
+                        }
+                    }
                 }
             ]
         }

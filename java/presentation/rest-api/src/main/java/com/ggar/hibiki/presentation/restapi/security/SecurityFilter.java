@@ -2,7 +2,6 @@ package com.ggar.hibiki.presentation.restapi.security;
 
 import com.ggar.hibiki.core.shared.mediator.Mediator;
 import com.ggar.hibiki.core.identity.model.ValidateTokenQuery;
-import io.jsonwebtoken.Claims;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -40,7 +39,7 @@ public class SecurityFilter implements WebFilter {
         return mediator.send(new ValidateTokenQuery(token))
                 .flatMap(claims -> {
                     exchange.getAttributes().put("userClaims", claims);
-                    exchange.getAttributes().put("userId", claims.getSubject());
+                    exchange.getAttributes().put("userId", claims.get("sub"));
                     return chain.filter(exchange);
                 })
                 .onErrorResume(e -> chain.filter(exchange));
