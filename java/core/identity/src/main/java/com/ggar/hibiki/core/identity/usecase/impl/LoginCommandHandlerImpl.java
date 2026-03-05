@@ -4,8 +4,6 @@ import com.ggar.hibiki.core.identity.model.AuthResponse;
 import com.ggar.hibiki.core.identity.model.LoginRequest;
 import com.ggar.hibiki.core.identity.persistence.repository.UserRepository;
 import com.ggar.hibiki.core.identity.usecase.LoginCommandHandler;
-import com.ggar.hibiki.core.shared.auth.query.ValidateDeviceLoginQuery;
-import com.ggar.hibiki.core.shared.mediator.Mediator;
 import com.ggar.hibiki.packages.jwt.signer.JwtSigner;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
