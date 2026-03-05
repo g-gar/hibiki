@@ -1,0 +1,15 @@
+dependencies {
+    implementation project(':core:identity:identity-api')
+    implementation project(':core:shared')
+    implementation project(':packages:jwt')
+    implementation project(':packages:uuid')
+    
+    implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+    implementation 'io.projectreactor:reactor-core'
+    
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    
+    compileOnly 'org.projectlombok:lombok:1.18.42'
+    annotationProcessor 'org.projectlombok:lombok:1.18.42'
+}

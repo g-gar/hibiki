@@ -10,9 +10,9 @@ dependencies {
     implementation project(':core:shared')
 
     // Domain Modules we orchestrate
-    implementation project(':core:identity')
-    implementation project(':features:devices')
-    implementation project(':features:ingestion')
+    implementation project(':core:identity:identity-api')
+    implementation project(':features:devices:devices-api')
+    implementation project(':features:ingestion:ingestion-api')
 
     // Add Spring Context for @Service annotations and Reactor Core for Mono/Flux
     implementation 'org.springframework:spring-context'
