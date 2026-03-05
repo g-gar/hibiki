@@ -2,7 +2,6 @@ package com.ggar.hibiki.features.devices.infrastructure.persistence.generator;
 
 import com.ggar.hibiki.packages.uuid.UuidV7Generator;
 import org.springframework.data.neo4j.core.schema.IdGenerator;
-import org.springframework.util.StringUtils;
 
 public class UuidV7IdGenerator implements IdGenerator<String> {
 

@@ -7,7 +7,6 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 import com.ggar.hibiki.core.catalog.persistence.generator.UuidV7IdGenerator;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @Node("Album")
 public class AlbumEntity {

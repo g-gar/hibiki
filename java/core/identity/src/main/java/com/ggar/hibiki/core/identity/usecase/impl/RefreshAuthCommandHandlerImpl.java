@@ -3,8 +3,6 @@ package com.ggar.hibiki.core.identity.usecase.impl;
 import com.ggar.hibiki.core.identity.model.AuthResponse;
 import com.ggar.hibiki.core.identity.model.RefreshAuthRequest;
 import com.ggar.hibiki.core.identity.usecase.RefreshAuthCommandHandler;
-import com.ggar.hibiki.core.shared.auth.query.ValidateDeviceLoginQuery;
-import com.ggar.hibiki.core.shared.mediator.Mediator;
 import com.ggar.hibiki.packages.jwt.signer.JwtSigner;
 import com.ggar.hibiki.packages.jwt.verifier.JwtVerifier;
 import org.springframework.stereotype.Service;
