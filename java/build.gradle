@@ -37,7 +37,7 @@ subprojects {
 
     checkstyle {
         toolVersion = '10.12.4'
-        configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+        configFile = rootProject.file("../config/checkstyle/checkstyle.xml")
         showViolations = true
         maxWarnings = 0
     }
