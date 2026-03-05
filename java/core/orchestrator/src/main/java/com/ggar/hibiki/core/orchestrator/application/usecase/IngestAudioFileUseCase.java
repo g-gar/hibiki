@@ -2,8 +2,8 @@ package com.ggar.hibiki.core.orchestrator.application.usecase;
 
 import com.ggar.hibiki.core.shared.mediator.Command;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;
-import com.ggar.hibiki.features.ingestion.application.usecase.UploadAudioStreamUseCase;
 import com.ggar.hibiki.features.ingestion.domain.AudioIngestionContent;
+import com.ggar.hibiki.features.ingestion.usecase.command.UploadAudioStreamCommand;
 import java.io.InputStream;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -16,10 +16,10 @@ import reactor.core.publisher.Mono;
 @Service
 public class IngestAudioFileUseCase implements CommandHandler<IngestAudioFileUseCase.IngestAudioCommand, String> {
 
-    private final UploadAudioStreamUseCase uploadAudioStreamUseCase;
+    private final UploadAudioStreamCommand uploadAudioStreamCommand;
 
-    public IngestAudioFileUseCase(UploadAudioStreamUseCase uploadAudioStreamUseCase) {
-        this.uploadAudioStreamUseCase = uploadAudioStreamUseCase;
+    public IngestAudioFileUseCase(UploadAudioStreamCommand uploadAudioStreamCommand) {
+        this.uploadAudioStreamCommand = uploadAudioStreamCommand;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class IngestAudioFileUseCase implements CommandHandler<IngestAudioFileUse
                 .flatMap(userId -> {
                     AudioIngestionContent content = new AudioIngestionContent(userId, command.inputStream());
 
-                    return uploadAudioStreamUseCase.execute(content).doOnSuccess(mediaId -> {
+                    return uploadAudioStreamCommand.execute(content).doOnSuccess(mediaId -> {
                         // TODO: Publish AudioFileIngestedEvent to EventBus
                         // eventBus.publish(new AudioFileIngestedEvent(mediaId));
                     });

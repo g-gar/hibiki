@@ -3,11 +3,17 @@ rootProject.name = 'hibiki'
 // Autodiscovery for modules
 def discoverModules(String parentDir) {
     if (!file(parentDir).exists()) return
-    file(parentDir).listFiles().findAll { it.isDirectory() && (new File(it, 'build.gradle').exists() || new File(it, 'build.gradle.kts').exists()) }.each {
-        include "${parentDir}:${it.name}"
+    file(parentDir).listFiles().findAll { it.isDirectory() }.each { dir ->
+        if (new File(dir, 'build.gradle').exists() || new File(dir, 'build.gradle.kts').exists()) {
+            include "${parentDir}:${dir.name}"
+        } else {
+            // Check for nested -api and -impl
+            dir.listFiles().findAll { it.isDirectory() && (it.name.endsWith('-api') || it.name.endsWith('-impl')) && (new File(it, 'build.gradle').exists() || new File(it, 'build.gradle.kts').exists()) }.each { subDir ->
+                include "${parentDir}:${dir.name}:${subDir.name}"
+            }
+        }
     }
 }
-
 discoverModules('core')
 discoverModules('features')
 discoverModules('packages')

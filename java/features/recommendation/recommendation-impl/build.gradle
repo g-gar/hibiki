@@ -1,0 +1,5 @@
+dependencies {
+    implementation project(':features:recommendation:recommendation-api')
+    implementation project(':core:shared')
+    // Feature specific dependencies
+}
