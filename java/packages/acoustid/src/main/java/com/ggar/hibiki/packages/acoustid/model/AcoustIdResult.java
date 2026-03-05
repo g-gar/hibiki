@@ -1,11 +1,10 @@
 package com.ggar.hibiki.packages.acoustid.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * Represents a single result from the AcoustID API lookup.

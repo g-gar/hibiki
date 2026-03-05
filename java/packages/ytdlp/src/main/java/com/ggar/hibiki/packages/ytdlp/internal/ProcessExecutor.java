@@ -1,13 +1,12 @@
 package com.ggar.hibiki.packages.ytdlp.internal;
 
 import com.ggar.hibiki.packages.ytdlp.logging.Logger;
-import reactor.core.publisher.Flux;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import reactor.core.publisher.Flux;
 
 /**
  * Internal utility to execute OS processes and stream their output reactively.
@@ -24,7 +23,7 @@ public class ProcessExecutor {
      * Executes a command and returns its standard output as a reactive stream of
      * lines.
      * Standard error is consumed and logged internally.
-     * 
+     *
      * @param command          The execution command and arguments.
      * @param workingDirectory The directory to run the process in, or null for
      *                         current.
@@ -42,21 +41,24 @@ public class ProcessExecutor {
                 Process process = processBuilder.start();
 
                 // Consume stderr in a separate virtual/background thread to prevent blocking
-                new Thread(() -> {
-                    try (BufferedReader errorReader = new BufferedReader(
-                            new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
-                        String line;
-                        while ((line = errorReader.readLine()) != null) {
-                            logger.error("yt-dlp error: " + line);
-                        }
-                    } catch (Exception e) {
-                        logger.error("Failed to read process stderr", e);
-                    }
-                }, "ytdlp-stderr-consumer-" + process.pid()).start();
+                new Thread(
+                                () -> {
+                                    try (BufferedReader errorReader = new BufferedReader(
+                                            new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
+                                        String line;
+                                        while ((line = errorReader.readLine()) != null) {
+                                            logger.error("yt-dlp error: " + line);
+                                        }
+                                    } catch (Exception e) {
+                                        logger.error("Failed to read process stderr", e);
+                                    }
+                                },
+                                "ytdlp-stderr-consumer-" + process.pid())
+                        .start();
 
                 // Consume stdout and push to Flux
-                try (BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+                try (BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
                         if (sink.isCancelled()) {

@@ -13,5 +13,4 @@ public interface AlbumRepository extends ReactiveNeo4jRepository<AlbumEntity, St
     Mono<AlbumEntity> findByTitleIgnoreCaseAndArtistNameIgnoreCase(String title, String artistName);
 
     Mono<AlbumEntity> findByBarcode(String barcode);
-
 }

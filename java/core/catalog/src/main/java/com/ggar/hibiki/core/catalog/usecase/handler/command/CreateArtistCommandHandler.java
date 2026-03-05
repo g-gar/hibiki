@@ -19,7 +19,8 @@ public class CreateArtistCommandHandler implements CommandHandler<CreateArtistCo
 
     @Override
     public Mono<Artist> handle(CreateArtistCommand command) {
-        return artistRepository.findByNameIgnoreCase(command.getName())
+        return artistRepository
+                .findByNameIgnoreCase(command.getName())
                 .switchIfEmpty(Mono.defer(() -> {
                     ArtistEntity entity = new ArtistEntity(command.getName());
                     return artistRepository.save(entity);

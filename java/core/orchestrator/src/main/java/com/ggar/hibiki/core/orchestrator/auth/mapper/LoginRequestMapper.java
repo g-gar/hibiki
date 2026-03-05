@@ -4,7 +4,6 @@ import com.ggar.hibiki.core.identity.model.LoginRequest;
 import com.ggar.hibiki.core.orchestrator.auth.model.LoginRequestDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
@@ -16,5 +15,4 @@ public interface LoginRequestMapper {
     @Mapping(target = "userAgent", source = "userAgent")
     @Mapping(target = "deviceId", ignore = true)
     LoginRequest toCommand(LoginRequestDTO dto, String ip, String userAgent);
-
 }

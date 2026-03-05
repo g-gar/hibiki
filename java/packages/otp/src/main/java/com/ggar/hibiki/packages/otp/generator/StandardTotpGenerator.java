@@ -3,11 +3,10 @@ package com.ggar.hibiki.packages.otp.generator;
 import com.ggar.hibiki.packages.otp.exception.OtpException;
 import com.ggar.hibiki.packages.otp.logging.Logger;
 import com.ggar.hibiki.packages.otp.util.SecretEncoder;
-import reactor.core.publisher.Mono;
-
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import reactor.core.publisher.Mono;
 
 /**
  * Concrete reactive implementation of {@link TotpGenerator}.
@@ -36,8 +35,15 @@ public class StandardTotpGenerator implements TotpGenerator {
      * @param digits            the number of digits in the OTP
      * @param period            the time period in seconds
      */
-    public StandardTotpGenerator(SecureRandom secureRandom, Logger logger, SecretEncoder secretEncoder,
-            int secretLengthBytes, String issuer, String algorithm, int digits, int period) {
+    public StandardTotpGenerator(
+            SecureRandom secureRandom,
+            Logger logger,
+            SecretEncoder secretEncoder,
+            int secretLengthBytes,
+            String issuer,
+            String algorithm,
+            int digits,
+            int period) {
         this.secureRandom = secureRandom;
         this.logger = logger;
         this.secretEncoder = secretEncoder;
@@ -68,19 +74,14 @@ public class StandardTotpGenerator implements TotpGenerator {
         return Mono.fromCallable(() -> {
             try {
                 logger.debug("Generating otpauth:// URI for account: {}", accountName);
-                String encodedIssuer = URLEncoder.encode(issuer, StandardCharsets.UTF_8.toString()).replace("+", "%20");
-                String encodedAccount = URLEncoder.encode(accountName, StandardCharsets.UTF_8.toString()).replace("+",
-                        "%20");
+                String encodedIssuer = URLEncoder.encode(issuer, StandardCharsets.UTF_8.toString())
+                        .replace("+", "%20");
+                String encodedAccount = URLEncoder.encode(accountName, StandardCharsets.UTF_8.toString())
+                        .replace("+", "%20");
 
                 return String.format(
                         "otpauth://totp/%s:%s?secret=%s&issuer=%s&algorithm=%s&digits=%d&period=%d",
-                        encodedIssuer,
-                        encodedAccount,
-                        secret,
-                        encodedIssuer,
-                        algorithm,
-                        digits,
-                        period);
+                        encodedIssuer, encodedAccount, secret, encodedIssuer, algorithm, digits, period);
             } catch (Exception e) {
                 logger.error("Failed to generate OTP URI", e);
                 throw new OtpException("Failed to generate OTP URI", e);

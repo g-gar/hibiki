@@ -1,12 +1,10 @@
 package com.ggar.hibiki.core.catalog.persistence.entity;
 
+import com.ggar.hibiki.core.catalog.persistence.generator.UuidV7IdGenerator;
+import java.util.Objects;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
-import com.ggar.hibiki.core.catalog.persistence.generator.UuidV7IdGenerator;
-
-import java.util.Objects;
-import java.util.UUID;
 
 @Node("Artist")
 public class ArtistEntity {
@@ -14,11 +12,11 @@ public class ArtistEntity {
     @Id
     @GeneratedValue(UuidV7IdGenerator.class)
     private String id;
+
     private String name;
     private String isni;
 
-    public ArtistEntity() {
-    }
+    public ArtistEntity() {}
 
     public ArtistEntity(String name) {
         this();
@@ -51,10 +49,8 @@ public class ArtistEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         ArtistEntity that = (ArtistEntity) o;
         return Objects.equals(id, that.id);
     }

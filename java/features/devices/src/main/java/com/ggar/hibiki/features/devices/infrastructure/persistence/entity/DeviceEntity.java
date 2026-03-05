@@ -1,12 +1,11 @@
 package com.ggar.hibiki.features.devices.infrastructure.persistence.entity;
 
+import com.ggar.hibiki.features.devices.infrastructure.persistence.generator.UuidV7IdGenerator;
+import java.time.Instant;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
-import com.ggar.hibiki.features.devices.infrastructure.persistence.generator.UuidV7IdGenerator;
-
-import java.time.Instant;
 
 @Node("Device")
 public class DeviceEntity {
@@ -39,11 +38,18 @@ public class DeviceEntity {
     @Property("lastSeenAt")
     private Instant lastSeenAt;
 
-    public DeviceEntity() {
-    }
+    public DeviceEntity() {}
 
-    public DeviceEntity(String id, String userId, String name, String type, String status, String userAgent,
-            String lastIp, Instant createdAt, Instant lastSeenAt) {
+    public DeviceEntity(
+            String id,
+            String userId,
+            String name,
+            String type,
+            String status,
+            String userAgent,
+            String lastIp,
+            Instant createdAt,
+            Instant lastSeenAt) {
         this.id = id;
         this.userId = userId;
         this.name = name;

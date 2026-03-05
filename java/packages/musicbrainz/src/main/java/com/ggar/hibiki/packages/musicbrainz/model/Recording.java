@@ -2,10 +2,9 @@ package com.ggar.hibiki.packages.musicbrainz.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * Represents a Recording entity.
@@ -19,8 +18,10 @@ public class Recording {
     private Integer length;
     private Boolean video;
     private List<String> isrcs;
+
     @JsonProperty("artist-credit")
     private List<ArtistCredit> artistCredit;
+
     private List<Release> releases;
     private List<Alias> aliases;
     private List<Tag> tags;

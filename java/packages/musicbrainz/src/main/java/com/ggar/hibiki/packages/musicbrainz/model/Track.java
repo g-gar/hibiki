@@ -2,10 +2,9 @@ package com.ggar.hibiki.packages.musicbrainz.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * Represents a Track inside a Medium.
@@ -19,7 +18,9 @@ public class Track {
     private String number;
     private Integer length;
     private String title;
+
     @JsonProperty("artist-credit")
     private List<ArtistCredit> artistCredit;
+
     private Recording recording;
 }

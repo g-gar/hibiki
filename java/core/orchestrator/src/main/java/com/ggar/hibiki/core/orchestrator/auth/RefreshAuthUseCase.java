@@ -27,18 +27,16 @@ public class RefreshAuthUseCase extends BaseOrchestratorUseCase {
         RefreshAuthRequest refreshCommand = mapper.toCommand(requestDto);
 
         // 1: Renew tokens
-        return mediator.send(refreshCommand)
-                .flatMap(authResponse -> {
-                    // 2: Validate the device
-                    ValidateDeviceLoginQuery deviceQuery = ValidateDeviceLoginQuery.builder()
-                            .userId(authResponse.getUserId())
-                            .deviceId(requestDto.getDeviceId())
-                            .ip(ip)
-                            .userAgent(userAgent)
-                            .build();
+        return mediator.send(refreshCommand).flatMap(authResponse -> {
+            // 2: Validate the device
+            ValidateDeviceLoginQuery deviceQuery = ValidateDeviceLoginQuery.builder()
+                    .userId(authResponse.getUserId())
+                    .deviceId(requestDto.getDeviceId())
+                    .ip(ip)
+                    .userAgent(userAgent)
+                    .build();
 
-                    return mediator.send(deviceQuery)
-                            .thenReturn(authResponse);
-                });
+            return mediator.send(deviceQuery).thenReturn(authResponse);
+        });
     }
 }

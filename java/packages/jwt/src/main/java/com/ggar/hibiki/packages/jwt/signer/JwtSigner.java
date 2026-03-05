@@ -1,8 +1,7 @@
 package com.ggar.hibiki.packages.jwt.signer;
 
-import reactor.core.publisher.Mono;
-
 import java.util.Map;
+import reactor.core.publisher.Mono;
 
 /**
  * Interface defining the contract for generating a signed JWT.

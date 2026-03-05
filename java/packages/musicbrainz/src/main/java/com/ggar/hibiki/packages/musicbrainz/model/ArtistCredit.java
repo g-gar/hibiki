@@ -13,7 +13,9 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ArtistCredit {
     private String name;
+
     @JsonProperty("joinphrase")
     private String joinPhrase;
+
     private Artist artist;
 }

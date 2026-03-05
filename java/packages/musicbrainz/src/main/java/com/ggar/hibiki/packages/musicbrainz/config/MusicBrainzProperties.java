@@ -1,9 +1,8 @@
 package com.ggar.hibiki.packages.musicbrainz.config;
 
+import java.time.Duration;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-
-import java.time.Duration;
 
 /**
  * Configuration properties for the MusicBrainz API client.

@@ -5,10 +5,9 @@ import com.ggar.hibiki.core.shared.mediator.QueryHandler;
 import com.ggar.hibiki.features.devices.domain.model.DeviceStatus;
 import com.ggar.hibiki.features.devices.domain.ports.DeviceRepository;
 import com.ggar.hibiki.features.devices.infrastructure.logging.DevicesLogger;
+import java.time.Instant;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.time.Instant;
 
 /**
  * Use case responsible for verifying the validity and ownership of a given
@@ -29,7 +28,8 @@ public class ValidateDeviceLoginUseCase implements QueryHandler<ValidateDeviceLo
 
     @Override
     public Mono<Boolean> handle(ValidateDeviceLoginQuery query) {
-        return deviceRepository.findById(query.getDeviceId())
+        return deviceRepository
+                .findById(query.getDeviceId())
                 .flatMap(device -> {
                     if (device.getStatus() == DeviceStatus.REVOKED) {
                         devicesLogger.warn("Login attempt on revoked device: " + query.getDeviceId());

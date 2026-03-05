@@ -22,13 +22,13 @@ public class RevokeDeviceUseCase implements CommandHandler<RevokeDeviceCommand, 
 
     @Override
     public Mono<Void> handle(RevokeDeviceCommand command) {
-        return deviceRepository.findById(command.getDeviceId())
+        return deviceRepository
+                .findById(command.getDeviceId())
                 .filter(device -> device.getUserId().equals(command.getUserId()))
                 .switchIfEmpty(Mono.error(new RuntimeException("Device not found or ownership mismatch")))
                 .flatMap(device -> {
-                    var revokedDevice = device.toBuilder()
-                            .status(DeviceStatus.REVOKED)
-                            .build();
+                    var revokedDevice =
+                            device.toBuilder().status(DeviceStatus.REVOKED).build();
                     return deviceRepository.save(revokedDevice);
                 })
                 .then();

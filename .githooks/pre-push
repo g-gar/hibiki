@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+echo "Running code formatting and style checks before push..."
+
+# Go to java directory
+cd java || exit 1
+
+# Run spotlessCheck and checkstyleMain/checkstyleTest
+gradle spotlessCheck checkstyleMain checkstyleTest
+STATUS=$?
+
+if [ $STATUS -ne 0 ]; then
+  echo "Code formatting or style checks failed. Push aborted."
+  echo "Please run 'gradle spotlessApply' and fix any Checkstyle warnings."
+  exit 1
+fi
+
+echo "Checks passed. Proceeding with push."
+exit 0

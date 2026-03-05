@@ -1,4 +1,3 @@
 package com.ggar.hibiki.core.shared.mediator;
 
-public interface Command<R> {
-}
+public interface Command<R> {}

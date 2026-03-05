@@ -46,7 +46,7 @@ public interface YtDlpDownload {
 
     /**
      * Overrides the default yt-dlp output template naming convention.
-     * 
+     *
      * @param template e.g. "%(title)s.%(ext)s"
      * @return this builder
      */
@@ -62,5 +62,4 @@ public interface YtDlpDownload {
      * @return A Flux stream emitting the download lifecycle status.
      */
     Flux<DownloadEvent> executeTo(String targetDirectory);
-
 }

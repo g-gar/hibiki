@@ -56,8 +56,7 @@ public class JwtConfiguration {
      */
     @Bean
     public JwtVerifier jwtVerifier(
-            @Value("${hibiki.security.jwt.secret:defaultSecretForJwtGenerationMin256b}") String secret,
-            Logger logger) {
+            @Value("${hibiki.security.jwt.secret:defaultSecretForJwtGenerationMin256b}") String secret, Logger logger) {
         return new JjwtVerifier(secret, logger);
     }
 }

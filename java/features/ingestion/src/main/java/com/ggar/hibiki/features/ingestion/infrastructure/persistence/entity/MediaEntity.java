@@ -1,12 +1,11 @@
 package com.ggar.hibiki.features.ingestion.infrastructure.persistence.entity;
 
+import java.time.Instant;
+import java.util.UUID;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
-
-import java.time.Instant;
-import java.util.UUID;
 
 @Node("Media")
 public class MediaEntity {
@@ -32,10 +31,15 @@ public class MediaEntity {
     @Relationship(type = "UPLOADED_BY", direction = Relationship.Direction.OUTGOING)
     private UserEntity uploadedBy;
 
-    public MediaEntity() {
-    }
+    public MediaEntity() {}
 
-    public MediaEntity(UUID id, String filename, String mimeType, Long size, String status, Instant uploadedAt,
+    public MediaEntity(
+            UUID id,
+            String filename,
+            String mimeType,
+            Long size,
+            String status,
+            Instant uploadedAt,
             UserEntity uploadedBy) {
         this.id = id;
         this.filename = filename;

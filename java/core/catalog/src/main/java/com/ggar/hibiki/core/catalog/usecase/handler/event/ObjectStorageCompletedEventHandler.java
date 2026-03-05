@@ -11,7 +11,7 @@ public class ObjectStorageCompletedEventHandler {
 
     /*
      * Example:
-     * 
+     *
      * @EventListener
      * public void onObjectStorageCompleted(ObjectStorageCompletedEvent event) {
      * // Store the song in MinIO

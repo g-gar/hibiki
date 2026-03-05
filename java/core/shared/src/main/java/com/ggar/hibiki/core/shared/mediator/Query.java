@@ -1,4 +1,3 @@
 package com.ggar.hibiki.core.shared.mediator;
 
-public interface Query<R> {
-}
+public interface Query<R> {}

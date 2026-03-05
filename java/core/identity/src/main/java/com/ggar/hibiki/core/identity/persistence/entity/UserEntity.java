@@ -1,12 +1,11 @@
 package com.ggar.hibiki.core.identity.persistence.entity;
 
+import com.ggar.hibiki.core.identity.persistence.generator.UuidV7IdGenerator;
+import java.util.Set;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
-import com.ggar.hibiki.core.identity.persistence.generator.UuidV7IdGenerator;
-
-import java.util.Set;
 
 @Node("User")
 public class UserEntity {
@@ -30,11 +29,10 @@ public class UserEntity {
     @Property("twoFactorEnabled")
     private boolean twoFactorEnabled;
 
-    public UserEntity() {
-    }
+    public UserEntity() {}
 
-    public UserEntity(String id, String username, String email, String password, Set<String> roles,
-            boolean twoFactorEnabled) {
+    public UserEntity(
+            String id, String username, String email, String password, Set<String> roles, boolean twoFactorEnabled) {
         this.id = id;
         this.username = username;
         this.email = email;

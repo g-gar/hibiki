@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * Represents a Label entity.
  */
@@ -17,10 +15,13 @@ public class Label {
     private String id;
     private String name;
     private String type;
+
     @JsonProperty("sort-name")
     private String sortName;
+
     @JsonProperty("label-code")
     private Integer labelCode;
+
     private String country;
     private Area area;
     private LifeSpan lifespan;

@@ -1,9 +1,8 @@
 package com.ggar.hibiki.packages.acoustid.fpcalc;
 
 import com.ggar.hibiki.packages.acoustid.model.AudioFingerprint;
-import reactor.core.publisher.Mono;
-
 import java.io.InputStream;
+import reactor.core.publisher.Mono;
 
 /**
  * Defines the contract for calculating audio fingerprints from an input stream.

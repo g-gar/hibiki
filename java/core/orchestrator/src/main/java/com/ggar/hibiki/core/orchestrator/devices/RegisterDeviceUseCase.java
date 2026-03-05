@@ -31,11 +31,11 @@ public class RegisterDeviceUseCase extends BaseOrchestratorUseCase {
         }
 
         return mediator.send(RegisterDeviceCommand.builder()
-                .userId(request.getUserId())
-                .id(request.getDeviceId())
-                .name(request.getFriendlyName())
-                .type(type)
-                .build())
+                        .userId(request.getUserId())
+                        .id(request.getDeviceId())
+                        .name(request.getFriendlyName())
+                        .type(type)
+                        .build())
                 .map(mapper::toDto);
     }
 }

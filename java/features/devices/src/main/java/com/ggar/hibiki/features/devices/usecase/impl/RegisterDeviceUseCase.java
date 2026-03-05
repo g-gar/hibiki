@@ -5,10 +5,9 @@ import com.ggar.hibiki.features.devices.domain.model.Device;
 import com.ggar.hibiki.features.devices.domain.model.DeviceStatus;
 import com.ggar.hibiki.features.devices.domain.ports.DeviceRepository;
 import com.ggar.hibiki.features.devices.usecase.command.RegisterDeviceCommand;
+import java.time.Instant;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.time.Instant;
 
 /**
  * Use case responsible for registering a new user device
@@ -26,7 +25,8 @@ public class RegisterDeviceUseCase implements CommandHandler<RegisterDeviceComma
 
     @Override
     public Mono<Device> handle(RegisterDeviceCommand command) {
-        return deviceRepository.findById(command.getId())
+        return deviceRepository
+                .findById(command.getId())
                 .flatMap(existingDevice -> {
                     if (existingDevice.getStatus() == DeviceStatus.REVOKED) {
                         return Mono.<Device>error(new RuntimeException(

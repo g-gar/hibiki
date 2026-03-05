@@ -18,12 +18,11 @@ public class UpdateArtistCommandHandler implements CommandHandler<UpdateArtistCo
 
     @Override
     public Mono<Artist> handle(UpdateArtistCommand command) {
-        return artistRepository.findById(command.getId())
+        return artistRepository
+                .findById(command.getId())
                 .flatMap(entity -> {
-                    if (command.getName() != null)
-                        entity.setName(command.getName());
-                    if (command.getIsni() != null)
-                        entity.setIsni(command.getIsni());
+                    if (command.getName() != null) entity.setName(command.getName());
+                    if (command.getIsni() != null) entity.setIsni(command.getIsni());
                     return artistRepository.save(entity);
                 })
                 .map(artistMapper::toDomain);

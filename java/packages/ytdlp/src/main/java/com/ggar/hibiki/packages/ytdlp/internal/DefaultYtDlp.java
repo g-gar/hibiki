@@ -14,8 +14,8 @@ public class DefaultYtDlp implements YtDlp {
     private final ObjectMapper objectMapper;
     private final Logger logger;
 
-    public DefaultYtDlp(ProcessExecutor processExecutor, YtDlpProperties properties, ObjectMapper objectMapper,
-            Logger logger) {
+    public DefaultYtDlp(
+            ProcessExecutor processExecutor, YtDlpProperties properties, ObjectMapper objectMapper, Logger logger) {
         this.processExecutor = processExecutor;
         this.properties = properties;
         this.objectMapper = objectMapper;
@@ -31,5 +31,4 @@ public class DefaultYtDlp implements YtDlp {
     public YtDlpDownload download(String url) {
         return new DefaultYtDlpDownload(url, processExecutor, properties, logger);
     }
-
 }

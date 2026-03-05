@@ -7,7 +7,7 @@ public interface UploadAudioStreamUseCase {
 
     /**
      * Processes an incoming audio stream, uploading it to storage and saving the metadata
-     * 
+     *
      * @param content the AudioIngestionContent
      * @return Mono completing with the generated ID
      */

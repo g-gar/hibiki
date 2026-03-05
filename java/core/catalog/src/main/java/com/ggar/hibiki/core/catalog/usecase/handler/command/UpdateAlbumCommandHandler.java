@@ -18,14 +18,12 @@ public class UpdateAlbumCommandHandler implements CommandHandler<UpdateAlbumComm
 
     @Override
     public Mono<Album> handle(UpdateAlbumCommand command) {
-        return albumRepository.findById(command.getId())
+        return albumRepository
+                .findById(command.getId())
                 .flatMap(entity -> {
-                    if (command.getTitle() != null)
-                        entity.setTitle(command.getTitle());
-                    if (command.getReleaseYear() != null)
-                        entity.setReleaseYear(command.getReleaseYear());
-                    if (command.getBarcode() != null)
-                        entity.setBarcode(command.getBarcode());
+                    if (command.getTitle() != null) entity.setTitle(command.getTitle());
+                    if (command.getReleaseYear() != null) entity.setReleaseYear(command.getReleaseYear());
+                    if (command.getBarcode() != null) entity.setBarcode(command.getBarcode());
                     return albumRepository.save(entity);
                 })
                 .map(albumMapper::toDomain);

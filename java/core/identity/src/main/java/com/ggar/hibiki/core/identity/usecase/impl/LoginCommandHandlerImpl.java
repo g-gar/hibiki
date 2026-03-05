@@ -17,38 +17,36 @@ import reactor.core.publisher.Mono;
 @Service
 public class LoginCommandHandlerImpl implements LoginCommandHandler {
 
-        private final UserRepository userRepository;
-        private final JwtSigner jwtSigner;
+    private final UserRepository userRepository;
+    private final JwtSigner jwtSigner;
 
-        public LoginCommandHandlerImpl(UserRepository userRepository, JwtSigner jwtSigner) {
-                this.userRepository = userRepository;
-                this.jwtSigner = jwtSigner;
-        }
+    public LoginCommandHandlerImpl(UserRepository userRepository, JwtSigner jwtSigner) {
+        this.userRepository = userRepository;
+        this.jwtSigner = jwtSigner;
+    }
 
-        @Override
-        public Mono<AuthResponse> handle(LoginRequest request) {
-                return userRepository.findByUsername(request.getUsername())
-                                .filter(user -> user.getPassword().equals(request.getPassword())) // TODO: Use password
-                                                                                                  // hashing
-                                .switchIfEmpty(Mono.error(new RuntimeException("Invalid credentials")))
-                                .flatMap(user -> Mono.zip(
-                                                jwtSigner.generateToken(user.getId()),
-                                                jwtSigner.generateToken(
-                                                                user.getId(),
-                                                                java.util.Map.of(
-                                                                                "type",
-                                                                                "refresh",
-                                                                                "deviceId",
-                                                                                request.getDeviceId() != null
-                                                                                                ? request.getDeviceId()
-                                                                                                : ""),
-                                                                30L * 24L * 60L * 60L
-                                                                                * 1000L))
-                                                .map(tokens -> AuthResponse.builder()
-                                                                .token(tokens.getT1())
-                                                                .refreshToken(tokens.getT2())
-                                                                .userId(user.getId())
-                                                                .username(user.getUsername())
-                                                                .build()));
-        }
+    @Override
+    public Mono<AuthResponse> handle(LoginRequest request) {
+        return userRepository
+                .findByUsername(request.getUsername())
+                .filter(user -> user.getPassword().equals(request.getPassword())) // TODO: Use password
+                // hashing
+                .switchIfEmpty(Mono.error(new RuntimeException("Invalid credentials")))
+                .flatMap(user -> Mono.zip(
+                                jwtSigner.generateToken(user.getId()),
+                                jwtSigner.generateToken(
+                                        user.getId(),
+                                        java.util.Map.of(
+                                                "type",
+                                                "refresh",
+                                                "deviceId",
+                                                request.getDeviceId() != null ? request.getDeviceId() : ""),
+                                        30L * 24L * 60L * 60L * 1000L))
+                        .map(tokens -> AuthResponse.builder()
+                                .token(tokens.getT1())
+                                .refreshToken(tokens.getT2())
+                                .userId(user.getId())
+                                .username(user.getUsername())
+                                .build()));
+    }
 }

@@ -1,8 +1,7 @@
 package com.ggar.hibiki.packages.jwt.verifier;
 
-import reactor.core.publisher.Mono;
-
 import java.util.Map;
+import reactor.core.publisher.Mono;
 
 /**
  * Interface defining the contract for verifying a JWT and extracting its

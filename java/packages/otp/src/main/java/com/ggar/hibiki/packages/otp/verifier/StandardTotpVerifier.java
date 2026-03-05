@@ -3,6 +3,7 @@ package com.ggar.hibiki.packages.otp.verifier;
 import com.ggar.hibiki.packages.otp.exception.OtpException;
 import com.ggar.hibiki.packages.otp.logging.Logger;
 import com.ggar.hibiki.packages.otp.util.SecretEncoder;
+import java.nio.ByteBuffer;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -10,8 +11,6 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import reactor.core.publisher.Mono;
-
-import java.nio.ByteBuffer;
 
 /**
  * Concrete reactive implementation of {@link TotpVerifier} based on RFC 6238
@@ -37,8 +36,8 @@ public class StandardTotpVerifier implements TotpVerifier {
      * @param windowSize    the number of time steps (before and after) to check to
      *                      allow for clock drift
      */
-    public StandardTotpVerifier(Logger logger, SecretEncoder secretEncoder, String algorithm, int digits, int period,
-            int windowSize) {
+    public StandardTotpVerifier(
+            Logger logger, SecretEncoder secretEncoder, String algorithm, int digits, int period, int windowSize) {
         this.logger = logger;
         this.secretEncoder = secretEncoder;
         this.algorithm = algorithm;
@@ -52,8 +51,10 @@ public class StandardTotpVerifier implements TotpVerifier {
         return Mono.fromCallable(() -> {
             try {
                 if (code == null || code.length() != digits) {
-                    logger.debug("Provided code length {} does not match expected digits {}",
-                            code != null ? code.length() : 0, digits);
+                    logger.debug(
+                            "Provided code length {} does not match expected digits {}",
+                            code != null ? code.length() : 0,
+                            digits);
                     return false;
                 }
 
@@ -88,10 +89,10 @@ public class StandardTotpVerifier implements TotpVerifier {
         hmac.doFinal(hash, 0);
 
         int offset = hash[hash.length - 1] & 0xf;
-        int binary = ((hash[offset] & 0x7f) << 24) |
-                ((hash[offset + 1] & 0xff) << 16) |
-                ((hash[offset + 2] & 0xff) << 8) |
-                (hash[offset + 3] & 0xff);
+        int binary = ((hash[offset] & 0x7f) << 24)
+                | ((hash[offset + 1] & 0xff) << 16)
+                | ((hash[offset + 2] & 0xff) << 8)
+                | (hash[offset + 3] & 0xff);
 
         int otp = binary % (int) Math.pow(10, digits);
 

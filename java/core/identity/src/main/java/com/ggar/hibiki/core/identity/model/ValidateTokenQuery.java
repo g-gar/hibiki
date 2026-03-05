@@ -1,7 +1,6 @@
 package com.ggar.hibiki.core.identity.model;
 
 import com.ggar.hibiki.core.shared.mediator.Query;
-
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

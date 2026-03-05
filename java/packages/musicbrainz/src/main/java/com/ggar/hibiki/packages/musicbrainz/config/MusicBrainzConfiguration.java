@@ -40,8 +40,8 @@ public class MusicBrainzConfiguration {
      * @return an instance of {@link MusicBrainzWebClient}
      */
     @Bean
-    public MusicBrainzWebClient musicBrainzWebClient(WebClient.Builder builder, MusicBrainzProperties properties,
-            Logger logger) {
+    public MusicBrainzWebClient musicBrainzWebClient(
+            WebClient.Builder builder, MusicBrainzProperties properties, Logger logger) {
         return new MusicBrainzWebClient(builder, properties, logger);
     }
 

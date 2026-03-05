@@ -1,9 +1,8 @@
 package com.ggar.hibiki.features.ingestion.infrastructure.persistence.entity;
 
+import java.util.UUID;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
-
-import java.util.UUID;
 
 @Node("User")
 public class UserEntity {
@@ -11,8 +10,7 @@ public class UserEntity {
     @Id
     private UUID id;
 
-    public UserEntity() {
-    }
+    public UserEntity() {}
 
     public UserEntity(UUID id) {
         this.id = id;

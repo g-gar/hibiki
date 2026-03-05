@@ -27,21 +27,16 @@ public class DevicePersistenceAdapter implements DeviceRepository {
 
     @Override
     public Mono<Device> save(Device device) {
-        return Mono.just(device)
-                .map(mapper::toEntity)
-                .flatMap(repository::save)
-                .map(mapper::toDomain);
+        return Mono.just(device).map(mapper::toEntity).flatMap(repository::save).map(mapper::toDomain);
     }
 
     @Override
     public Mono<Device> findById(String id) {
-        return repository.findById(id)
-                .map(mapper::toDomain);
+        return repository.findById(id).map(mapper::toDomain);
     }
 
     @Override
     public Flux<Device> findByUserId(String userId) {
-        return repository.findByUserId(userId)
-                .map(mapper::toDomain);
+        return repository.findByUserId(userId).map(mapper::toDomain);
     }
 }

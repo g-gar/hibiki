@@ -1,12 +1,11 @@
 package com.ggar.hibiki.core.catalog.persistence.entity;
 
+import com.ggar.hibiki.core.catalog.persistence.generator.UuidV7IdGenerator;
+import java.util.Objects;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
-import com.ggar.hibiki.core.catalog.persistence.generator.UuidV7IdGenerator;
-
-import java.util.Objects;
 
 @Node("Album")
 public class AlbumEntity {
@@ -14,6 +13,7 @@ public class AlbumEntity {
     @Id
     @GeneratedValue(UuidV7IdGenerator.class)
     private String id;
+
     private String title;
     private Integer releaseYear;
     private String barcode;
@@ -21,8 +21,7 @@ public class AlbumEntity {
     @Relationship(type = "RELEASED_BY", direction = Relationship.Direction.OUTGOING)
     private ArtistEntity artist;
 
-    public AlbumEntity() {
-    }
+    public AlbumEntity() {}
 
     public AlbumEntity(String title, Integer releaseYear) {
         this();
@@ -72,10 +71,8 @@ public class AlbumEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         AlbumEntity that = (AlbumEntity) o;
         return Objects.equals(id, that.id);
     }

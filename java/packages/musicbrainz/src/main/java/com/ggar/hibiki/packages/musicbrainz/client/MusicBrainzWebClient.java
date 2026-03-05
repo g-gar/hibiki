@@ -2,12 +2,11 @@ package com.ggar.hibiki.packages.musicbrainz.client;
 
 import com.ggar.hibiki.packages.musicbrainz.config.MusicBrainzProperties;
 import com.ggar.hibiki.packages.musicbrainz.logging.Logger;
+import java.util.Optional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
 
 /**
  * Reactive wrapper for standard MusicBrainz API calls.
@@ -49,7 +48,8 @@ public class MusicBrainzWebClient {
      */
     public <T> Mono<T> get(String uri, Class<T> responseType) {
         logger.debug("Executing MusicBrainz GET request to: {}", uri);
-        return webClient.get()
+        return webClient
+                .get()
                 .uri(uri)
                 .retrieve()
                 .bodyToMono(responseType)

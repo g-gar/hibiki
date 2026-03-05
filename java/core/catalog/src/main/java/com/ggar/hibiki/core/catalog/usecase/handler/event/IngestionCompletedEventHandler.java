@@ -12,7 +12,7 @@ public class IngestionCompletedEventHandler {
 
     /*
      * Example:
-     * 
+     *
      * @EventListener
      * public void onIngestionCompleted(IngestionCompletedEvent event) {
      * // Read ID3v2 Tags from Event Payload

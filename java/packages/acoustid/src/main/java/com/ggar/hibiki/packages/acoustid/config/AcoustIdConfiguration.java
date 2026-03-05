@@ -55,8 +55,7 @@ public class AcoustIdConfiguration {
      * @return a configured {@link DefaultAcoustId}
      */
     @Bean
-    public AcoustId acoustId(FingerprintCalculator fingerprintCalculator,
-            AcoustIdWebClient acoustIdWebClient) {
+    public AcoustId acoustId(FingerprintCalculator fingerprintCalculator, AcoustIdWebClient acoustIdWebClient) {
         return new DefaultAcoustId(fingerprintCalculator, acoustIdWebClient);
     }
 }

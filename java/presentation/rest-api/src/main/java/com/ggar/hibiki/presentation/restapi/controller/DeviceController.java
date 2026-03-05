@@ -8,11 +8,10 @@ import com.ggar.hibiki.core.orchestrator.devices.model.RegisterDeviceRequestDTO;
 import com.ggar.hibiki.core.orchestrator.devices.model.RevokeDeviceRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/devices")

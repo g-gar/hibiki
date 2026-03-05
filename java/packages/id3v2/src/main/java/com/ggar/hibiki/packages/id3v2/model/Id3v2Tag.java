@@ -1,10 +1,9 @@
 package com.ggar.hibiki.packages.id3v2.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -23,8 +22,6 @@ public class Id3v2Tag {
     }
 
     public List<Id3v2Frame> getFramesById(String id) {
-        return frames.stream()
-                .filter(frame -> frame.getId().equals(id))
-                .toList();
+        return frames.stream().filter(frame -> frame.getId().equals(id)).toList();
     }
 }

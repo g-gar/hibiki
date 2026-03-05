@@ -19,16 +19,16 @@ public class SpringMediator implements Mediator {
                 ResolvableType.forClassWithGenerics(CommandHandler.class, command.getClass(), Object.class));
 
         if (beanNames.length == 0) {
-            return Mono.error(
-                    new IllegalStateException("No CommandHandler found for command: " + command.getClass().getName()));
+            return Mono.error(new IllegalStateException(
+                    "No CommandHandler found for command: " + command.getClass().getName()));
         }
         if (beanNames.length > 1) {
-            return Mono.error(new IllegalStateException(
-                    "Multiple CommandHandlers found for command: " + command.getClass().getName()));
+            return Mono.error(new IllegalStateException("Multiple CommandHandlers found for command: "
+                    + command.getClass().getName()));
         }
 
-        CommandHandler<Command<R>, R> handler = (CommandHandler<Command<R>, R>) applicationContext
-                .getBean(beanNames[0]);
+        CommandHandler<Command<R>, R> handler =
+                (CommandHandler<Command<R>, R>) applicationContext.getBean(beanNames[0]);
         return handler.handle(command);
     }
 
@@ -39,12 +39,12 @@ public class SpringMediator implements Mediator {
                 ResolvableType.forClassWithGenerics(QueryHandler.class, query.getClass(), Object.class));
 
         if (beanNames.length == 0) {
-            return Mono
-                    .error(new IllegalStateException("No QueryHandler found for query: " + query.getClass().getName()));
+            return Mono.error(new IllegalStateException(
+                    "No QueryHandler found for query: " + query.getClass().getName()));
         }
         if (beanNames.length > 1) {
-            return Mono.error(
-                    new IllegalStateException("Multiple QueryHandlers found for query: " + query.getClass().getName()));
+            return Mono.error(new IllegalStateException("Multiple QueryHandlers found for query: "
+                    + query.getClass().getName()));
         }
 
         QueryHandler<Query<R>, R> handler = (QueryHandler<Query<R>, R>) applicationContext.getBean(beanNames[0]);

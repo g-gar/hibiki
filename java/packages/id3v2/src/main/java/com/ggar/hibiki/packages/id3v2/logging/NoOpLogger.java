@@ -8,8 +8,7 @@ public class NoOpLogger implements Logger {
 
     private static final NoOpLogger INSTANCE = new NoOpLogger();
 
-    private NoOpLogger() {
-    }
+    private NoOpLogger() {}
 
     public static NoOpLogger getInstance() {
         return INSTANCE;

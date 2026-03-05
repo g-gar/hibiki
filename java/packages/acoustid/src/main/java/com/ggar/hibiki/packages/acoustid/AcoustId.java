@@ -1,9 +1,8 @@
 package com.ggar.hibiki.packages.acoustid;
 
 import com.ggar.hibiki.packages.acoustid.model.AcoustIdLookupResponse;
-import reactor.core.publisher.Mono;
-
 import java.io.InputStream;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point for the AcoustID module.

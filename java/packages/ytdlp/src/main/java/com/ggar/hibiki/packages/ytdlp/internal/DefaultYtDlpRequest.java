@@ -9,11 +9,10 @@ import com.ggar.hibiki.packages.ytdlp.model.Chapter;
 import com.ggar.hibiki.packages.ytdlp.model.MediaFormat;
 import com.ggar.hibiki.packages.ytdlp.model.VideoMetadata;
 import com.ggar.hibiki.packages.ytdlp.model.VideoSearchResult;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class DefaultYtDlpRequest implements YtDlpRequest {
 
@@ -26,8 +25,12 @@ public class DefaultYtDlpRequest implements YtDlpRequest {
     private boolean flatPlaylist = false;
     private Integer maxResults = null;
 
-    protected DefaultYtDlpRequest(String target, ProcessExecutor processExecutor, YtDlpProperties properties,
-            ObjectMapper objectMapper, Logger logger) {
+    protected DefaultYtDlpRequest(
+            String target,
+            ProcessExecutor processExecutor,
+            YtDlpProperties properties,
+            ObjectMapper objectMapper,
+            Logger logger) {
         this.target = target;
         this.processExecutor = processExecutor;
         this.properties = properties;
@@ -51,7 +54,8 @@ public class DefaultYtDlpRequest implements YtDlpRequest {
     public Flux<VideoSearchResult> execute() {
         List<String> args = buildArgs();
 
-        return processExecutor.execute(args, properties.getScratchpadDirectory())
+        return processExecutor
+                .execute(args, properties.getScratchpadDirectory())
                 .flatMap(line -> {
                     if (line == null || line.trim().isEmpty()) {
                         return Mono.empty();
@@ -76,7 +80,8 @@ public class DefaultYtDlpRequest implements YtDlpRequest {
             args.add("--no-playlist");
         }
 
-        return processExecutor.execute(args, properties.getScratchpadDirectory())
+        return processExecutor
+                .execute(args, properties.getScratchpadDirectory())
                 .next()
                 .flatMap(line -> {
                     try {
@@ -100,15 +105,19 @@ public class DefaultYtDlpRequest implements YtDlpRequest {
                             for (JsonNode formatNode : formatsNode) {
                                 try {
                                     MediaFormat format = MediaFormat.builder()
-                                            .formatId(formatNode.path("format_id").asText(null))
+                                            .formatId(
+                                                    formatNode.path("format_id").asText(null))
                                             .ext(formatNode.path("ext").asText(null))
-                                            .resolution(formatNode.path("resolution").asText(null))
+                                            .resolution(formatNode
+                                                    .path("resolution")
+                                                    .asText(null))
                                             .vcodec(formatNode.path("vcodec").asText(null))
                                             .acodec(formatNode.path("acodec").asText(null))
                                             .abr(formatNode.path("abr").asDouble(0.0))
                                             .vbr(formatNode.path("vbr").asDouble(0.0))
                                             .tbr(formatNode.path("tbr").asDouble(0.0))
-                                            .filesize(formatNode.path("filesize").asLong(0L))
+                                            .filesize(
+                                                    formatNode.path("filesize").asLong(0L))
                                             .build();
                                     formats.add(format);
                                 } catch (Exception e) {
@@ -165,5 +174,4 @@ public class DefaultYtDlpRequest implements YtDlpRequest {
         args.add(finalTarget);
         return args;
     }
-
 }

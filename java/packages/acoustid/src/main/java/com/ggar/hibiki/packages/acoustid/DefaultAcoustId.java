@@ -3,10 +3,9 @@ package com.ggar.hibiki.packages.acoustid;
 import com.ggar.hibiki.packages.acoustid.client.AcoustIdWebClient;
 import com.ggar.hibiki.packages.acoustid.fpcalc.FingerprintCalculator;
 import com.ggar.hibiki.packages.acoustid.model.AcoustIdLookupResponse;
+import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-
-import java.io.InputStream;
 
 /**
  * Default implementation of {@link AcoustId}.
@@ -20,9 +19,9 @@ public class DefaultAcoustId implements AcoustId {
 
     @Override
     public Mono<AcoustIdLookupResponse> lookupByStream(InputStream audioStream) {
-        return fingerprintCalculator.calculate(audioStream)
+        return fingerprintCalculator
+                .calculate(audioStream)
                 .flatMap(audioFingerprint -> acoustIdWebClient.lookupByFingerprint(
-                        audioFingerprint.getFingerprint(),
-                        audioFingerprint.getDurationSeconds()));
+                        audioFingerprint.getFingerprint(), audioFingerprint.getDurationSeconds()));
     }
 }

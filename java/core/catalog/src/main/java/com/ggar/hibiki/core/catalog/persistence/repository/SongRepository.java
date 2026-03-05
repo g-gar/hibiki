@@ -9,5 +9,4 @@ import reactor.core.publisher.Mono;
 public interface SongRepository extends ReactiveNeo4jRepository<SongEntity, String> {
 
     Mono<SongEntity> findByIsrc(String isrc);
-
 }

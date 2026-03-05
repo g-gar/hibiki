@@ -2,12 +2,11 @@ package com.ggar.hibiki.packages.acoustid.client;
 
 import com.ggar.hibiki.packages.acoustid.config.AcoustIdProperties;
 import com.ggar.hibiki.packages.acoustid.model.AcoustIdLookupResponse;
+import java.time.Duration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 /**
  * WebClient abstraction for querying the AcoustID API.
@@ -48,15 +47,15 @@ public class AcoustIdWebClient {
      * @return a {@link Mono} emitting the {@link AcoustIdLookupResponse}
      */
     public Mono<AcoustIdLookupResponse> lookupByFingerprint(String fingerprint, int durationSeconds) {
-        return Mono.delay(intervalBetweenRequests)
-                .flatMap(delay -> this.webClient.get()
-                        .uri(uriBuilder -> uriBuilder
-                                .queryParam("client", properties.getClientKey())
-                                .queryParam("duration", durationSeconds)
-                                .queryParam("fingerprint", fingerprint)
-                                .queryParam("meta", "recordings+isrcs")
-                                .build())
-                        .retrieve()
-                        .bodyToMono(AcoustIdLookupResponse.class));
+        return Mono.delay(intervalBetweenRequests).flatMap(delay -> this.webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("client", properties.getClientKey())
+                        .queryParam("duration", durationSeconds)
+                        .queryParam("fingerprint", fingerprint)
+                        .queryParam("meta", "recordings+isrcs")
+                        .build())
+                .retrieve()
+                .bodyToMono(AcoustIdLookupResponse.class));
     }
 }

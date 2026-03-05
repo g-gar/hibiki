@@ -9,11 +9,10 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import reactor.core.publisher.Mono;
-
-import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import javax.crypto.SecretKey;
+import reactor.core.publisher.Mono;
 
 /**
  * Concrete implementation of {@link JwtVerifier} using the JJWT library.

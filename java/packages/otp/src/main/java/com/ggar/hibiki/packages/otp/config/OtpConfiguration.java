@@ -4,16 +4,15 @@ import com.ggar.hibiki.packages.otp.generator.StandardTotpGenerator;
 import com.ggar.hibiki.packages.otp.generator.TotpGenerator;
 import com.ggar.hibiki.packages.otp.logging.Logger;
 import com.ggar.hibiki.packages.otp.logging.NoOpLogger;
+import com.ggar.hibiki.packages.otp.util.Base32SecretEncoder;
+import com.ggar.hibiki.packages.otp.util.SecretEncoder;
 import com.ggar.hibiki.packages.otp.verifier.StandardTotpVerifier;
 import com.ggar.hibiki.packages.otp.verifier.TotpVerifier;
-import com.ggar.hibiki.packages.otp.util.SecretEncoder;
-import com.ggar.hibiki.packages.otp.util.Base32SecretEncoder;
+import java.security.SecureRandom;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.security.SecureRandom;
 
 /**
  * Spring configuration class to instantiate the default generator, verifier,
@@ -37,8 +36,8 @@ public class OtpConfiguration {
     @Bean
     @ConditionalOnMissingBean(SecretEncoder.class)
     public SecretEncoder secretEncoder(
-            @Value("${hibiki.security.otp.base32.alphabet:" + Base32SecretEncoder.DEFAULT_ALPHABET
-                    + "}") String alphabet) {
+            @Value("${hibiki.security.otp.base32.alphabet:" + Base32SecretEncoder.DEFAULT_ALPHABET + "}")
+                    String alphabet) {
         return new Base32SecretEncoder(alphabet);
     }
 
@@ -52,8 +51,8 @@ public class OtpConfiguration {
             @Value("${hibiki.security.otp.algorithm:SHA1}") String algorithm,
             @Value("${hibiki.security.otp.digits:6}") int digits,
             @Value("${hibiki.security.otp.period:30}") int period) {
-        return new StandardTotpGenerator(secureRandom, logger, secretEncoder, secretLengthBytes, issuer, algorithm,
-                digits, period);
+        return new StandardTotpGenerator(
+                secureRandom, logger, secretEncoder, secretLengthBytes, issuer, algorithm, digits, period);
     }
 
     @Bean

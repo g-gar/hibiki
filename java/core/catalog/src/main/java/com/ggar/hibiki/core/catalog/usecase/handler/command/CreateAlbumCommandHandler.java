@@ -21,8 +21,10 @@ public class CreateAlbumCommandHandler implements CommandHandler<CreateAlbumComm
 
     @Override
     public Mono<Album> handle(CreateAlbumCommand command) {
-        return albumRepository.findByTitleIgnoreCaseAndArtistNameIgnoreCase(command.getTitle(), command.getArtistName())
-                .switchIfEmpty(Mono.defer(() -> artistRepository.findByNameIgnoreCase(command.getArtistName())
+        return albumRepository
+                .findByTitleIgnoreCaseAndArtistNameIgnoreCase(command.getTitle(), command.getArtistName())
+                .switchIfEmpty(Mono.defer(() -> artistRepository
+                        .findByNameIgnoreCase(command.getArtistName())
                         .flatMap(artist -> {
                             AlbumEntity album = new AlbumEntity(command.getTitle(), command.getReleaseYear());
                             album.setArtist(artist);

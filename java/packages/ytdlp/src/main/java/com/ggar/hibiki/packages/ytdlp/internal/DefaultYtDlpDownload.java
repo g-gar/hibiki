@@ -4,13 +4,12 @@ import com.ggar.hibiki.packages.ytdlp.builder.YtDlpDownload;
 import com.ggar.hibiki.packages.ytdlp.config.YtDlpProperties;
 import com.ggar.hibiki.packages.ytdlp.logging.Logger;
 import com.ggar.hibiki.packages.ytdlp.model.DownloadEvent;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class DefaultYtDlpDownload implements YtDlpDownload {
 
@@ -29,8 +28,8 @@ public class DefaultYtDlpDownload implements YtDlpDownload {
     private static final Pattern DESTINATION_PATTERN = Pattern.compile("\\[download\\] Destination: (.*)");
     private static final Pattern COMPLETED_PATTERN = Pattern.compile("\\[download\\] 100% of .* in .*");
 
-    protected DefaultYtDlpDownload(String url, ProcessExecutor processExecutor, YtDlpProperties properties,
-            Logger logger) {
+    protected DefaultYtDlpDownload(
+            String url, ProcessExecutor processExecutor, YtDlpProperties properties, Logger logger) {
         this.url = url;
         this.processExecutor = processExecutor;
         this.properties = properties;
@@ -71,7 +70,8 @@ public class DefaultYtDlpDownload implements YtDlpDownload {
     public Flux<DownloadEvent> executeTo(String targetDirectory) {
         List<String> args = buildArgs();
 
-        return processExecutor.execute(args, targetDirectory)
+        return processExecutor
+                .execute(args, targetDirectory)
                 .flatMap(line -> {
                     try {
                         return Mono.justOrEmpty(parseEvent(line));

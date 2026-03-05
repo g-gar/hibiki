@@ -5,10 +5,9 @@ import com.ggar.hibiki.core.orchestrator.devices.model.DeviceDTO;
 import com.ggar.hibiki.core.orchestrator.shared.BaseOrchestratorUseCase;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
 import com.ggar.hibiki.features.devices.usecase.query.GetDevicesQuery;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Service
 public class GetDevicesUseCase extends BaseOrchestratorUseCase {
@@ -21,7 +20,6 @@ public class GetDevicesUseCase extends BaseOrchestratorUseCase {
     }
 
     public Mono<List<DeviceDTO>> execute(String userId) {
-        return mediator.send(GetDevicesQuery.builder().userId(userId).build())
-                .map(mapper::toDtoList);
+        return mediator.send(GetDevicesQuery.builder().userId(userId).build()).map(mapper::toDtoList);
     }
 }

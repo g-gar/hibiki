@@ -49,5 +49,4 @@ public interface YtDlpRequest {
      * @return A Mono emitting the deeply parsed metadata.
      */
     Mono<VideoMetadata> executeForDeepMetadata();
-
 }

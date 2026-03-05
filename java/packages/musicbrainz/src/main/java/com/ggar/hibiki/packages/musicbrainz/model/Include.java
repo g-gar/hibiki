@@ -1,10 +1,9 @@
 package com.ggar.hibiki.packages.musicbrainz.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Defines all possible Include subqueries that can be passed to the API.

@@ -11,5 +11,4 @@ public interface ArtistRepository extends ReactiveNeo4jRepository<ArtistEntity, 
     Mono<ArtistEntity> findByNameIgnoreCase(String name);
 
     Mono<ArtistEntity> findByIsni(String isni);
-
 }

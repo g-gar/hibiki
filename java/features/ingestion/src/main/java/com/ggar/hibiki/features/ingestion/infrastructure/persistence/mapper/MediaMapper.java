@@ -10,8 +10,10 @@ import org.mapstruct.Mapper;
 public interface MediaMapper {
 
     Media toDomain(MediaEntity entity);
+
     MediaEntity toEntity(Media domain);
-    
+
     User toDomain(UserEntity entity);
+
     UserEntity toEntity(User domain);
 }

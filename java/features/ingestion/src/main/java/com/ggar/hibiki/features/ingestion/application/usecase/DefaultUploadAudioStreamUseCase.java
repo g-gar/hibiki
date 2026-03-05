@@ -8,13 +8,12 @@ import com.ggar.hibiki.features.ingestion.infrastructure.persistence.generator.U
 import com.ggar.hibiki.features.ingestion.infrastructure.s3.MinioClientWrapper;
 import com.ggar.hibiki.features.ingestion.infrastructure.tika.MediaTypeDetector;
 import com.ggar.hibiki.features.ingestion.logging.Logger;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * Implementation of the {@link UploadAudioStreamUseCase}.
@@ -31,9 +30,7 @@ public class DefaultUploadAudioStreamUseCase implements UploadAudioStreamUseCase
     private final MediaTypeDetector mediaTypeDetector;
 
     public DefaultUploadAudioStreamUseCase(
-            Logger logger,
-            MinioClientWrapper minioClientWrapper,
-            MediaRepository mediaRepository) {
+            Logger logger, MinioClientWrapper minioClientWrapper, MediaRepository mediaRepository) {
         this.logger = logger;
         this.minioClientWrapper = minioClientWrapper;
         this.mediaRepository = mediaRepository;
@@ -46,23 +43,24 @@ public class DefaultUploadAudioStreamUseCase implements UploadAudioStreamUseCase
         InputStream bufferedStream = new BufferedInputStream(content.getContentStream());
 
         return Mono.fromCallable(() -> {
-            UUID mediaId = idGenerator.generateId();
-            logger.info("Starting ingestion, generated Media ID: {}", mediaId);
+                    UUID mediaId = idGenerator.generateId();
+                    logger.info("Starting ingestion, generated Media ID: {}", mediaId);
 
-            bufferedStream.mark(64 * 1024);
-            String detectedMimeType = mediaTypeDetector.detect(bufferedStream, mediaId.toString());
-            bufferedStream.reset();
+                    bufferedStream.mark(64 * 1024);
+                    String detectedMimeType = mediaTypeDetector.detect(bufferedStream, mediaId.toString());
+                    bufferedStream.reset();
 
-            logger.info("Detected MIME type for {}: {}", mediaId, detectedMimeType);
+                    logger.info("Detected MIME type for {}: {}", mediaId, detectedMimeType);
 
-            return new Object[] { mediaId, detectedMimeType };
-        })
+                    return new Object[] {mediaId, detectedMimeType};
+                })
                 .flatMap(tuple -> {
                     UUID mediaId = (UUID) tuple[0];
                     String mimeType = (String) tuple[1];
                     long size = -1;
 
-                    return minioClientWrapper.uploadStream(mediaId.toString(), bufferedStream, size, mimeType)
+                    return minioClientWrapper
+                            .uploadStream(mediaId.toString(), bufferedStream, size, mimeType)
                             .doOnSuccess(v -> logger.info("Successfully uploaded stream for Media ID: {}", mediaId))
                             .thenReturn(tuple);
                 })
@@ -79,11 +77,14 @@ public class DefaultUploadAudioStreamUseCase implements UploadAudioStreamUseCase
                             .uploadedAt(Instant.now())
                             .uploadedBy(
                                     content.getUserId() != null
-                                            ? User.builder().id(UUID.fromString(content.getUserId())).build()
+                                            ? User.builder()
+                                                    .id(UUID.fromString(content.getUserId()))
+                                                    .build()
                                             : null)
                             .build();
 
-                    return mediaRepository.save(media)
+                    return mediaRepository
+                            .save(media)
                             .doOnSuccess(saved -> logger.info("Saved Media for ID: {}", saved.getId()))
                             .thenReturn(mediaId.toString());
                 })

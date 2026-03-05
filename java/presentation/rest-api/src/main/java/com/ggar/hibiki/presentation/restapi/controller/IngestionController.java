@@ -1,16 +1,14 @@
 package com.ggar.hibiki.presentation.restapi.controller;
 
 import com.ggar.hibiki.core.orchestrator.application.usecase.IngestAudioFileUseCase;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 
 /**
  * REST Controller responsible for handling ingestion boundaries.
@@ -27,7 +25,7 @@ public class IngestionController {
 
     /**
      * Uploads an audio stream.
-     * 
+     *
      * @param filePartMono The incoming multipart file.
      * @return Mono completing with the accepted response and the Media ID.
      */
@@ -40,34 +38,34 @@ public class IngestionController {
                 PipedOutputStream os = new PipedOutputStream();
                 PipedInputStream is = new PipedInputStream(os);
 
-                filePart.content().subscribe(
-                        dataBuffer -> {
-                            try {
-                                byte[] bytes = new byte[dataBuffer.readableByteCount()];
-                                dataBuffer.read(bytes);
-                                os.write(bytes);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        },
-                        error -> {
-                            try {
-                                os.close();
-                            } catch (Exception ignored) {
-                            }
-                        },
-                        () -> {
-                            try {
-                                os.close();
-                            } catch (Exception ignored) {
-                            }
-                        });
+                filePart.content()
+                        .subscribe(
+                                dataBuffer -> {
+                                    try {
+                                        byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                                        dataBuffer.read(bytes);
+                                        os.write(bytes);
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                },
+                                error -> {
+                                    try {
+                                        os.close();
+                                    } catch (Exception ignored) {
+                                    }
+                                },
+                                () -> {
+                                    try {
+                                        os.close();
+                                    } catch (Exception ignored) {
+                                    }
+                                });
 
-                IngestAudioFileUseCase.IngestAudioCommand command = new IngestAudioFileUseCase.IngestAudioCommand(
-                        is);
+                IngestAudioFileUseCase.IngestAudioCommand command = new IngestAudioFileUseCase.IngestAudioCommand(is);
 
-                return ingestAudioFileUseCase.handle(command)
-                        .map(id -> ResponseEntity.accepted().body("Ingestion started. Media ID: " + id));
+                return ingestAudioFileUseCase.handle(command).map(id -> ResponseEntity.accepted()
+                        .body("Ingestion started. Media ID: " + id));
 
             } catch (Exception e) {
                 return Mono.error(new RuntimeException("Error preparing stream", e));

@@ -2,11 +2,10 @@ package com.ggar.hibiki.features.ingestion.infrastructure.s3;
 
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import java.io.InputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.io.InputStream;
 
 /**
  * Infrastructure component interacting with the MinIO media storage.
@@ -43,14 +42,12 @@ public class MinioClientWrapper {
      */
     public Mono<Void> uploadStream(String objectKey, InputStream stream, long size, String contentType) {
         return Mono.fromCallable(() -> {
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(objectKey)
-                            .stream(stream, size, -1)
-                            .contentType(contentType)
-                            .build());
-            return null;
-        }).then();
+                    minioClient.putObject(
+                            PutObjectArgs.builder().bucket(bucketName).object(objectKey).stream(stream, size, -1)
+                                    .contentType(contentType)
+                                    .build());
+                    return null;
+                })
+                .then();
     }
 }

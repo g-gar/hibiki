@@ -2,12 +2,11 @@ package com.ggar.hibiki.core.catalog.model.command;
 
 import com.ggar.hibiki.core.catalog.model.domain.Song;
 import com.ggar.hibiki.core.shared.mediator.Command;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @Builder

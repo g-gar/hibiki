@@ -1,8 +1,7 @@
 package com.ggar.hibiki.features.ingestion.infrastructure.tika;
 
-import org.apache.tika.Tika;
-
 import java.io.InputStream;
+import org.apache.tika.Tika;
 
 /**
  * Wrapper for Apache Tika's media type detection capabilities.

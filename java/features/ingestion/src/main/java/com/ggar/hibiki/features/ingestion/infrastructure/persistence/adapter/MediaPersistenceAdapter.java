@@ -20,9 +20,6 @@ public class MediaPersistenceAdapter implements MediaRepository {
 
     @Override
     public Mono<Media> save(Media media) {
-        return Mono.just(media)
-                .map(mapper::toEntity)
-                .flatMap(repository::save)
-                .map(mapper::toDomain);
+        return Mono.just(media).map(mapper::toEntity).flatMap(repository::save).map(mapper::toDomain);
     }
 }

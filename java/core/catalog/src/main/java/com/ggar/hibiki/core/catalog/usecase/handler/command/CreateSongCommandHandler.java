@@ -24,7 +24,8 @@ public class CreateSongCommandHandler implements CommandHandler<CreateSongComman
 
     @Override
     public Mono<Song> handle(CreateSongCommand command) {
-        return songRepository.findByIsrc(command.getIsrc())
+        return songRepository
+                .findByIsrc(command.getIsrc())
                 .switchIfEmpty(Mono.defer(() -> createNewSong(command)))
                 .map(songMapper::toDomain);
     }
@@ -38,18 +39,21 @@ public class CreateSongCommandHandler implements CommandHandler<CreateSongComman
         song.setIsrc(command.getIsrc());
 
         // Resolve Album and Artists sequentially for simplicity
-        Mono<SongEntity> withAlbum = command.getAlbumTitle() != null && command.getArtistNames() != null
-                && !command.getArtistNames().isEmpty()
-                        ? albumRepository
-                                .findByTitleIgnoreCaseAndArtistNameIgnoreCase(command.getAlbumTitle(),
-                                        command.getArtistNames().get(0))
-                                .doOnNext(song::setAlbum)
-                                .thenReturn(song)
-                        : Mono.just(song);
+        Mono<SongEntity> withAlbum = command.getAlbumTitle() != null
+                        && command.getArtistNames() != null
+                        && !command.getArtistNames().isEmpty()
+                ? albumRepository
+                        .findByTitleIgnoreCaseAndArtistNameIgnoreCase(
+                                command.getAlbumTitle(),
+                                command.getArtistNames().get(0))
+                        .doOnNext(song::setAlbum)
+                        .thenReturn(song)
+                : Mono.just(song);
 
-        return withAlbum.flatMap(s -> Flux
-                .fromIterable(command.getArtistNames() != null ? command.getArtistNames()
-                        : java.util.Collections.<String>emptyList())
+        return withAlbum.flatMap(s -> Flux.fromIterable(
+                        command.getArtistNames() != null
+                                ? command.getArtistNames()
+                                : java.util.Collections.<String>emptyList())
                 .flatMap(artistRepository::findByNameIgnoreCase)
                 .collectList()
                 .doOnNext(song::setArtists)

@@ -18,18 +18,14 @@ public class UpdateSongCommandHandler implements CommandHandler<UpdateSongComman
 
     @Override
     public Mono<Song> handle(UpdateSongCommand command) {
-        return songRepository.findById(command.getId())
+        return songRepository
+                .findById(command.getId())
                 .flatMap(entity -> {
-                    if (command.getTitle() != null)
-                        entity.setTitle(command.getTitle());
-                    if (command.getFilePath() != null)
-                        entity.setFilePath(command.getFilePath());
-                    if (command.getDurationMs() != null)
-                        entity.setDurationMs(command.getDurationMs());
-                    if (command.getTrackNumber() != null)
-                        entity.setTrackNumber(command.getTrackNumber());
-                    if (command.getIsrc() != null)
-                        entity.setIsrc(command.getIsrc());
+                    if (command.getTitle() != null) entity.setTitle(command.getTitle());
+                    if (command.getFilePath() != null) entity.setFilePath(command.getFilePath());
+                    if (command.getDurationMs() != null) entity.setDurationMs(command.getDurationMs());
+                    if (command.getTrackNumber() != null) entity.setTrackNumber(command.getTrackNumber());
+                    if (command.getIsrc() != null) entity.setIsrc(command.getIsrc());
                     return songRepository.save(entity);
                 })
                 .map(songMapper::toDomain);

@@ -8,26 +8,20 @@ package com.ggar.hibiki.packages.jwt.logging;
 public class NoOpLogger implements Logger {
 
     @Override
-    public void debug(String message, Object... args) {
-    }
+    public void debug(String message, Object... args) {}
 
     @Override
-    public void info(String message, Object... args) {
-    }
+    public void info(String message, Object... args) {}
 
     @Override
-    public void warn(String message, Object... args) {
-    }
+    public void warn(String message, Object... args) {}
 
     @Override
-    public void warn(String message, Throwable t) {
-    }
+    public void warn(String message, Throwable t) {}
 
     @Override
-    public void error(String message, Object... args) {
-    }
+    public void error(String message, Object... args) {}
 
     @Override
-    public void error(String message, Throwable t) {
-    }
+    public void error(String message, Throwable t) {}
 }
