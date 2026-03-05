@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
  * Mediator command handler orchestrating the insertion of an audio file.
  */
 @Service
-public class IngestAudioFileUseCase implements CommandHandler<IngestAudioFileUseCase.IngestAudioCommand, Mono<String>> {
+public class IngestAudioFileUseCase implements CommandHandler<IngestAudioFileUseCase.IngestAudioCommand, String> {
 
     private final UploadAudioStreamUseCase uploadAudioStreamUseCase;
 
@@ -38,5 +38,5 @@ public class IngestAudioFileUseCase implements CommandHandler<IngestAudioFileUse
                 });
     }
 
-    public record IngestAudioCommand(InputStream inputStream) implements Command<Mono<String>> {}
+    public record IngestAudioCommand(InputStream inputStream) implements Command<String> {}
 }

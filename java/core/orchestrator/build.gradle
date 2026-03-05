@@ -12,10 +12,12 @@ dependencies {
     // Domain Modules we orchestrate
     implementation project(':core:identity')
     implementation project(':features:devices')
+    implementation project(':features:ingestion')
 
     // Add Spring Context for @Service annotations and Reactor Core for Mono/Flux
     implementation 'org.springframework:spring-context'
     implementation 'io.projectreactor:reactor-core'
+    implementation 'org.springframework.security:spring-security-core'
     // MapStruct
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
