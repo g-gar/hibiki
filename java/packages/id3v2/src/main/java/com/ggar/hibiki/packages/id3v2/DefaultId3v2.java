@@ -2,8 +2,6 @@ package com.ggar.hibiki.packages.id3v2;
 
 import com.ggar.hibiki.packages.id3v2.internal.Id3v2Reader;
 import com.ggar.hibiki.packages.id3v2.internal.Id3v2Writer;
-import com.ggar.hibiki.packages.id3v2.logging.Logger;
-import com.ggar.hibiki.packages.id3v2.logging.NoOpLogger;
 import com.ggar.hibiki.packages.id3v2.model.Id3v2Tag;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,16 +18,10 @@ public class DefaultId3v2 implements Id3v2 {
 
     private final Id3v2Reader reader;
     private final Id3v2Writer writer;
-    private final Logger logger;
 
     public DefaultId3v2() {
-        this(NoOpLogger.getInstance());
-    }
-
-    public DefaultId3v2(Logger logger) {
-        this.logger = logger;
-        this.reader = new Id3v2Reader(logger);
-        this.writer = new Id3v2Writer(logger);
+        this.reader = new Id3v2Reader();
+        this.writer = new Id3v2Writer();
     }
 
     @Override

@@ -1,7 +1,5 @@
 package com.ggar.hibiki.packages.id3v2.internal;
 
-import com.ggar.hibiki.packages.id3v2.logging.Logger;
-import com.ggar.hibiki.packages.id3v2.logging.NoOpLogger;
 import com.ggar.hibiki.packages.id3v2.model.Id3v2Frame;
 import com.ggar.hibiki.packages.id3v2.model.Id3v2Tag;
 import java.io.OutputStream;
@@ -10,30 +8,24 @@ import java.nio.channels.AsynchronousFileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 public class Id3v2Writer {
 
     private static final byte[] ID3_IDENTIFIER = {'I', 'D', '3'};
     private static final int HEADER_SIZE = 10;
     private static final int FRAME_HEADER_SIZE = 10;
 
-    private final Logger logger;
-
-    public Id3v2Writer() {
-        this(NoOpLogger.getInstance());
-    }
-
-    public Id3v2Writer(Logger logger) {
-        this.logger = logger;
-    }
+    public Id3v2Writer() {}
 
     public Mono<Void> writeTag(Path filePath, Id3v2Tag tag) {
-        logger.debug("Writing ID3 Tag to File path: {}", filePath);
+        log.debug("Writing ID3 Tag to File path: {}", filePath);
         return Mono.using(
                 () -> AsynchronousFileChannel.open(filePath, StandardOpenOption.WRITE, StandardOpenOption.CREATE),
                 channel -> DataBufferUtils.write(createBufferFlux(tag), channel).then(),
@@ -41,13 +33,13 @@ public class Id3v2Writer {
                     try {
                         channel.close();
                     } catch (Exception e) {
-                        logger.warn("Failed to close channel", e);
+                        log.warn("Failed to close channel", e);
                     }
                 });
     }
 
     public Mono<Void> writeTag(OutputStream outputStream, Id3v2Tag tag) {
-        logger.debug("Writing ID3 Tag to OutputStream");
+        log.debug("Writing ID3 Tag to OutputStream");
         return DataBufferUtils.write(createBufferFlux(tag), outputStream).then();
     }
 
@@ -108,7 +100,7 @@ public class Id3v2Writer {
                 }
             }
 
-            logger.info(
+            log.info(
                     "Successfully scheduled write of ID3v2.3.0 tag with {} frames and {} bytes",
                     frames.size(),
                     tagSize);

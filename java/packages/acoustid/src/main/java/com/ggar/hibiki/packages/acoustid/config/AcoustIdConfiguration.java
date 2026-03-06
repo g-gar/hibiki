@@ -6,7 +6,6 @@ import com.ggar.hibiki.packages.acoustid.DefaultAcoustId;
 import com.ggar.hibiki.packages.acoustid.client.AcoustIdWebClient;
 import com.ggar.hibiki.packages.acoustid.fpcalc.FingerprintCalculator;
 import com.ggar.hibiki.packages.acoustid.fpcalc.FpcalcFingerprintCalculator;
-import com.ggar.hibiki.packages.acoustid.logging.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -28,8 +27,8 @@ public class AcoustIdConfiguration {
      * @return a configured {@link FpcalcFingerprintCalculator}
      */
     @Bean
-    public FingerprintCalculator fingerprintCalculator(ObjectMapper objectMapper, Logger logger) {
-        return new FpcalcFingerprintCalculator(objectMapper, logger);
+    public FingerprintCalculator fingerprintCalculator(ObjectMapper objectMapper) {
+        return new FpcalcFingerprintCalculator(objectMapper);
     }
 
     /**

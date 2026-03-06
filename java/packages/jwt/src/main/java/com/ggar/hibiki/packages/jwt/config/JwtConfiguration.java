@@ -1,13 +1,10 @@
 package com.ggar.hibiki.packages.jwt.config;
 
-import com.ggar.hibiki.packages.jwt.logging.Logger;
-import com.ggar.hibiki.packages.jwt.logging.NoOpLogger;
 import com.ggar.hibiki.packages.jwt.signer.JjwtSigner;
 import com.ggar.hibiki.packages.jwt.signer.JwtSigner;
 import com.ggar.hibiki.packages.jwt.verifier.JjwtVerifier;
 import com.ggar.hibiki.packages.jwt.verifier.JwtVerifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,18 +14,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class JwtConfiguration {
-
-    /**
-     * Provides a default no-operation logger if no other {@link Logger} bean is
-     * defined in the application context.
-     *
-     * @return a {@link NoOpLogger} instance
-     */
-    @Bean
-    @ConditionalOnMissingBean(Logger.class)
-    public Logger defaultJwtLogger() {
-        return new NoOpLogger();
-    }
 
     /**
      * Provides a {@link JwtSigner} bean configured with the application secret and
@@ -42,9 +27,8 @@ public class JwtConfiguration {
     @Bean
     public JwtSigner jwtSigner(
             @Value("${hibiki.security.jwt.secret:defaultSecretForJwtGenerationMin256b}") String secret,
-            @Value("${hibiki.security.jwt.expiration:3600000}") long expirationTime,
-            Logger logger) {
-        return new JjwtSigner(secret, expirationTime, logger);
+            @Value("${hibiki.security.jwt.expiration:3600000}") long expirationTime) {
+        return new JjwtSigner(secret, expirationTime);
     }
 
     /**
@@ -56,7 +40,7 @@ public class JwtConfiguration {
      */
     @Bean
     public JwtVerifier jwtVerifier(
-            @Value("${hibiki.security.jwt.secret:defaultSecretForJwtGenerationMin256b}") String secret, Logger logger) {
-        return new JjwtVerifier(secret, logger);
+            @Value("${hibiki.security.jwt.secret:defaultSecretForJwtGenerationMin256b}") String secret) {
+        return new JjwtVerifier(secret);
     }
 }

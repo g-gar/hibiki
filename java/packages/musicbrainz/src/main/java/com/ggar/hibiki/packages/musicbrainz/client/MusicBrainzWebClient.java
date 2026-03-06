@@ -1,8 +1,8 @@
 package com.ggar.hibiki.packages.musicbrainz.client;
 
 import com.ggar.hibiki.packages.musicbrainz.config.MusicBrainzProperties;
-import com.ggar.hibiki.packages.musicbrainz.logging.Logger;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,21 +13,20 @@ import reactor.core.publisher.Mono;
  * Enforces the required rate limiting and HTTP headers (User-Agent, Accept:
  * application/json).
  */
+@Slf4j
 public class MusicBrainzWebClient {
 
     private final WebClient webClient;
     private final MusicBrainzProperties properties;
-    private final Logger logger;
 
-    public MusicBrainzWebClient(WebClient.Builder webClientBuilder, MusicBrainzProperties properties, Logger logger) {
+    public MusicBrainzWebClient(WebClient.Builder webClientBuilder, MusicBrainzProperties properties) {
         this.properties = properties;
-        this.logger = logger;
 
         String userAgent = Optional.ofNullable(properties.getUserAgent())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "musicbrainz.api.user-agent must be properly configured to avoid being blocked."));
 
-        logger.info("Initializing MusicBrainz WebClient with User-Agent: {}", userAgent);
+        log.info("Initializing MusicBrainz WebClient with User-Agent: {}", userAgent);
 
         this.webClient = webClientBuilder
                 .baseUrl(properties.getUrl())
@@ -47,7 +46,7 @@ public class MusicBrainzWebClient {
      * @return a {@link Mono} emitting the deserialized response body
      */
     public <T> Mono<T> get(String uri, Class<T> responseType) {
-        logger.debug("Executing MusicBrainz GET request to: {}", uri);
+        log.debug("Executing MusicBrainz GET request to: {}", uri);
         return webClient
                 .get()
                 .uri(uri)

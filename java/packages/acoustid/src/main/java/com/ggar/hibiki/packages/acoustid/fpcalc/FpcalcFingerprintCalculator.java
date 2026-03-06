@@ -2,10 +2,10 @@ package com.ggar.hibiki.packages.acoustid.fpcalc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ggar.hibiki.packages.acoustid.logging.Logger;
 import com.ggar.hibiki.packages.acoustid.model.AudioFingerprint;
 import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -15,10 +15,10 @@ import reactor.core.scheduler.Schedulers;
  * It pipes the {@link InputStream} into `fpcalc` and parses the JSON output.
  */
 @RequiredArgsConstructor
+@Slf4j
 public class FpcalcFingerprintCalculator implements FingerprintCalculator {
 
     private final ObjectMapper objectMapper;
-    private final Logger log;
 
     @Override
     public Mono<AudioFingerprint> calculate(InputStream audioStream) {

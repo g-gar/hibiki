@@ -1,9 +1,9 @@
 package com.ggar.hibiki.packages.otp.verifier;
 
 import com.ggar.hibiki.packages.otp.exception.OtpException;
-import com.ggar.hibiki.packages.otp.logging.Logger;
 import com.ggar.hibiki.packages.otp.util.SecretEncoder;
 import java.nio.ByteBuffer;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -16,9 +16,9 @@ import reactor.core.publisher.Mono;
  * Concrete reactive implementation of {@link TotpVerifier} based on RFC 6238
  * using BouncyCastle.
  */
+@Slf4j
 public class StandardTotpVerifier implements TotpVerifier {
 
-    private final Logger logger;
     private final SecretEncoder secretEncoder;
     private final String algorithm;
     private final int digits;
@@ -28,7 +28,6 @@ public class StandardTotpVerifier implements TotpVerifier {
     /**
      * Constructs a new {@link StandardTotpVerifier}.
      *
-     * @param logger        the logger instance
      * @param secretEncoder the secret encoder instance
      * @param algorithm     the algorithm to use (e.g., "SHA1", "SHA256", "SHA512")
      * @param digits        the number of digits in the OTP
@@ -36,9 +35,7 @@ public class StandardTotpVerifier implements TotpVerifier {
      * @param windowSize    the number of time steps (before and after) to check to
      *                      allow for clock drift
      */
-    public StandardTotpVerifier(
-            Logger logger, SecretEncoder secretEncoder, String algorithm, int digits, int period, int windowSize) {
-        this.logger = logger;
+    public StandardTotpVerifier(SecretEncoder secretEncoder, String algorithm, int digits, int period, int windowSize) {
         this.secretEncoder = secretEncoder;
         this.algorithm = algorithm;
         this.digits = digits;
@@ -51,7 +48,7 @@ public class StandardTotpVerifier implements TotpVerifier {
         return Mono.fromCallable(() -> {
             try {
                 if (code == null || code.length() != digits) {
-                    logger.debug(
+                    log.debug(
                             "Provided code length {} does not match expected digits {}",
                             code != null ? code.length() : 0,
                             digits);
@@ -64,15 +61,15 @@ public class StandardTotpVerifier implements TotpVerifier {
                 for (int i = -windowSize; i <= windowSize; i++) {
                     String generatedCode = generateTotp(decodedSecret, currentBucket + i);
                     if (generatedCode.equals(code)) {
-                        logger.debug("Code verified successfully at window offset {}", i);
+                        log.debug("Code verified successfully at window offset {}", i);
                         return true;
                     }
                 }
 
-                logger.debug("Code verification failed after checking {} window offsets", windowSize);
+                log.debug("Code verification failed after checking {} window offsets", windowSize);
                 return false;
             } catch (Exception e) {
-                logger.error("Failed to verify TOTP code", e);
+                log.error("Failed to verify TOTP code", e);
                 throw new OtpException("Failed to verify TOTP code", e);
             }
         });

@@ -1,7 +1,6 @@
 package com.ggar.hibiki.packages.jwt.signer;
 
 import com.ggar.hibiki.packages.jwt.exception.JwtException;
-import com.ggar.hibiki.packages.jwt.logging.Logger;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -9,28 +8,27 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.SecretKey;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 /**
  * Concrete implementation of {@link JwtSigner} using the JJWT library.
  */
+@Slf4j
 public class JjwtSigner implements JwtSigner {
 
     private final SecretKey key;
     private final long expirationTime;
-    private final Logger logger;
 
     /**
      * Constructs a new {@link JjwtSigner}.
      *
      * @param secret         the secret string to generate the HMAC key
      * @param expirationTime the token validity duration in milliseconds
-     * @param logger         the logger instance to use
      */
-    public JjwtSigner(String secret, long expirationTime, Logger logger) {
+    public JjwtSigner(String secret, long expirationTime) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expirationTime;
-        this.logger = logger;
     }
 
     @Override
@@ -52,7 +50,7 @@ public class JjwtSigner implements JwtSigner {
     public Mono<String> generateToken(String subject, Map<String, Object> claims, long expirationTime) {
         return Mono.fromCallable(() -> {
             try {
-                logger.debug("Generating JWT token for subject: {} with duration {} ms", subject, expirationTime);
+                log.debug("Generating JWT token for subject: {} with duration {} ms", subject, expirationTime);
                 Date now = new Date();
                 Date expiryDate = new Date(now.getTime() + expirationTime);
 
@@ -64,7 +62,7 @@ public class JjwtSigner implements JwtSigner {
                         .signWith(key)
                         .compact();
             } catch (Exception e) {
-                logger.error("Failed to generate JWT token for subject: {}", subject, e);
+                log.error("Failed to generate JWT token for subject: {}", subject, e);
                 throw new JwtException("Failed to generate JWT token", e);
             }
         });
