@@ -2,22 +2,21 @@ package com.ggar.hibiki.packages.ytdlp.internal;
 
 import com.ggar.hibiki.packages.ytdlp.builder.YtDlpDownload;
 import com.ggar.hibiki.packages.ytdlp.config.YtDlpProperties;
-import com.ggar.hibiki.packages.ytdlp.logging.Logger;
 import com.ggar.hibiki.packages.ytdlp.model.DownloadEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 public class DefaultYtDlpDownload implements YtDlpDownload {
 
     private final String url;
     private final ProcessExecutor processExecutor;
     private final YtDlpProperties properties;
-    private final Logger logger;
-
     private boolean extractAudio = false;
     private String audioFormat = null;
     private Integer audioQuality = null;
@@ -28,12 +27,10 @@ public class DefaultYtDlpDownload implements YtDlpDownload {
     private static final Pattern DESTINATION_PATTERN = Pattern.compile("\\[download\\] Destination: (.*)");
     private static final Pattern COMPLETED_PATTERN = Pattern.compile("\\[download\\] 100% of .* in .*");
 
-    protected DefaultYtDlpDownload(
-            String url, ProcessExecutor processExecutor, YtDlpProperties properties, Logger logger) {
+    protected DefaultYtDlpDownload(String url, ProcessExecutor processExecutor, YtDlpProperties properties) {
         this.url = url;
         this.processExecutor = processExecutor;
         this.properties = properties;
-        this.logger = logger;
     }
 
     @Override
@@ -76,12 +73,12 @@ public class DefaultYtDlpDownload implements YtDlpDownload {
                     try {
                         return Mono.justOrEmpty(parseEvent(line));
                     } catch (Exception e) {
-                        logger.error("Failed to parse yt-dlp download event line: " + line, e);
+                        log.error("Failed to parse yt-dlp download event line: " + line, e);
                         return Mono.empty();
                     }
                 })
-                .doOnSubscribe(subscription -> logger.info("Starting yt-dlp download: " + url))
-                .doOnComplete(() -> logger.info("Download completed successfully: " + url));
+                .doOnSubscribe(subscription -> log.info("Starting yt-dlp download: " + url))
+                .doOnComplete(() -> log.info("Download completed successfully: " + url));
     }
 
     private List<String> buildArgs() {

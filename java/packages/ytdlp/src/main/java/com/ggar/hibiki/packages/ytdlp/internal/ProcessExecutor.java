@@ -1,23 +1,20 @@
 package com.ggar.hibiki.packages.ytdlp.internal;
 
-import com.ggar.hibiki.packages.ytdlp.logging.Logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
  * Internal utility to execute OS processes and stream their output reactively.
  */
+@Slf4j
 public class ProcessExecutor {
 
-    private final Logger logger;
-
-    public ProcessExecutor(Logger logger) {
-        this.logger = logger;
-    }
+    public ProcessExecutor() {}
 
     /**
      * Executes a command and returns its standard output as a reactive stream of
@@ -37,7 +34,7 @@ public class ProcessExecutor {
                     processBuilder.directory(new File(workingDirectory));
                 }
 
-                logger.debug("Executing process: " + String.join(" ", command));
+                log.debug("Executing process: " + String.join(" ", command));
                 Process process = processBuilder.start();
 
                 // Consume stderr in a separate virtual/background thread to prevent blocking
@@ -47,10 +44,10 @@ public class ProcessExecutor {
                                             new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
                                         String line;
                                         while ((line = errorReader.readLine()) != null) {
-                                            logger.error("yt-dlp error: " + line);
+                                            log.error("yt-dlp error: " + line);
                                         }
                                     } catch (Exception e) {
-                                        logger.error("Failed to read process stderr", e);
+                                        log.error("Failed to read process stderr", e);
                                     }
                                 },
                                 "ytdlp-stderr-consumer-" + process.pid())

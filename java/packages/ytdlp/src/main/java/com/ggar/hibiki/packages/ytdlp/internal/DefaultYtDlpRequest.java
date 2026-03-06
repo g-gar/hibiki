@@ -4,38 +4,32 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ggar.hibiki.packages.ytdlp.builder.YtDlpRequest;
 import com.ggar.hibiki.packages.ytdlp.config.YtDlpProperties;
-import com.ggar.hibiki.packages.ytdlp.logging.Logger;
 import com.ggar.hibiki.packages.ytdlp.model.Chapter;
 import com.ggar.hibiki.packages.ytdlp.model.MediaFormat;
 import com.ggar.hibiki.packages.ytdlp.model.VideoMetadata;
 import com.ggar.hibiki.packages.ytdlp.model.VideoSearchResult;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 public class DefaultYtDlpRequest implements YtDlpRequest {
 
     private final String target;
     private final ProcessExecutor processExecutor;
     private final YtDlpProperties properties;
     private final ObjectMapper objectMapper;
-    private final Logger logger;
-
     private boolean flatPlaylist = false;
     private Integer maxResults = null;
 
     protected DefaultYtDlpRequest(
-            String target,
-            ProcessExecutor processExecutor,
-            YtDlpProperties properties,
-            ObjectMapper objectMapper,
-            Logger logger) {
+            String target, ProcessExecutor processExecutor, YtDlpProperties properties, ObjectMapper objectMapper) {
         this.target = target;
         this.processExecutor = processExecutor;
         this.properties = properties;
         this.objectMapper = objectMapper;
-        this.logger = logger;
     }
 
     @Override
@@ -65,7 +59,7 @@ public class DefaultYtDlpRequest implements YtDlpRequest {
                         VideoSearchResult result = objectMapper.readValue(line, VideoSearchResult.class);
                         return Mono.just(result);
                     } catch (Exception e) {
-                        logger.error("Failed to parse yt-dlp metadata line: " + line, e);
+                        log.error("Failed to parse yt-dlp metadata line: " + line, e);
                         return Mono.empty();
                     }
                 });
@@ -121,7 +115,7 @@ public class DefaultYtDlpRequest implements YtDlpRequest {
                                             .build();
                                     formats.add(format);
                                 } catch (Exception e) {
-                                    logger.error("Failed to parse format metadata: " + formatNode, e);
+                                    log.error("Failed to parse format metadata: " + formatNode, e);
                                 }
                             }
                         }
@@ -140,7 +134,7 @@ public class DefaultYtDlpRequest implements YtDlpRequest {
                                 .build();
                         return Mono.just(metadata);
                     } catch (Exception e) {
-                        logger.error("Failed to parse yt-dlp deep metadata JSON", e);
+                        log.error("Failed to parse yt-dlp deep metadata JSON", e);
                         return Mono.error(new RuntimeException("Failed to parse deep metadata", e));
                     }
                 });

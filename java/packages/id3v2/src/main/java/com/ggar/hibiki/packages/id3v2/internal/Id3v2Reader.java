@@ -1,7 +1,5 @@
 package com.ggar.hibiki.packages.id3v2.internal;
 
-import com.ggar.hibiki.packages.id3v2.logging.Logger;
-import com.ggar.hibiki.packages.id3v2.logging.NoOpLogger;
 import com.ggar.hibiki.packages.id3v2.model.Id3v2Frame;
 import com.ggar.hibiki.packages.id3v2.model.Id3v2Tag;
 import java.io.IOException;
@@ -11,30 +9,24 @@ import java.nio.channels.AsynchronousFileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 public class Id3v2Reader {
 
     private static final byte[] ID3_IDENTIFIER = {'I', 'D', '3'};
     private static final int HEADER_SIZE = 10;
     private static final int FRAME_HEADER_SIZE = 10;
 
-    private final Logger logger;
-
-    public Id3v2Reader() {
-        this(NoOpLogger.getInstance());
-    }
-
-    public Id3v2Reader(Logger logger) {
-        this.logger = logger;
-    }
+    public Id3v2Reader() {}
 
     public Mono<Id3v2Tag> readTag(Path filePath) {
-        logger.debug("Reading ID3 Tag from File path: {}", filePath);
+        log.debug("Reading ID3 Tag from File path: {}", filePath);
         return Mono.using(
                 () -> AsynchronousFileChannel.open(filePath, StandardOpenOption.READ),
                 channel -> parseTagFromBuffer(DataBufferUtils.readAsynchronousFileChannel(
@@ -49,13 +41,13 @@ public class Id3v2Reader {
     }
 
     public Mono<Id3v2Tag> readTag(InputStream inputStream) {
-        logger.debug("Reading ID3 Tag from InputStream");
+        log.debug("Reading ID3 Tag from InputStream");
         return parseTagFromBuffer(
                 DataBufferUtils.readInputStream(() -> inputStream, new DefaultDataBufferFactory(), 4096));
     }
 
     public Mono<Id3v2Tag> readTag(Flux<DataBuffer> data) {
-        logger.debug("Reading ID3 Tag from reactive DataBuffer stream");
+        log.debug("Reading ID3 Tag from reactive DataBuffer stream");
         return parseTagFromBuffer(data);
     }
 
@@ -109,17 +101,17 @@ public class Id3v2Reader {
                         buffer.read(frameData);
                         bytesRead += frameSize;
 
-                        logger.debug("Read frame {} with {} bytes", frameId, frameSize);
+                        log.debug("Read frame {} with {} bytes", frameId, frameSize);
                         Id3v2Frame frame = new Id3v2Frame(frameId, frameSize, frameFlags, frameData);
                         tag.addFrame(frame);
                     } else {
                         // Invalid frame size or not enough data
-                        logger.debug("Reached invalid frame size or end of stream at {} bytes read", bytesRead);
+                        log.debug("Reached invalid frame size or end of stream at {} bytes read", bytesRead);
                         break;
                     }
                 }
 
-                logger.info(
+                log.info(
                         "Successfully read ID3v2.3.0 tag with {} frames",
                         tag.getFrames().size());
                 return Mono.just(tag);
