@@ -1,0 +1,87 @@
+package com.ggar.hibiki.features.library.infrastructure.persistence.mapper;
+
+import com.ggar.hibiki.features.library.infrastructure.persistence.entity.AlbumEntity;
+import com.ggar.hibiki.features.library.infrastructure.persistence.entity.AlbumLibraryItemEntity;
+import com.ggar.hibiki.features.library.infrastructure.persistence.entity.ArtistEntity;
+import com.ggar.hibiki.features.library.infrastructure.persistence.entity.LibraryItemEntity;
+import com.ggar.hibiki.features.library.infrastructure.persistence.entity.PlaylistEntity;
+import com.ggar.hibiki.features.library.infrastructure.persistence.entity.PlaylistItemRelationship;
+import com.ggar.hibiki.features.library.infrastructure.persistence.entity.SongEntity;
+import com.ggar.hibiki.features.library.infrastructure.persistence.entity.SongLibraryItemEntity;
+import com.ggar.hibiki.features.library.infrastructure.persistence.entity.UserEntity;
+import com.ggar.hibiki.features.library.model.Album;
+import com.ggar.hibiki.features.library.model.AlbumLibraryItem;
+import com.ggar.hibiki.features.library.model.Artist;
+import com.ggar.hibiki.features.library.model.LibraryItem;
+import com.ggar.hibiki.features.library.model.Playlist;
+import com.ggar.hibiki.features.library.model.PlaylistItem;
+import com.ggar.hibiki.features.library.model.Song;
+import com.ggar.hibiki.features.library.model.SongLibraryItem;
+import com.ggar.hibiki.features.library.model.User;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+@Mapper(componentModel = "spring")
+public interface LibraryMapper {
+
+    // --- Domain to Entity ---
+
+    default LibraryItemEntity toEntity(LibraryItem domain) {
+        if (domain instanceof SongLibraryItem) {
+            return toEntity((SongLibraryItem) domain);
+        } else if (domain instanceof AlbumLibraryItem) {
+            return toEntity((AlbumLibraryItem) domain);
+        } else if (domain instanceof Playlist) {
+            return toEntity((Playlist) domain);
+        }
+        return null;
+    }
+
+    SongLibraryItemEntity toEntity(SongLibraryItem domain);
+
+    AlbumLibraryItemEntity toEntity(AlbumLibraryItem domain);
+
+    @Mapping(target = "items", source = "items")
+    PlaylistEntity toEntity(Playlist domain);
+
+    @Mapping(target = "song", source = "song")
+    PlaylistItemRelationship toRelationship(PlaylistItem domain);
+
+    UserEntity toEntity(User domain);
+
+    SongEntity toEntity(Song domain);
+
+    AlbumEntity toEntity(Album domain);
+
+    ArtistEntity toEntity(Artist domain);
+
+    // --- Entity to Domain ---
+
+    default LibraryItem toDomain(LibraryItemEntity entity) {
+        if (entity instanceof SongLibraryItemEntity) {
+            return toDomain((SongLibraryItemEntity) entity);
+        } else if (entity instanceof AlbumLibraryItemEntity) {
+            return toDomain((AlbumLibraryItemEntity) entity);
+        } else if (entity instanceof PlaylistEntity) {
+            return toDomain((PlaylistEntity) entity);
+        }
+        return null;
+    }
+
+    SongLibraryItem toDomain(SongLibraryItemEntity entity);
+
+    AlbumLibraryItem toDomain(AlbumLibraryItemEntity entity);
+
+    Playlist toDomain(PlaylistEntity entity);
+
+    @Mapping(target = "song", source = "song")
+    PlaylistItem toDomain(PlaylistItemRelationship relationship);
+
+    User toDomain(UserEntity entity);
+
+    Song toDomain(SongEntity entity);
+
+    Album toDomain(AlbumEntity entity);
+
+    Artist toDomain(ArtistEntity entity);
+}
