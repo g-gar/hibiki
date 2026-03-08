@@ -1,9 +1,9 @@
 package com.ggar.hibiki.features.ingestion.infrastructure.persistence.adapter;
 
-import com.ggar.hibiki.features.ingestion.domain.Media;
-import com.ggar.hibiki.features.ingestion.domain.port.MediaRepository;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.repository.ReactiveNeo4jMediaRepository;
+import com.ggar.hibiki.features.ingestion.model.Media;
+import com.ggar.hibiki.features.ingestion.port.MediaRepository;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
