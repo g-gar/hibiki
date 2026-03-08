@@ -3,7 +3,7 @@ package com.ggar.hibiki.core.orchestrator.devices;
 import com.ggar.hibiki.core.orchestrator.devices.model.RevokeDeviceRequestDTO;
 import com.ggar.hibiki.core.orchestrator.shared.BaseOrchestratorUseCase;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
-import com.ggar.hibiki.features.devices.usecase.command.RevokeDeviceCommand;
+import com.ggar.hibiki.features.devices.dto.RevokeDeviceCommand;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

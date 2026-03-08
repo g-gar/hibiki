@@ -1,5 +1,6 @@
 package com.ggar.hibiki.core.orchestrator.devices.model;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterDeviceRequestDTO {
-    private String userId;
-    private String deviceId;
+    private UUID userId;
+    private UUID deviceId;
     private String friendlyName;
     private String platform;
     private String appVersion;

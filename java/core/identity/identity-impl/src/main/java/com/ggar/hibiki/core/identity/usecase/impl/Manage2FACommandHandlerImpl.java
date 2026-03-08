@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.identity.usecase.impl;
 
-import com.ggar.hibiki.core.identity.model.TwoFactorRequest;
-import com.ggar.hibiki.core.identity.usecase.Manage2FACommandHandler;
+import com.ggar.hibiki.core.identity.dto.TwoFactorRequest;
+import com.ggar.hibiki.core.identity.service.Manage2FACommandHandler;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

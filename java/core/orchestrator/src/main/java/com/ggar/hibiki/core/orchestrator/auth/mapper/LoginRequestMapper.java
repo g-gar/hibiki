@@ -1,6 +1,6 @@
 package com.ggar.hibiki.core.orchestrator.auth.mapper;
 
-import com.ggar.hibiki.core.identity.model.LoginRequest;
+import com.ggar.hibiki.core.identity.dto.LoginRequest;
 import com.ggar.hibiki.core.orchestrator.auth.model.LoginRequestDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

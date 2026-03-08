@@ -9,6 +9,7 @@ import com.ggar.hibiki.core.orchestrator.devices.model.RevokeDeviceRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,7 @@ public class DeviceController {
 
     @GetMapping
     @Operation(summary = "Get all devices for a user")
-    public Mono<List<DeviceDTO>> getDevices(@RequestParam String userId) {
+    public Mono<List<DeviceDTO>> getDevices(@RequestParam UUID userId) {
         // In a real scenario, userId would come from the JWT context
         return getDevicesUseCase.execute(userId);
     }
@@ -45,7 +46,7 @@ public class DeviceController {
 
     @DeleteMapping("/{deviceId}")
     @Operation(summary = "Revoke a device")
-    public Mono<Void> revokeDevice(@PathVariable String deviceId, @RequestParam String userId) {
+    public Mono<Void> revokeDevice(@PathVariable UUID deviceId, @RequestParam UUID userId) {
         // In a real scenario, userId would come from the JWT context
         return revokeDeviceUseCase.execute(RevokeDeviceRequestDTO.builder()
                 .userId(userId)

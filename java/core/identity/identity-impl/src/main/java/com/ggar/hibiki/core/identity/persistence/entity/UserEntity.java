@@ -2,6 +2,7 @@ package com.ggar.hibiki.core.identity.persistence.entity;
 
 import com.ggar.hibiki.core.identity.persistence.generator.UuidV7IdGenerator;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -12,7 +13,7 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(UuidV7IdGenerator.class)
-    private String id;
+    private UUID id;
 
     @Property("username")
     private String username;
@@ -32,7 +33,7 @@ public class UserEntity {
     public UserEntity() {}
 
     public UserEntity(
-            String id, String username, String email, String password, Set<String> roles, boolean twoFactorEnabled) {
+            UUID id, String username, String email, String password, Set<String> roles, boolean twoFactorEnabled) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -41,11 +42,11 @@ public class UserEntity {
         this.twoFactorEnabled = twoFactorEnabled;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

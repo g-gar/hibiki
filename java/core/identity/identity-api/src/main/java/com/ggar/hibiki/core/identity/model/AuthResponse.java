@@ -1,5 +1,6 @@
 package com.ggar.hibiki.core.identity.model;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class AuthResponse {
     private String token;
     private String refreshToken;
-    private String userId;
+    private UUID userId;
     private String username;
 }

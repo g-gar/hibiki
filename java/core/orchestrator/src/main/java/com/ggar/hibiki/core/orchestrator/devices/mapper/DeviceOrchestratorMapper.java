@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.orchestrator.devices.mapper;
 
 import com.ggar.hibiki.core.orchestrator.devices.model.DeviceDTO;
-import com.ggar.hibiki.features.devices.domain.model.Device;
+import com.ggar.hibiki.features.devices.model.Device;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,8 +17,7 @@ public interface DeviceOrchestratorMapper {
     @Mapping(target = "appVersion", ignore = true)
     @Mapping(
             target = "isActive",
-            expression =
-                    "java(domain.getStatus() == com.ggar.hibiki.features.devices.domain.model.DeviceStatus.ACTIVE)")
+            expression = "java(domain.getStatus() == com.ggar.hibiki.features.devices.model.DeviceStatus.ACTIVE)")
     DeviceDTO toDto(Device domain);
 
     List<DeviceDTO> toDtoList(List<Device> list);

@@ -1,9 +1,9 @@
 package com.ggar.hibiki.core.identity.usecase.impl;
 
-import com.ggar.hibiki.core.identity.model.SignupRequest;
-import com.ggar.hibiki.core.identity.persistence.entity.UserEntity;
-import com.ggar.hibiki.core.identity.persistence.repository.UserRepository;
-import com.ggar.hibiki.core.identity.usecase.SignupCommandHandler;
+import com.ggar.hibiki.core.identity.dto.SignupRequest;
+import com.ggar.hibiki.core.identity.model.User;
+import com.ggar.hibiki.core.identity.port.UserRepository;
+import com.ggar.hibiki.core.identity.service.SignupCommandHandler;
 import java.util.Collections;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -26,13 +26,14 @@ public class SignupCommandHandlerImpl implements SignupCommandHandler {
                         .findByEmail(request.getEmail())
                         .flatMap(user -> Mono.error(new RuntimeException("Email already exists"))))
                 .then(Mono.defer(() -> {
-                    UserEntity entity = new UserEntity();
-                    entity.setUsername(request.getUsername());
-                    entity.setEmail(request.getEmail());
-                    entity.setPassword(request.getPassword()); // TODO: Hash password
-                    entity.setRoles(Collections.singleton("ROLE_USER"));
-                    entity.setTwoFactorEnabled(false);
-                    return userRepository.save(entity);
+                    User user = User.builder()
+                            .username(request.getUsername())
+                            .email(request.getEmail())
+                            .password(request.getPassword()) // TODO: Hash password
+                            .roles(Collections.singleton("ROLE_USER"))
+                            .twoFactorEnabled(false)
+                            .build();
+                    return userRepository.save(user);
                 }))
                 .then();
     }

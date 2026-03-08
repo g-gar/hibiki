@@ -2,6 +2,7 @@ package com.ggar.hibiki.features.devices.infrastructure.persistence.entity;
 
 import com.ggar.hibiki.features.devices.infrastructure.persistence.generator.UuidV7IdGenerator;
 import java.time.Instant;
+import java.util.UUID;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -12,10 +13,10 @@ public class DeviceEntity {
 
     @Id
     @GeneratedValue(UuidV7IdGenerator.class)
-    private String id;
+    private UUID id;
 
     @Property("userId")
-    private String userId;
+    private UUID userId;
 
     @Property("name")
     private String name;
@@ -41,8 +42,8 @@ public class DeviceEntity {
     public DeviceEntity() {}
 
     public DeviceEntity(
-            String id,
-            String userId,
+            UUID id,
+            UUID userId,
             String name,
             String type,
             String status,
@@ -61,19 +62,19 @@ public class DeviceEntity {
         this.lastSeenAt = lastSeenAt;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public String getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 

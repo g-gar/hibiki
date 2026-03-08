@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.identity.usecase.impl;
 
-import com.ggar.hibiki.core.identity.model.ValidateTokenQuery;
-import com.ggar.hibiki.core.identity.usecase.ValidateTokenQueryHandler;
+import com.ggar.hibiki.core.identity.dto.ValidateTokenQuery;
+import com.ggar.hibiki.core.identity.service.ValidateTokenQueryHandler;
 import com.ggar.hibiki.packages.jwt.verifier.JwtVerifier;
 import java.util.Map;
 import org.springframework.stereotype.Service;

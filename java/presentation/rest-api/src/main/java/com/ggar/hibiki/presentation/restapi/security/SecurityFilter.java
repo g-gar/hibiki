@@ -1,6 +1,6 @@
 package com.ggar.hibiki.presentation.restapi.security;
 
-import com.ggar.hibiki.core.identity.model.ValidateTokenQuery;
+import com.ggar.hibiki.core.identity.dto.ValidateTokenQuery;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;

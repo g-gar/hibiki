@@ -1,5 +1,6 @@
 package com.ggar.hibiki.core.orchestrator.devices.model;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RevokeDeviceRequestDTO {
-    private String userId;
-    private String deviceId;
+    private UUID userId;
+    private UUID deviceId;
 }

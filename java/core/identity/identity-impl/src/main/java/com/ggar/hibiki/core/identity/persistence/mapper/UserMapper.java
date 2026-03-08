@@ -9,5 +9,5 @@ import org.mapstruct.ReportingPolicy;
 public interface UserMapper {
     User toDomain(UserEntity entity);
 
-    UserEntity toEntity(User domain);
+    UserEntity toEntity(User user);
 }

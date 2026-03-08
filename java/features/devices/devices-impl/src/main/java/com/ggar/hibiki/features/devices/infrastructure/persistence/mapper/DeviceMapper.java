@@ -1,7 +1,7 @@
 package com.ggar.hibiki.features.devices.infrastructure.persistence.mapper;
 
-import com.ggar.hibiki.features.devices.domain.model.Device;
 import com.ggar.hibiki.features.devices.infrastructure.persistence.entity.DeviceEntity;
+import com.ggar.hibiki.features.devices.model.Device;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

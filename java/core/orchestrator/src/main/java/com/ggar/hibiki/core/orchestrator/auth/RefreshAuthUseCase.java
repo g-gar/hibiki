@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.orchestrator.auth;
 
+import com.ggar.hibiki.core.identity.dto.RefreshAuthRequest;
 import com.ggar.hibiki.core.identity.model.AuthResponse;
-import com.ggar.hibiki.core.identity.model.RefreshAuthRequest;
 import com.ggar.hibiki.core.orchestrator.auth.mapper.RefreshRequestMapper;
 import com.ggar.hibiki.core.orchestrator.auth.model.RefreshRequestDTO;
 import com.ggar.hibiki.core.orchestrator.shared.BaseOrchestratorUseCase;

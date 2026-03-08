@@ -5,8 +5,8 @@ import com.ggar.hibiki.core.orchestrator.devices.model.DeviceDTO;
 import com.ggar.hibiki.core.orchestrator.devices.model.RegisterDeviceRequestDTO;
 import com.ggar.hibiki.core.orchestrator.shared.BaseOrchestratorUseCase;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
-import com.ggar.hibiki.features.devices.domain.model.DeviceType;
-import com.ggar.hibiki.features.devices.usecase.command.RegisterDeviceCommand;
+import com.ggar.hibiki.features.devices.dto.RegisterDeviceCommand;
+import com.ggar.hibiki.features.devices.model.DeviceType;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

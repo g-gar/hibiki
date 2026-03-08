@@ -1,11 +1,12 @@
 package com.ggar.hibiki.core.identity.usecase.impl;
 
+import com.ggar.hibiki.core.identity.dto.RefreshAuthRequest;
 import com.ggar.hibiki.core.identity.model.AuthResponse;
-import com.ggar.hibiki.core.identity.model.RefreshAuthRequest;
-import com.ggar.hibiki.core.identity.usecase.RefreshAuthCommandHandler;
+import com.ggar.hibiki.core.identity.service.RefreshAuthCommandHandler;
 import com.ggar.hibiki.packages.jwt.signer.JwtSigner;
 import com.ggar.hibiki.packages.jwt.verifier.JwtVerifier;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -50,7 +51,7 @@ public class RefreshAuthCommandHandlerImpl implements RefreshAuthCommandHandler 
                     .map(tokens -> AuthResponse.builder()
                             .token(tokens.getT1())
                             .refreshToken(tokens.getT2())
-                            .userId(userId)
+                            .userId(UUID.fromString(userId))
                             .username("fetched_from_db_or_cache")
                             .build());
         });

@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.orchestrator.auth;
 
+import com.ggar.hibiki.core.identity.dto.LoginRequest;
 import com.ggar.hibiki.core.identity.model.AuthResponse;
-import com.ggar.hibiki.core.identity.model.LoginRequest;
 import com.ggar.hibiki.core.orchestrator.auth.mapper.LoginRequestMapper;
 import com.ggar.hibiki.core.orchestrator.auth.model.LoginRequestDTO;
 import com.ggar.hibiki.core.orchestrator.shared.BaseOrchestratorUseCase;

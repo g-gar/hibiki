@@ -1,16 +1,11 @@
 package com.ggar.hibiki.core.orchestrator.auth.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.UUID;
+import lombok.Value;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class LoginRequestDTO {
-    private String username;
-    private String password;
-    private String deviceId;
+    String username;
+    String password;
+    UUID deviceId;
 }

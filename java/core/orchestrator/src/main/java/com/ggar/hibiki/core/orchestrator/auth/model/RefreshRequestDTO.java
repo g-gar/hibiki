@@ -1,13 +1,10 @@
 package com.ggar.hibiki.core.orchestrator.auth.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.UUID;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class RefreshRequestDTO {
-    private String refreshToken;
-    private String deviceId;
+    String refreshToken;
+    UUID deviceId;
 }
