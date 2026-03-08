@@ -1,11 +1,11 @@
 package com.ggar.hibiki.presentation.restapi.controller;
 
 import com.ggar.hibiki.core.identity.model.AuthResponse;
-import com.ggar.hibiki.core.orchestrator.auth.LoginUseCase;
-import com.ggar.hibiki.core.orchestrator.auth.RefreshAuthUseCase;
-import com.ggar.hibiki.core.orchestrator.auth.model.LoginRequestDTO;
-import com.ggar.hibiki.core.orchestrator.auth.model.RefreshRequestDTO;
-import com.ggar.hibiki.core.orchestrator.auth.model.SignupRequestDTO;
+import com.ggar.hibiki.core.orchestrator.dto.LoginRequestDTO;
+import com.ggar.hibiki.core.orchestrator.dto.RefreshRequestDTO;
+import com.ggar.hibiki.core.orchestrator.dto.SignupRequestDTO;
+import com.ggar.hibiki.core.orchestrator.usecase.LoginUseCase;
+import com.ggar.hibiki.core.orchestrator.usecase.RefreshAuthUseCase;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
 import com.ggar.hibiki.presentation.restapi.mapper.AuthMapper;
 import org.springframework.web.bind.annotation.PostMapping;

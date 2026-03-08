@@ -1,7 +1,7 @@
 package com.ggar.hibiki.presentation.restapi.mapper;
 
 import com.ggar.hibiki.core.identity.dto.SignupRequest;
-import com.ggar.hibiki.core.orchestrator.auth.model.SignupRequestDTO;
+import com.ggar.hibiki.core.orchestrator.dto.SignupRequestDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

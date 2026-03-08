@@ -1,6 +1,7 @@
 package com.ggar.hibiki.presentation.restapi.controller;
 
-import com.ggar.hibiki.core.orchestrator.application.usecase.IngestAudioFileUseCase;
+import com.ggar.hibiki.core.orchestrator.dto.IngestAudioRequestDTO;
+import com.ggar.hibiki.core.orchestrator.usecase.IngestAudioFileUseCase;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import org.springframework.http.HttpStatus;
@@ -66,9 +67,10 @@ public class IngestionController {
                                     }
                                 });
 
-                IngestAudioFileUseCase.IngestAudioCommand command = new IngestAudioFileUseCase.IngestAudioCommand(is);
+                IngestAudioRequestDTO requestDTO =
+                        IngestAudioRequestDTO.builder().inputStream(is).build();
 
-                return ingestAudioFileUseCase.handle(command).map(id -> ResponseEntity.accepted()
+                return ingestAudioFileUseCase.execute(requestDTO).map(id -> ResponseEntity.accepted()
                         .body("Ingestion started. Media ID: " + id));
 
             } catch (Exception e) {

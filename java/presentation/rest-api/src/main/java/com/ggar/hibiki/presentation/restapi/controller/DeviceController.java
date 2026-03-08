@@ -1,11 +1,11 @@
 package com.ggar.hibiki.presentation.restapi.controller;
 
-import com.ggar.hibiki.core.orchestrator.devices.GetDevicesUseCase;
-import com.ggar.hibiki.core.orchestrator.devices.RegisterDeviceUseCase;
-import com.ggar.hibiki.core.orchestrator.devices.RevokeDeviceUseCase;
-import com.ggar.hibiki.core.orchestrator.devices.model.DeviceDTO;
-import com.ggar.hibiki.core.orchestrator.devices.model.RegisterDeviceRequestDTO;
-import com.ggar.hibiki.core.orchestrator.devices.model.RevokeDeviceRequestDTO;
+import com.ggar.hibiki.core.orchestrator.dto.DeviceDTO;
+import com.ggar.hibiki.core.orchestrator.dto.RegisterDeviceRequestDTO;
+import com.ggar.hibiki.core.orchestrator.dto.RevokeDeviceRequestDTO;
+import com.ggar.hibiki.core.orchestrator.usecase.GetDevicesUseCase;
+import com.ggar.hibiki.core.orchestrator.usecase.RegisterDeviceUseCase;
+import com.ggar.hibiki.core.orchestrator.usecase.RevokeDeviceUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
