@@ -1,8 +1,9 @@
 package com.ggar.hibiki.features.ingestion.pipeline;
 
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
+import com.ggar.hibiki.features.ingestion.model.MediaId;
+import com.ggar.hibiki.features.ingestion.model.UserId;
 import java.util.Map;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
@@ -16,10 +17,10 @@ import lombok.With;
 @Builder(toBuilder = true)
 @With
 public class IngestionContext {
-    UUID mediaId;
+    MediaId mediaId;
     String s3Key;
     String mimeType;
-    UUID userId;
+    UserId userId;
     IngestionPhase currentPhase;
 
     @Singular

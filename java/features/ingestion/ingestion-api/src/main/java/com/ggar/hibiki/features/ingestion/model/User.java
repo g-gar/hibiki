@@ -1,6 +1,5 @@
 package com.ggar.hibiki.features.ingestion.model;
 
-import java.util.UUID;
 import lombok.Value;
 
 /**
@@ -8,5 +7,5 @@ import lombok.Value;
  */
 @Value
 public class User {
-    UUID id;
+    UserId id;
 }

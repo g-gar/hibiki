@@ -2,7 +2,6 @@ package com.ggar.hibiki.features.ingestion.model;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
@@ -15,8 +14,8 @@ import lombok.With;
 @Builder(toBuilder = true)
 @With
 public class UploadSession {
-    UUID id;
-    UUID userId;
+    UploadSessionId id;
+    User userId;
     List<UploadItem> items;
     IngestionPhase phase;
     Instant createdAt;

@@ -1,7 +1,7 @@
 package com.ggar.hibiki.features.ingestion.port;
 
 import com.ggar.hibiki.features.ingestion.model.Media;
-import java.util.UUID;
+import com.ggar.hibiki.features.ingestion.model.MediaId;
 import reactor.core.publisher.Mono;
 
 /**
@@ -10,5 +10,5 @@ import reactor.core.publisher.Mono;
 public interface MediaRepository {
     Mono<Media> save(Media media);
 
-    Mono<Media> findById(UUID id);
+    Mono<Media> findById(MediaId id);
 }

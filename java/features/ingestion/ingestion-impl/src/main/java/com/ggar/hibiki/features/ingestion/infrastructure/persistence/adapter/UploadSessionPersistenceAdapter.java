@@ -3,8 +3,8 @@ package com.ggar.hibiki.features.ingestion.infrastructure.persistence.adapter;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.repository.ReactiveNeo4jUploadSessionRepository;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
+import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
-import java.util.UUID;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -28,12 +28,12 @@ public class UploadSessionPersistenceAdapter implements UploadSessionRepository 
     }
 
     @Override
-    public Mono<UploadSession> findById(UUID id) {
-        return repository.findById(id).map(mapper::toDomain);
+    public Mono<UploadSession> findById(UploadSessionId id) {
+        return repository.findById(id.getId()).map(mapper::toDomain);
     }
 
     @Override
-    public Mono<Void> deleteById(UUID id) {
-        return repository.deleteById(id);
+    public Mono<Void> deleteById(UploadSessionId id) {
+        return repository.deleteById(id.getId());
     }
 }

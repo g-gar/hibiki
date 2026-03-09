@@ -1,7 +1,6 @@
 package com.ggar.hibiki.features.ingestion.model;
 
 import java.time.Instant;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
@@ -13,7 +12,7 @@ import lombok.With;
 @Builder(toBuilder = true)
 @With
 public class Media {
-    UUID id;
+    MediaId id;
     String filename;
     String mimeType;
     MediaStatus status;

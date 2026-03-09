@@ -1,7 +1,8 @@
 package com.ggar.hibiki.features.ingestion.event;
 
 import com.ggar.hibiki.core.shared.event.DomainEvent;
-import java.util.UUID;
+import com.ggar.hibiki.features.ingestion.model.MediaId;
+import com.ggar.hibiki.features.ingestion.model.UserId;
 import lombok.Builder;
 import lombok.Value;
 
@@ -12,8 +13,8 @@ import lombok.Value;
 @Value
 @Builder
 public class MediaIngestedEvent implements DomainEvent {
-    UUID userId;
-    UUID mediaId;
+    UserId userId;
+    MediaId mediaId;
     String s3Key;
     String mimeType;
     String contentHash;

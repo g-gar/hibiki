@@ -1,7 +1,9 @@
 java/**/build
 java/**/.gradle
 
-*.class
-build/
-target/
-out/
+**/*.class
+**/build/
+**/target/
+**/out/
+**/local.properties
+**/gradle.properties.local

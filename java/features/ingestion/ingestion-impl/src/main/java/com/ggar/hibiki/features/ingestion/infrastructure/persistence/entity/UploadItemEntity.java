@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
+import org.springframework.data.neo4j.core.schema.Relationship;
 
 @Node("UploadItem")
 @Data
@@ -38,8 +39,8 @@ public class UploadItemEntity {
     @Property("phase")
     private String phase;
 
-    @Property("mediaId")
-    private UUID mediaId;
+    @Relationship(type = "HAS_MEDIA", direction = Relationship.Direction.OUTGOING)
+    private MediaEntity media;
 
     @Property("accumulatedHash")
     private String accumulatedHash;

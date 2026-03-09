@@ -1,7 +1,8 @@
 package com.ggar.hibiki.features.ingestion.event;
 
 import com.ggar.hibiki.core.shared.event.DomainEvent;
-import java.util.UUID;
+import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
+import com.ggar.hibiki.features.ingestion.model.UserId;
 import lombok.Builder;
 import lombok.Value;
 
@@ -12,6 +13,6 @@ import lombok.Value;
 @Value
 @Builder
 public class UploadCancelledEvent implements DomainEvent {
-    UUID userId;
-    UUID uploadSessionId;
+    UserId userId;
+    UploadSessionId uploadSessionId;
 }
