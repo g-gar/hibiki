@@ -1,0 +1,35 @@
+plugins {
+    id 'java-library'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
+ext {
+    mapstructVersion = "1.5.5.Final"
+}
+
+dependencies {
+    implementation project(':features:analysis:audio:audio-api')
+    implementation project(':features:ingestion:ingestion-api')
+    implementation project(':core:shared')
+    implementation project(':packages:uuid')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+    implementation 'org.springframework:spring-web'
+    implementation 'io.projectreactor:reactor-core'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
