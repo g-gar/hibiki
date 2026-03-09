@@ -6,7 +6,7 @@ echo "Running code formatting and style checks before push..."
 cd java || exit 1
 
 # Run spotlessCheck and checkstyleMain/checkstyleTest
-gradle spotlessCheck checkstyleMain checkstyleTest
+gradle spotlessApply checkstyleMain checkstyleTest
 STATUS=$?
 
 if [ $STATUS -ne 0 ]; then
