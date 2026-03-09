@@ -4,7 +4,9 @@ import com.ggar.hibiki.features.ingestion.dto.InitiateUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.ItemDescriptor;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
+import com.ggar.hibiki.features.ingestion.model.UploadItemId;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
+import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.User;
 import com.ggar.hibiki.features.ingestion.port.MediaStorage;
 import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
@@ -41,7 +43,7 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
         for (ItemDescriptor descriptor : command.getItems()) {
             int totalChunks = (int) Math.ceil((double) descriptor.getExpectedSize() / DEFAULT_CHUNK_SIZE);
             items.add(UploadItem.builder()
-                    .id(idGenerator.generate())
+                    .id(new UploadItemId(idGenerator.generate()))
                     .originalFilename(descriptor.getOriginalFilename())
                     .expectedSize(descriptor.getExpectedSize())
                     .totalChunks(totalChunks)
@@ -51,7 +53,7 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
         }
 
         UploadSession session = UploadSession.builder()
-                .id(sessionId)
+                .id(new UploadSessionId(sessionId))
                 .userId(new User(userId))
                 .items(items)
                 .phase(IngestionPhase.INITIATED)
@@ -59,8 +61,8 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
                 .build();
 
         return Flux.fromIterable(items)
-                .flatMap(item ->
-                        mediaStorage.initiateMultipartUpload(item.getId().toString()))
+                .flatMap(item -> mediaStorage.initiateMultipartUpload(
+                        item.getId().getId().toString()))
                 .then(uploadSessionRepository.save(session))
                 .doOnSuccess(saved -> log.info("Upload session {} created with {} items", sessionId, items.size()));
     }

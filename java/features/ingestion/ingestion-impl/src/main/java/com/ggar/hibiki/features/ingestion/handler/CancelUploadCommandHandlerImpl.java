@@ -33,7 +33,8 @@ public class CancelUploadCommandHandlerImpl implements CancelUploadCommandHandle
 
             return Flux.fromIterable(session.getItems())
                     .flatMap(item -> mediaStorage.abortMultipartUpload(
-                            item.getId().toString(), session.getId().toString()))
+                            item.getId().getId().toString(),
+                            session.getId().getId().toString()))
                     .then(uploadSessionRepository.save(session.withPhase(IngestionPhase.CANCELLED)))
                     .flatMap(s -> eventBus.publish(UploadCancelledEvent.builder()
                                     .userId(userId)

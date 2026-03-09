@@ -1,6 +1,5 @@
 package com.ggar.hibiki.features.ingestion.model;
 
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
 
@@ -10,10 +9,10 @@ import lombok.Value;
 @Value
 @Builder
 public class UploadProgress {
-    UUID uploadSessionId;
-    UUID itemId;
+    UploadSessionId uploadSessionId;
+    UploadItemId itemId;
     IngestionPhase phase;
     int progress;
-    UUID mediaId;
+    MediaId mediaId;
     String error;
 }

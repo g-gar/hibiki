@@ -1,6 +1,5 @@
 package com.ggar.hibiki.features.ingestion.model;
 
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
@@ -13,14 +12,14 @@ import lombok.With;
 @Builder(toBuilder = true)
 @With
 public class UploadItem {
-    UUID id;
+    UploadItemId id;
     String originalFilename;
     String mimeType;
     long expectedSize;
     int receivedChunks;
     int totalChunks;
     IngestionPhase phase;
-    UUID mediaId;
+    MediaId mediaId;
     String accumulatedHash;
     String error;
 }

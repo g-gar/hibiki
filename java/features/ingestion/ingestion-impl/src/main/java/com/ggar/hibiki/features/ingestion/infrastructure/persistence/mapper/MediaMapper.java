@@ -6,10 +6,15 @@ import com.ggar.hibiki.features.ingestion.infrastructure.persistence.entity.Uplo
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.entity.UserEntity;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.Media;
+import com.ggar.hibiki.features.ingestion.model.MediaId;
 import com.ggar.hibiki.features.ingestion.model.MediaStatus;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
+import com.ggar.hibiki.features.ingestion.model.UploadItemId;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
+import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.User;
+import com.ggar.hibiki.features.ingestion.model.UserId;
+import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -18,28 +23,38 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface MediaMapper {
 
+    @Mapping(target = "id", source = "id", qualifiedByName = "uuidToMediaId")
     @Mapping(target = "status", source = "status", qualifiedByName = "mediaStatusToDomain")
     Media toDomain(MediaEntity entity);
 
+    @Mapping(target = "id", source = "id", qualifiedByName = "mediaIdToUuid")
     @Mapping(target = "status", source = "status", qualifiedByName = "mediaStatusToEntity")
     MediaEntity toEntity(Media domain);
 
+    @Mapping(target = "id", source = "id", qualifiedByName = "uuidToUserId")
     User toDomain(UserEntity entity);
 
+    @Mapping(target = "id", source = "id", qualifiedByName = "userIdToUuid")
     UserEntity toEntity(User domain);
 
+    @Mapping(target = "id", source = "id", qualifiedByName = "uuidToUploadSessionId")
     @Mapping(target = "phase", source = "phase", qualifiedByName = "phaseToDomain")
     @Mapping(target = "userId", source = "user")
     UploadSession toDomain(UploadSessionEntity entity);
 
+    @Mapping(target = "id", source = "id", qualifiedByName = "uploadSessionIdToUuid")
     @Mapping(target = "phase", source = "phase", qualifiedByName = "phaseToEntity")
     @Mapping(target = "user", source = "userId")
     UploadSessionEntity toEntity(UploadSession domain);
 
+    @Mapping(target = "id", source = "id", qualifiedByName = "uuidToUploadItemId")
     @Mapping(target = "phase", source = "phase", qualifiedByName = "phaseToDomain")
+    @Mapping(target = "mediaId", source = "media", qualifiedByName = "mediaEntityToMediaId")
     UploadItem toDomain(UploadItemEntity entity);
 
+    @Mapping(target = "id", source = "id", qualifiedByName = "uploadItemIdToUuid")
     @Mapping(target = "phase", source = "phase", qualifiedByName = "phaseToEntity")
+    @Mapping(target = "media", source = "mediaId", qualifiedByName = "mediaIdToMediaEntity")
     UploadItemEntity toEntity(UploadItem domain);
 
     @Named("mediaStatusToDomain")
@@ -60,5 +75,55 @@ public interface MediaMapper {
     @Named("phaseToEntity")
     default String phaseToEntity(IngestionPhase phase) {
         return phase != null ? phase.name() : null;
+    }
+
+    @Named("mediaEntityToMediaId")
+    default MediaId mediaEntityToMediaId(MediaEntity entity) {
+        return entity != null ? new MediaId(entity.getId()) : null;
+    }
+
+    @Named("mediaIdToMediaEntity")
+    default MediaEntity mediaIdToMediaEntity(MediaId mediaId) {
+        return mediaId != null ? MediaEntity.builder().id(mediaId.getId()).build() : null;
+    }
+
+    @Named("uuidToMediaId")
+    default MediaId uuidToMediaId(UUID id) {
+        return id != null ? new MediaId(id) : null;
+    }
+
+    @Named("mediaIdToUuid")
+    default UUID mediaIdToUuid(MediaId id) {
+        return id != null ? id.getId() : null;
+    }
+
+    @Named("uuidToUserId")
+    default UserId uuidToUserId(UUID id) {
+        return id != null ? new UserId(id) : null;
+    }
+
+    @Named("userIdToUuid")
+    default UUID userIdToUuid(UserId id) {
+        return id != null ? id.getId() : null;
+    }
+
+    @Named("uuidToUploadSessionId")
+    default UploadSessionId uuidToUploadSessionId(UUID id) {
+        return id != null ? new UploadSessionId(id) : null;
+    }
+
+    @Named("uploadSessionIdToUuid")
+    default UUID uploadSessionIdToUuid(UploadSessionId id) {
+        return id != null ? id.getId() : null;
+    }
+
+    @Named("uuidToUploadItemId")
+    default UploadItemId uuidToUploadItemId(UUID id) {
+        return id != null ? new UploadItemId(id) : null;
+    }
+
+    @Named("uploadItemIdToUuid")
+    default UUID uploadItemIdToUuid(UploadItemId id) {
+        return id != null ? id.getId() : null;
     }
 }

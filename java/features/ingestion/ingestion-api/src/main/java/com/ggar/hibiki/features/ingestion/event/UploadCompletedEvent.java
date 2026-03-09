@@ -1,7 +1,9 @@
 package com.ggar.hibiki.features.ingestion.event;
 
 import com.ggar.hibiki.core.shared.event.DomainEvent;
-import java.util.UUID;
+import com.ggar.hibiki.features.ingestion.model.UploadItemId;
+import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
+import com.ggar.hibiki.features.ingestion.model.UserId;
 import lombok.Builder;
 import lombok.Value;
 
@@ -11,9 +13,9 @@ import lombok.Value;
 @Value
 @Builder
 public class UploadCompletedEvent implements DomainEvent {
-    UUID userId;
-    UUID uploadSessionId;
-    UUID itemId;
+    UserId userId;
+    UploadSessionId uploadSessionId;
+    UploadItemId itemId;
     String s3Key;
     String mimeType;
     long totalSize;

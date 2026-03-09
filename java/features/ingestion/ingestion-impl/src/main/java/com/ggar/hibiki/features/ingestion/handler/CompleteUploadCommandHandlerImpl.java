@@ -6,10 +6,12 @@ import com.ggar.hibiki.features.ingestion.event.MediaIngestedEvent;
 import com.ggar.hibiki.features.ingestion.event.UploadCompletedEvent;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.Media;
+import com.ggar.hibiki.features.ingestion.model.MediaId;
 import com.ggar.hibiki.features.ingestion.model.MediaStatus;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import com.ggar.hibiki.features.ingestion.model.User;
+import com.ggar.hibiki.features.ingestion.model.UserId;
 import com.ggar.hibiki.features.ingestion.pipeline.IngestionContext;
 import com.ggar.hibiki.features.ingestion.pipeline.IngestionPipeline;
 import com.ggar.hibiki.features.ingestion.port.MediaRepository;
@@ -46,7 +48,9 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
             return Flux.fromIterable(session.getItems())
                     .flatMap(item -> mediaStorage
                             .completeMultipartUpload(
-                                    item.getId().toString(), session.getId().toString(), List.of())
+                                    item.getId().getId().toString(),
+                                    session.getId().getId().toString(),
+                                    List.of())
                             .then(createAndPersistMedia(item, userId))
                             .flatMap(media -> runPipelineAndPublishEvents(media, item, session, userId)))
                     .then(uploadSessionRepository.save(
@@ -54,9 +58,9 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
         });
     }
 
-    private Mono<Media> createAndPersistMedia(UploadItem item, java.util.UUID userId) {
+    private Mono<Media> createAndPersistMedia(UploadItem item, UserId userId) {
         Media media = Media.builder()
-                .id(item.getId())
+                .id(new MediaId(item.getId().getId()))
                 .filename(item.getOriginalFilename())
                 .mimeType(item.getMimeType())
                 .status(MediaStatus.PENDING)
@@ -68,12 +72,11 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
         return mediaRepository.save(media);
     }
 
-    private Mono<Void> runPipelineAndPublishEvents(
-            Media media, UploadItem item, UploadSession session, java.util.UUID userId) {
+    private Mono<Void> runPipelineAndPublishEvents(Media media, UploadItem item, UploadSession session, UserId userId) {
 
         IngestionContext context = IngestionContext.builder()
                 .mediaId(media.getId())
-                .s3Key(item.getId().toString())
+                .s3Key(item.getId().getId().toString())
                 .mimeType(media.getMimeType())
                 .userId(userId)
                 .currentPhase(IngestionPhase.PROCESSING)
@@ -85,7 +88,7 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
                                 .userId(userId)
                                 .uploadSessionId(session.getId())
                                 .itemId(item.getId())
-                                .s3Key(item.getId().toString())
+                                .s3Key(item.getId().getId().toString())
                                 .mimeType(media.getMimeType())
                                 .totalSize(item.getExpectedSize())
                                 .build())
@@ -96,7 +99,7 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
                         .then(eventBus.publish(MediaIngestedEvent.builder()
                                 .userId(userId)
                                 .mediaId(media.getId())
-                                .s3Key(item.getId().toString())
+                                .s3Key(item.getId().getId().toString())
                                 .mimeType(media.getMimeType())
                                 .contentHash(media.getContentHash())
                                 .build()))
