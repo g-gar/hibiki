@@ -4,6 +4,7 @@ import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.Medi
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.repository.ReactiveNeo4jMediaRepository;
 import com.ggar.hibiki.features.ingestion.model.Media;
 import com.ggar.hibiki.features.ingestion.port.MediaRepository;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -21,5 +22,10 @@ public class MediaPersistenceAdapter implements MediaRepository {
     @Override
     public Mono<Media> save(Media media) {
         return Mono.just(media).map(mapper::toEntity).flatMap(repository::save).map(mapper::toDomain);
+    }
+
+    @Override
+    public Mono<Media> findById(UUID id) {
+        return repository.findById(id).map(mapper::toDomain);
     }
 }

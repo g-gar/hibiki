@@ -37,7 +37,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public Mono<Void> signup(@RequestBody SignupRequestDTO request) {
-        return mediator.send(authMapper.toDomain(request));
+        return Mono.from(mediator.send(authMapper.toDomain(request)));
     }
 
     @PostMapping("/login")

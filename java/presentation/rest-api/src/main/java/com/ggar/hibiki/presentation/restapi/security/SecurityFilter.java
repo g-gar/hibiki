@@ -36,7 +36,7 @@ public class SecurityFilter implements WebFilter {
 
         String token = authHeader.substring(BEARER_PREFIX.length());
 
-        return mediator.send(new ValidateTokenQuery(token))
+        return Mono.from(mediator.send(new ValidateTokenQuery(token)))
                 .flatMap(claims -> {
                     exchange.getAttributes().put("userClaims", claims);
                     exchange.getAttributes().put("userId", claims.get("sub"));

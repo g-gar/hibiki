@@ -14,10 +14,12 @@ dependencies {
     implementation project(':packages:uuid')
 
     implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+    implementation 'org.springframework:spring-web'
     implementation 'io.projectreactor:reactor-core'
-    
-    // Minio Client
-    implementation 'io.minio:minio:8.5.7'
+
+    // AWS S3 SDK v2 (works with any S3-compatible server: SeaweedFS, MinIO, Garage, Ceph)
+    implementation platform('software.amazon.awssdk:bom:2.25.11')
+    implementation 'software.amazon.awssdk:s3'
 
     // Apache Tika (for Media Type detection)
     implementation 'org.apache.tika:tika-core:2.9.1'

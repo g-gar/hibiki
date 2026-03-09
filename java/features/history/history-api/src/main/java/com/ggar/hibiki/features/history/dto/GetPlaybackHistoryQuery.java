@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import reactor.core.publisher.Flux;
 
 /**
  * Query to retrieve playback history with optional filters and pagination.
@@ -17,7 +16,7 @@ import reactor.core.publisher.Flux;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetPlaybackHistoryQuery implements Query<Flux<PlaybackHistoryEntry>> {
+public class GetPlaybackHistoryQuery implements Query<PlaybackHistoryEntry> {
     private UUID userId;
     private UUID songId;
     private UUID artistId;

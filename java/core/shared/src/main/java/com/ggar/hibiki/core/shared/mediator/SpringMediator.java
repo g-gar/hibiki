@@ -1,5 +1,6 @@
 package com.ggar.hibiki.core.shared.mediator;
 
+import org.reactivestreams.Publisher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Mono;
@@ -14,7 +15,7 @@ public class SpringMediator implements Mediator {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <R> Mono<R> send(Command<R> command) {
+    public <R> Publisher<R> send(Command<R> command) {
         String[] beanNames = applicationContext.getBeanNamesForType(
                 ResolvableType.forClassWithGenerics(CommandHandler.class, command.getClass(), Object.class));
 
@@ -34,7 +35,7 @@ public class SpringMediator implements Mediator {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <R> Mono<R> send(Query<R> query) {
+    public <R> Publisher<R> send(Query<R> query) {
         String[] beanNames = applicationContext.getBeanNamesForType(
                 ResolvableType.forClassWithGenerics(QueryHandler.class, query.getClass(), Object.class));
 

@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Implementation of the {@link GetPlaybackHistoryQueryHandler}.
@@ -21,7 +20,7 @@ public class GetPlaybackHistoryQueryHandlerImpl implements GetPlaybackHistoryQue
     private final PlaybackHistoryRepository repository;
 
     @Override
-    public Mono<Flux<PlaybackHistoryEntry>> handle(GetPlaybackHistoryQuery query) {
+    public Flux<PlaybackHistoryEntry> handle(GetPlaybackHistoryQuery query) {
         log.debug(
                 "Retrieving playback history for user: {}, page: {}, size: {}",
                 query.getUserId(),
@@ -30,11 +29,11 @@ public class GetPlaybackHistoryQueryHandlerImpl implements GetPlaybackHistoryQue
 
         if (query.getUserId() == null) {
             log.warn("Attempted to retrieve history with null userId");
-            return Mono.just(Flux.empty());
+            return Flux.empty();
         }
-        return Mono.just(repository
+        return repository
                 .findByUserId(query.getUserId())
                 .skip((long) query.getPage() * query.getSize())
-                .take(query.getSize()));
+                .take(query.getSize());
     }
 }

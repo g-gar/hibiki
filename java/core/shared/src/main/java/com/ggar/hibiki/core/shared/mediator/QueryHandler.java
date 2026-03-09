@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.shared.mediator;
 
-import reactor.core.publisher.Mono;
+import org.reactivestreams.Publisher;
 
 public interface QueryHandler<Q extends Query<R>, R> {
-    Mono<R> handle(Q query);
+    Publisher<R> handle(Q query);
 }
