@@ -5,6 +5,7 @@ import com.ggar.hibiki.features.ingestion.dto.ItemDescriptor;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
+import com.ggar.hibiki.features.ingestion.model.User;
 import com.ggar.hibiki.features.ingestion.port.MediaStorage;
 import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
 import com.ggar.hibiki.features.ingestion.service.InitiateUploadCommandHandler;
@@ -51,7 +52,7 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
 
         UploadSession session = UploadSession.builder()
                 .id(sessionId)
-                .userId(userId)
+                .userId(new User(userId))
                 .items(items)
                 .phase(IngestionPhase.INITIATED)
                 .createdAt(Instant.now())

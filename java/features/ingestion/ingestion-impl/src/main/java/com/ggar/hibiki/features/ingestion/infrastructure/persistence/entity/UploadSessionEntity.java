@@ -23,8 +23,8 @@ public class UploadSessionEntity {
     @Id
     private UUID id;
 
-    @Property("userId")
-    private UUID userId;
+    @Relationship(type = "OWNS", direction = Relationship.Direction.INCOMING)
+    private UserEntity user;
 
     @Property("phase")
     private String phase;

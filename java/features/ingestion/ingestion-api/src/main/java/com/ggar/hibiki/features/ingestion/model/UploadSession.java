@@ -16,7 +16,7 @@ import lombok.With;
 @With
 public class UploadSession {
     UUID id;
-    UUID userId;
+    User userId;
     List<UploadItem> items;
     IngestionPhase phase;
     Instant createdAt;

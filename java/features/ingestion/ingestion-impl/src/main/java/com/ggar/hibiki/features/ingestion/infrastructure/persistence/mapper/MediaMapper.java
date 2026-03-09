@@ -29,9 +29,11 @@ public interface MediaMapper {
     UserEntity toEntity(User domain);
 
     @Mapping(target = "phase", source = "phase", qualifiedByName = "phaseToDomain")
+    @Mapping(target = "userId", source = "user")
     UploadSession toDomain(UploadSessionEntity entity);
 
     @Mapping(target = "phase", source = "phase", qualifiedByName = "phaseToEntity")
+    @Mapping(target = "user", source = "userId")
     UploadSessionEntity toEntity(UploadSession domain);
 
     @Mapping(target = "phase", source = "phase", qualifiedByName = "phaseToDomain")
