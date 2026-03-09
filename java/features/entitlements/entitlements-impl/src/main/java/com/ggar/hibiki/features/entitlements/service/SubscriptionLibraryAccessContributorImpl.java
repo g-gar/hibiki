@@ -1,19 +1,18 @@
 package com.ggar.hibiki.features.entitlements.service;
 
+import com.ggar.hibiki.features.entitlements.port.SubscriptionLibraryAccessContributor;
 import com.ggar.hibiki.features.library.model.AccessIntent;
 import com.ggar.hibiki.features.library.model.User;
-import com.ggar.hibiki.features.library.port.LibraryAccessContributor;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 
 /**
- * Example implementation of LibraryAccessContributor for subscription-based filtering.
- * This module is decoupled from library's persistence (Neo4j).
+ * Implementation of SubscriptionLibraryAccessContributor.
  */
 @Service
-public class SubscriptionLibraryAccessContributor implements LibraryAccessContributor {
+public class SubscriptionLibraryAccessContributorImpl implements SubscriptionLibraryAccessContributor {
 
     @Override
     public List<AccessIntent> getAccessIntents(User user) {
