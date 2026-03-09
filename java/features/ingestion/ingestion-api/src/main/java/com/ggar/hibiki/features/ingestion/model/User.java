@@ -1,20 +1,12 @@
 package com.ggar.hibiki.features.ingestion.model;
 
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
 /**
- * Represents a user within the ingestion domain context.
- *
- * <p>Typically used to associate ingested media with the user who initiated the upload.
+ * Immutable user identity for ingestion operations.
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class User {
-    private UUID id;
+    UUID id;
 }

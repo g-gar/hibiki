@@ -2,27 +2,22 @@ package com.ggar.hibiki.features.ingestion.model;
 
 import java.time.Instant;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
+import lombok.With;
 
 /**
- * Represents an ingested media file within the system.
- *
- * <p>Stores metadata about the uploaded file such as its MIME type, size, upload timestamp,
- * and the user who uploaded it.
+ * Immutable domain model representing a persisted media file.
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
+@Builder(toBuilder = true)
+@With
 public class Media {
-    private UUID id;
-    private String filename;
-    private String mimeType;
-    private Long size;
-    private String status;
-    private Instant uploadedAt;
-    private User uploadedBy;
+    UUID id;
+    String filename;
+    String mimeType;
+    MediaStatus status;
+    String contentHash;
+    Instant uploadedAt;
+    User uploadedBy;
 }

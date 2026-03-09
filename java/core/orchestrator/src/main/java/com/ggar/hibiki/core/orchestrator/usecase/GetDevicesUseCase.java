@@ -20,6 +20,7 @@ public class GetDevicesUseCase extends BaseOrchestratorUseCase {
     }
 
     public Mono<List<DeviceDTO>> execute(UUID userId) {
-        return mediator.send(GetDevicesQuery.builder().userId(userId).build()).map(mapper::toDtoList);
+        return Mono.from(mediator.send(GetDevicesQuery.builder().userId(userId).build()))
+                .map(mapper::toDtoList);
     }
 }

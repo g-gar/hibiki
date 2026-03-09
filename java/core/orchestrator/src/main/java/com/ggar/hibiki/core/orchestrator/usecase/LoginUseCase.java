@@ -29,7 +29,7 @@ public class LoginUseCase extends BaseOrchestratorUseCase {
         LoginRequest loginCommand = mapper.toCommand(requestDto, ip, userAgent);
 
         // Step 1: Execute Login Command (Validates credentials and generates tokens)
-        return mediator.send(loginCommand).flatMap(authResponse -> {
+        return Mono.from(mediator.send(loginCommand)).flatMap(authResponse -> {
             // Step 2: Validate Device (Requires user ID from the response)
             ValidateDeviceLoginQuery deviceQuery = ValidateDeviceLoginQuery.builder()
                     .userId(authResponse.getUserId())
@@ -40,7 +40,7 @@ public class LoginUseCase extends BaseOrchestratorUseCase {
 
             // Chain the checks: if device validation passes, return the original
             // authResponse
-            return mediator.send(deviceQuery).thenReturn(authResponse);
+            return Mono.from(mediator.send(deviceQuery)).thenReturn(authResponse);
         });
     }
 }
