@@ -101,7 +101,7 @@ sequenceDiagram
     participant EV as EventBus (Shared)
     
     %% Fase 1 - Subida Rápida
-    rect rgb(200, 220, 240)
+    rect rgba(0, 128, 255, 0.1)
         Note over C, EV: Fase 1: Subida del Binario al Servidor (Upload)
         C->>Ctrl: POST /api/v1/ingestion (Multipart File)
         Ctrl->>Orch: execute(filename, flux<DataBuffer>)
@@ -130,7 +130,7 @@ sequenceDiagram
     participant MWC as WebhookController (Rest API)
     participant Meta as Metadata (Módulo)
     
-    rect rgb(240, 230, 200)
+    rect rgba(255, 165, 0, 0.15)
         Note over C, Meta: Fase 2: Fingerprinting Serverless
         S3-)+Lam: S3 ObjectCreated Event Trigger
         Lam->>Lam: Lee archivo y ejecuta "fpcalc"
@@ -143,7 +143,7 @@ sequenceDiagram
     %% Fase 3 - Orquestación Final
     participant Ext as AcoustID / MusicBrainz
     
-    rect rgb(220, 240, 200)
+    rect rgba(0, 200, 100, 0.1)
         Note over Orch, Ext: Fase 3: Resolución de Metadata y Catálogo
         EV-)+Orch: Listen(FingerprintCalculatedEvent)
         
