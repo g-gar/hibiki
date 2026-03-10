@@ -5,7 +5,170 @@
 
 ---
 
-## 1. Architecture Overview
+## 1. Arquitectura de Ingestión y Procesamiento de Archivos de Audio
+
+Este documento detalla el diseño arquitectónico (Clases y Secuencia) del proceso por el cual `Hibiki` recibe y procesa archivos de audio. El diseño se basa en **Clean Architecture**, el patrón **CQRS** (Command Query Responsibility Segregation) a través de un `Mediator`, y una escalabilidad basada en **Serverless** mediante AWS Lambda para procesos pesados de CPU como el cálculo de huellas digitales de audio.
+
+### Diagrama de Clases (Componentes Principales)
+
+El siguiente diagrama muestra los componentes involucrados en el flujo, separados por sus módulos lógicos. Muestra la inyección de dependencias y los Command/Handlers que cada módulo expone.
+
+```mermaid
+classDiagram
+    %% Core Orchestrator
+    namespace CoreOrchestrator {
+        class IngestAudioFileUseCase {
+            +execute(identityContext, filename, Flux~DataBuffer~) Mono~String~
+        }
+    }
+
+    %% Presentation Layer
+    namespace PresentationRestApi {
+        class IngestionController {
+            +uploadAudio(FilePart) Mono~ResponseEntity~
+        }
+        class FingerprintWebhookController {
+            +handleAcoustIdCallback(WebhookRequest) Mono~ResponseEntity~
+        }
+    }
+
+    %% Features Ingestion API / Impl
+    namespace FeaturesIngestion {
+        class InitiateUploadCommand
+        class UploadChunkCommand
+        class CompleteUploadCommand
+        class InitiateUploadCommandHandlerImpl
+        class UploadChunkCommandHandlerImpl
+        class CompleteUploadCommandHandlerImpl
+    }
+    
+    %% Features Metadata API / Impl
+    namespace FeaturesMetadata {
+        class HandleFingerprintCalculatedCommand
+        class FetchMetadataCommand
+        class FetchMetadataCommandHandlerImpl
+        class HandleFingerprintCalculatedCommandHandler
+        class MapToId3Command
+        class MapToId3CommandHandlerImpl
+    }
+    
+    %% Event Bus & Mediator
+    namespace SharedCore {
+        class Mediator {
+            +send(Command) Mono~T~
+        }
+        class EventBus {
+            +publish(DomainEvent) void
+        }
+        class MediaIngestedEvent
+        class FingerprintCalculatedEvent
+    }
+
+    IngestionController --> IngestAudioFileUseCase : usa
+    FingerprintWebhookController --> Mediator : envía
+    
+    IngestAudioFileUseCase --> Mediator : envía
+    
+    Mediator --> InitiateUploadCommandHandlerImpl : resuelve
+    Mediator --> UploadChunkCommandHandlerImpl : resuelve
+    Mediator --> CompleteUploadCommandHandlerImpl : resuelve
+    
+    Mediator --> HandleFingerprintCalculatedCommandHandler : resuelve
+    Mediator --> FetchMetadataCommandHandlerImpl : resuelve
+    Mediator --> MapToId3CommandHandlerImpl : resuelve
+    
+    CompleteUploadCommandHandlerImpl --> EventBus : publica
+    HandleFingerprintCalculatedCommandHandler --> EventBus : publica
+    
+    EventBus ..> MediaIngestedEvent : propaga
+    EventBus ..> FingerprintCalculatedEvent : propaga
+```
+
+### Diagrama de Flujo y Secuencia (End-to-End)
+
+El flujo de ingestión está profundamente dividido en dos fases para garantizar la resiliencia y el escalado:
+1. **Fase Síncrona (Ingestión Rápida)**: El cliente envía los bytes, el Orchestrator coordina con Ingestion para guardarlos en S3 y se finaliza la sesión HTTP devolviendo un identificador (`sessionId`), liberando recursos inmediatamente.
+2. **Fase Serverless + Background (Procesamiento Asíncrono)**: El archivo físico dispara un evento (ej. Lambda S3 Trigger) que ejecuta `fpcalc`. Posteriormente, la red de módulos internos (Metadata, Catalog...) se comunican mediante Eventos y el Orchestrator para extraer, transformar y persistir los detalles del álbum y de la canción.
+
+```mermaid
+sequenceDiagram
+    participant C as Cliente (Frontend)
+    participant Ctrl as IngestionController (Rest API)
+    participant Orch as IngestAudioFileUseCase (Orchestrator)
+    participant Med as Mediator (CQRS)
+    participant Ing as Ingestion (Módulo)
+    participant S3 as AWS S3 / Local Disk
+    participant EV as EventBus (Shared)
+    
+    %% Fase 1 - Subida Rápida
+    rect rgb(200, 220, 240)
+        Note over C, EV: Fase 1: Subida del Binario al Servidor (Upload)
+        C->>Ctrl: POST /api/v1/ingestion (Multipart File)
+        Ctrl->>Orch: execute(filename, flux<DataBuffer>)
+        
+        Orch->>Med: send(InitiateUploadCommand)
+        Med->>Ing: InitiateUploadCommandHandlerImpl
+        Ing-->>Orch: UploadSession (ID: 123)
+        
+        Orch->>Med: send(UploadChunkCommand(flux))
+        Med->>Ing: UploadChunkCommandHandlerImpl
+        Ing->>S3: Escribe flujo de bytes
+        S3-->>Ing: Guardado OK
+        Ing-->>Orch: Progreso/OK
+        
+        Orch->>Med: send(CompleteUploadCommand)
+        Med->>Ing: CompleteUploadCommandHandlerImpl
+        Ing->>EV: publish(MediaIngestedEvent)
+        Ing-->>Orch: UploadSession finalizada
+        
+        Orch-->>Ctrl: sessionId: 123
+        Ctrl-->>C: 202 Accepted (mediaId: 123)
+    end
+    
+    %% Fase 2 - Procesamiento Serverless
+    participant Lam as AWS Lambda (fpcalc)
+    participant MWC as WebhookController (Rest API)
+    participant Meta as Metadata (Módulo)
+    
+    rect rgb(240, 230, 200)
+        Note over C, Meta: Fase 2: Fingerprinting Serverless
+        S3-)+Lam: S3 ObjectCreated Event Trigger
+        Lam->>Lam: Lee archivo y ejecuta "fpcalc"
+        Lam->>MWC: POST /api/v1/metadata/webhooks/fingerprint
+        MWC->>Med: send(HandleFingerprintCalculatedCommand)
+        Med->>Meta: HandleFingerprintCalculatedCommandHandler
+        Meta->>EV: publish(FingerprintCalculatedEvent)
+    end
+    
+    %% Fase 3 - Orquestación Final
+    participant Ext as AcoustID / MusicBrainz
+    
+    rect rgb(220, 240, 200)
+        Note over Orch, Ext: Fase 3: Resolución de Metadata y Catálogo
+        EV-)+Orch: Listen(FingerprintCalculatedEvent)
+        
+        Orch->>Med: send(FetchMetadataCommand)
+        Med->>Meta: FetchMetadataCommandHandlerImpl
+        Meta->>Ext: lookupByFingerprint (AcoustID)
+        Ext-->>Meta: ISRC (e.g., USSM19902636)
+        Meta->>Ext: lookupByIsrc (MusicBrainz)
+        Ext-->>Meta: IsrcResponse (Canción, Álbum, Artista)
+        Meta-->>Orch: FetchMetadataResult
+        
+        Orch->>Med: send(MapToId3Command)
+        Med->>Meta: MapToId3CommandHandlerImpl
+        Meta-->>Orch: Id3Result (Tags Normalizados)
+        
+        Orch->>Med: send(CreateCatalogItemsCommand) (TODO)
+        Orch->>Med: send(AddSongToLibraryCommand) (TODO)
+        
+        Orch--)-C: PUSH [SSE Notification: READY]
+    end
+```
+
+---
+
+## 2. Legacy Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────┐
