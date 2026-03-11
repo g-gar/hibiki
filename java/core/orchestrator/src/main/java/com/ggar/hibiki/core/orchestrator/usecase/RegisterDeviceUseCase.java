@@ -5,11 +5,7 @@ import com.ggar.hibiki.core.orchestrator.dto.RegisterDeviceRequestDTO;
 import com.ggar.hibiki.core.orchestrator.mapper.DeviceOrchestratorMapper;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
 import com.ggar.hibiki.features.devices.dto.RegisterDeviceCommand;
-import com.ggar.hibiki.features.devices.model.DeviceId;
 import com.ggar.hibiki.features.devices.model.DeviceType;
-import com.ggar.hibiki.features.devices.model.IdentityContext;
-import com.ggar.hibiki.features.devices.model.User;
-import com.ggar.hibiki.features.devices.model.UserId;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -33,13 +29,9 @@ public class RegisterDeviceUseCase extends BaseOrchestratorUseCase {
             }
         }
 
-        var identityContext = IdentityContext.builder()
-                .user(User.builder().id(UserId.of(request.getUserId())).build())
-                .build();
-
         RegisterDeviceCommand command = RegisterDeviceCommand.builder()
-                .identityContext(identityContext)
-                .id(request.getDeviceId() != null ? DeviceId.of(request.getDeviceId()) : null)
+                .id(request.getDeviceId())
+                .userId(request.getUserId())
                 .name(request.getFriendlyName())
                 .type(type)
                 .build();

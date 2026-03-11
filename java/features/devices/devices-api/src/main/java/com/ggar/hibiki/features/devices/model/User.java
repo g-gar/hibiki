@@ -3,21 +3,19 @@ package com.ggar.hibiki.features.devices.model;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.With;
+import lombok.Value;
 import lombok.experimental.FieldDefaults;
 
 /**
  * Domain representation of a user within the devices module.
  * Helps in defining clean relationships between devices and users.
  */
-@Data
-@Builder(toBuilder = true)
-@With
-@NoArgsConstructor
+@Value
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder(toBuilder = true)
 public class User {
     /**
      * Unique identifier for the user.

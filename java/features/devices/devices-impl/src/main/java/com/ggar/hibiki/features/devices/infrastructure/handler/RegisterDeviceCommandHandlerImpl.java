@@ -2,7 +2,9 @@ package com.ggar.hibiki.features.devices.infrastructure.handler;
 
 import com.ggar.hibiki.features.devices.dto.RegisterDeviceCommand;
 import com.ggar.hibiki.features.devices.model.Device;
+import com.ggar.hibiki.features.devices.model.DeviceId;
 import com.ggar.hibiki.features.devices.model.DeviceStatus;
+import com.ggar.hibiki.features.devices.model.UserId;
 import com.ggar.hibiki.features.devices.port.DeviceRepository;
 import com.ggar.hibiki.features.devices.service.RegisterDeviceCommandHandler;
 import java.time.Instant;
@@ -27,8 +29,10 @@ public class RegisterDeviceCommandHandlerImpl implements RegisterDeviceCommandHa
 
     @Override
     public Mono<Device> handle(RegisterDeviceCommand command) {
-        return deviceRepository
-                .findById(command.getId())
+        DeviceId deviceId = command.getId() != null ? DeviceId.of(command.getId()) : null;
+        Mono<Device> deviceMono = deviceId != null ? deviceRepository.findById(deviceId) : Mono.empty();
+
+        return deviceMono
                 .flatMap(existingDevice -> {
                     if (existingDevice.getStatus() == DeviceStatus.REVOKED) {
                         return Mono.<Device>error(new RuntimeException(
@@ -43,8 +47,8 @@ public class RegisterDeviceCommandHandlerImpl implements RegisterDeviceCommandHa
                 })
                 .switchIfEmpty(Mono.defer(() -> {
                     Device newDevice = Device.builder()
-                            .id(command.getId())
-                            .userId(command.getIdentityContext().getUser().getId())
+                            .id(deviceId != null ? deviceId : DeviceId.of(java.util.UUID.randomUUID()))
+                            .userId(UserId.of(command.getUserId()))
                             .name(command.getName())
                             .type(command.getType())
                             .status(DeviceStatus.ACTIVE)

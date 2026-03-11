@@ -1,7 +1,9 @@
 package com.ggar.hibiki.features.devices.infrastructure.handler;
 
 import com.ggar.hibiki.features.devices.dto.ValidateDeviceLoginQuery;
+import com.ggar.hibiki.features.devices.model.DeviceId;
 import com.ggar.hibiki.features.devices.model.DeviceStatus;
+import com.ggar.hibiki.features.devices.model.UserId;
 import com.ggar.hibiki.features.devices.port.DeviceRepository;
 import com.ggar.hibiki.features.devices.service.ValidateDeviceLoginQueryHandler;
 import java.time.Instant;
@@ -27,25 +29,21 @@ public class ValidateDeviceLoginQueryHandlerImpl implements ValidateDeviceLoginQ
 
     @Override
     public Mono<Boolean> handle(ValidateDeviceLoginQuery query) {
-        log.info(
-                "Validating device login for user {} and device {}",
-                query.getIdentityContext().getUser().getId(),
-                query.getDeviceId());
+        UserId userId = UserId.of(query.getUserId());
+        DeviceId deviceId = DeviceId.of(query.getDeviceId());
+
+        log.info("Validating device login for user {} and device {}", userId, deviceId);
 
         return deviceRepository
-                .findById(query.getDeviceId())
+                .findById(deviceId)
                 .flatMap(device -> {
                     if (device.getStatus() == DeviceStatus.REVOKED) {
-                        log.warn("Login attempt on revoked device: {}", query.getDeviceId());
+                        log.warn("Login attempt on revoked device: {}", deviceId);
                         return Mono.error(new RuntimeException("Device is revoked"));
                     }
 
-                    if (!device.getUserId()
-                            .equals(query.getIdentityContext().getUser().getId())) {
-                        log.warn(
-                                "Device {} does not belong to user {}",
-                                query.getDeviceId(),
-                                query.getIdentityContext().getUser().getId());
+                    if (!device.getUserId().equals(userId)) {
+                        log.warn("Device {} does not belong to user {}", deviceId, userId);
                         return Mono.error(new RuntimeException("Device ownership mismatch"));
                     }
 

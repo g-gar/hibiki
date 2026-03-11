@@ -2,28 +2,32 @@ package com.ggar.hibiki.features.devices.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Command;
 import com.ggar.hibiki.features.devices.model.Device;
-import com.ggar.hibiki.features.devices.model.DeviceId;
 import com.ggar.hibiki.features.devices.model.DeviceType;
-import com.ggar.hibiki.features.devices.model.IdentityContext;
+import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Value;
-import lombok.With;
+import lombok.experimental.FieldDefaults;
 
 /**
  * Command to register a new device for a user.
  */
 @Value
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Builder(toBuilder = true)
-@With
 public class RegisterDeviceCommand implements Command<Device> {
     /**
      * Unique identifier for the device (optional, generated if null).
      */
-    DeviceId id;
+    UUID id;
     /**
-     * User identity context.
+     * User identity identifier.
      */
-    IdentityContext identityContext;
+    UUID userId;
     /**
      * Human-readable name given to the device.
      */

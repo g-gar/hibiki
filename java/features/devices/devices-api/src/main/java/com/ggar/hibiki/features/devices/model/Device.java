@@ -1,16 +1,21 @@
 package com.ggar.hibiki.features.devices.model;
 
 import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Value;
-import lombok.With;
+import lombok.experimental.FieldDefaults;
 
 /**
  * Domain representation of a device registered in the system.
  */
 @Value
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Builder(toBuilder = true)
-@With
 public class Device {
     /**
      * Unique identifier for the device.

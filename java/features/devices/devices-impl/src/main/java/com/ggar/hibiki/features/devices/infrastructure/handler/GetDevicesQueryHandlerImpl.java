@@ -27,7 +27,7 @@ public class GetDevicesQueryHandlerImpl implements GetDevicesQueryHandler {
 
     @Override
     public Mono<List<Device>> handle(GetDevicesQuery query) {
-        UserId userId = query.getIdentityContext().getUser().getId();
+        UserId userId = UserId.of(query.getUserId());
         log.info("Fetching devices for user {}", userId);
 
         return deviceRepository.findByUserId(userId).collectList();

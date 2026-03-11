@@ -1,27 +1,31 @@
 package com.ggar.hibiki.features.devices.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Query;
-import com.ggar.hibiki.features.devices.model.DeviceId;
-import com.ggar.hibiki.features.devices.model.IdentityContext;
+import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Value;
-import lombok.With;
+import lombok.experimental.FieldDefaults;
 
 /**
  * Query to validate if a device login is authorized for a specific user.
  */
 @Value
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Builder(toBuilder = true)
-@With
 public class ValidateDeviceLoginQuery implements Query<Boolean> {
     /**
-     * User identity context.
+     * User identity identifier.
      */
-    IdentityContext identityContext;
+    UUID userId;
     /**
      * Identifier of the device attempting to login.
      */
-    DeviceId deviceId;
+    UUID deviceId;
     /**
      * IP address of the login attempt.
      */
