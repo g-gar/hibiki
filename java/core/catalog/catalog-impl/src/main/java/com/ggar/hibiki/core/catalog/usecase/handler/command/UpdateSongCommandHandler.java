@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.catalog.usecase.handler.command;
 
+import com.ggar.hibiki.core.catalog.dto.SongDto;
 import com.ggar.hibiki.core.catalog.dto.UpdateSongCommand;
-import com.ggar.hibiki.core.catalog.model.Song;
 import com.ggar.hibiki.core.catalog.persistence.mapper.SongMapper;
 import com.ggar.hibiki.core.catalog.persistence.repository.SongRepository;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;
@@ -11,13 +11,13 @@ import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
-public class UpdateSongCommandHandler implements CommandHandler<UpdateSongCommand, Song> {
+public class UpdateSongCommandHandler implements CommandHandler<UpdateSongCommand, SongDto> {
 
     private final SongRepository songRepository;
     private final SongMapper songMapper;
 
     @Override
-    public Mono<Song> handle(UpdateSongCommand command) {
+    public Mono<SongDto> handle(UpdateSongCommand command) {
         return songRepository
                 .findById(command.getId())
                 .flatMap(entity -> {
@@ -28,6 +28,6 @@ public class UpdateSongCommandHandler implements CommandHandler<UpdateSongComman
                     if (command.getIsrc() != null) entity.setIsrc(command.getIsrc());
                     return songRepository.save(entity);
                 })
-                .map(songMapper::toDomain);
+                .map(songMapper::toDto);
     }
 }

@@ -1,10 +1,7 @@
 package com.ggar.hibiki.features.ingestion.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Command;
-import com.ggar.hibiki.features.ingestion.model.IdentityContext;
-import com.ggar.hibiki.features.ingestion.model.UploadItemId;
-import com.ggar.hibiki.features.ingestion.model.UploadProgress;
-import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
+import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.Builder;
 import lombok.Value;
@@ -17,10 +14,10 @@ import reactor.core.publisher.Flux;
  */
 @Value
 @Builder
-public class UploadChunkCommand implements Command<UploadProgress> {
-    IdentityContext identityContext;
-    UploadSessionId uploadSessionId;
-    UploadItemId itemId;
+public class UploadChunkCommand implements Command<UploadProgressDto> {
+    UUID userId;
+    UUID uploadSessionId;
+    UUID itemId;
     int chunkIndex;
     Flux<DataBuffer> content;
 

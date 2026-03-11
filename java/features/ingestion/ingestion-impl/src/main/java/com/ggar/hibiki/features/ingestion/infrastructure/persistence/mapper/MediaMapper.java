@@ -1,5 +1,7 @@
 package com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper;
 
+import com.ggar.hibiki.features.ingestion.dto.UploadProgressDto;
+import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.entity.MediaEntity;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.entity.UploadItemEntity;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.entity.UploadSessionEntity;
@@ -10,6 +12,7 @@ import com.ggar.hibiki.features.ingestion.model.MediaId;
 import com.ggar.hibiki.features.ingestion.model.MediaStatus;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadItemId;
+import com.ggar.hibiki.features.ingestion.model.UploadProgress;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.User;
@@ -57,6 +60,43 @@ public interface MediaMapper {
     @Mapping(target = "media", source = "mediaId", qualifiedByName = "mediaIdToMediaEntity")
     UploadItemEntity toEntity(UploadItem domain);
 
+    // --- Domain to DTO ---
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "mapUploadSessionIdToString")
+    @Mapping(target = "userId", source = "userId", qualifiedByName = "mapUserToUserIdString")
+    UploadSessionDto toDto(UploadSession domain);
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "mapUploadItemIdToString")
+    @Mapping(target = "originalFilename", source = "originalFilename")
+    @Mapping(target = "expectedSize", source = "expectedSize")
+    @Mapping(target = "phase", source = "phase")
+    UploadSessionDto.UploadItemDto toDto(UploadItem domain);
+
+    @Mapping(target = "uploadSessionId", source = "uploadSessionId")
+    @Mapping(target = "itemId", source = "itemId")
+    @Mapping(target = "mediaId", source = "mediaId")
+    UploadProgressDto toDto(UploadProgress domain);
+
+    @Named("mapUploadSessionIdToString")
+    default String mapUploadSessionIdToString(UploadSessionId value) {
+        return value != null ? value.getId().toString() : null;
+    }
+
+    @Named("mapUploadItemIdToString")
+    default String mapUploadItemIdToString(UploadItemId value) {
+        return value != null ? value.getId().toString() : null;
+    }
+
+    @Named("mapMediaIdToString")
+    default String mapMediaIdToString(MediaId value) {
+        return value != null ? value.getId().toString() : null;
+    }
+
+    @Named("mapUserToUserIdString")
+    default String mapUserToUserIdString(User value) {
+        return (value != null && value.getId() != null) ? value.getId().getId().toString() : null;
+    }
+
     @Named("mediaStatusToDomain")
     default MediaStatus mediaStatusToDomain(String status) {
         return status != null ? MediaStatus.valueOf(status) : null;
@@ -79,7 +119,7 @@ public interface MediaMapper {
 
     @Named("mediaEntityToMediaId")
     default MediaId mediaEntityToMediaId(MediaEntity entity) {
-        return entity != null ? new MediaId(entity.getId()) : null;
+        return entity != null ? MediaId.of(entity.getId()) : null;
     }
 
     @Named("mediaIdToMediaEntity")
@@ -89,7 +129,7 @@ public interface MediaMapper {
 
     @Named("uuidToMediaId")
     default MediaId uuidToMediaId(UUID id) {
-        return id != null ? new MediaId(id) : null;
+        return id != null ? MediaId.of(id) : null;
     }
 
     @Named("mediaIdToUuid")
@@ -99,7 +139,7 @@ public interface MediaMapper {
 
     @Named("uuidToUserId")
     default UserId uuidToUserId(UUID id) {
-        return id != null ? new UserId(id) : null;
+        return id != null ? UserId.of(id) : null;
     }
 
     @Named("userIdToUuid")
@@ -109,7 +149,7 @@ public interface MediaMapper {
 
     @Named("uuidToUploadSessionId")
     default UploadSessionId uuidToUploadSessionId(UUID id) {
-        return id != null ? new UploadSessionId(id) : null;
+        return id != null ? UploadSessionId.of(id) : null;
     }
 
     @Named("uploadSessionIdToUuid")
@@ -119,7 +159,7 @@ public interface MediaMapper {
 
     @Named("uuidToUploadItemId")
     default UploadItemId uuidToUploadItemId(UUID id) {
-        return id != null ? new UploadItemId(id) : null;
+        return id != null ? UploadItemId.of(id) : null;
     }
 
     @Named("uploadItemIdToUuid")

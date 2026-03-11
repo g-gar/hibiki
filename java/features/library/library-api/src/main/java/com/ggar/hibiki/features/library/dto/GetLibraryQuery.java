@@ -1,11 +1,10 @@
 package com.ggar.hibiki.features.library.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Query;
-import com.ggar.hibiki.features.library.model.IdentityContext;
 import com.ggar.hibiki.features.library.model.LibraryFilter;
-import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.Page;
 import com.ggar.hibiki.features.library.model.Pagination;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
@@ -16,11 +15,11 @@ import lombok.With;
 @Value
 @Builder(toBuilder = true)
 @With
-public class GetLibraryQuery implements Query<Page<LibraryItem>> {
+public class GetLibraryQuery implements Query<Page<LibraryItemDto>> {
     /**
-     * User identity context.
+     * User identifier.
      */
-    IdentityContext identityContext;
+    UUID userId;
     /**
      * Filtering criteria.
      */

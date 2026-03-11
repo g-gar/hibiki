@@ -1,6 +1,5 @@
 package com.ggar.hibiki.core.catalog.dto;
 
-import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.core.shared.mediator.Query;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FindArtistQuery implements Query<Artist> {
+public class FindArtistQuery implements Query<ArtistDto> {
     private String id;
     private String isni;
     private String name;

@@ -3,6 +3,7 @@ package com.ggar.hibiki.features.library.service.factory;
 import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
 import com.ggar.hibiki.features.library.model.Song;
+import com.ggar.hibiki.features.library.model.SongId;
 import com.ggar.hibiki.features.library.model.SongLibraryItem;
 import com.ggar.hibiki.features.library.model.User;
 import com.ggar.hibiki.features.library.model.Visibility;
@@ -25,7 +26,7 @@ public class SongLibraryItemCreator implements LibraryItemCreator {
     public LibraryItem create(User user, UUID mediaId) {
         return SongLibraryItem.builder()
                 .user(user)
-                .song(Song.builder().id(mediaId).build())
+                .song(Song.builder().id(SongId.of(mediaId)).build())
                 .visibility(Visibility.PRIVATE)
                 .owner(true)
                 .addedAt(Instant.now())

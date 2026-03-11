@@ -29,12 +29,13 @@ public class RegisterDeviceUseCase extends BaseOrchestratorUseCase {
             }
         }
 
-        return Mono.from(mediator.send(RegisterDeviceCommand.builder()
-                        .userId(request.getUserId())
-                        .id(request.getDeviceId())
-                        .name(request.getFriendlyName())
-                        .type(type)
-                        .build()))
-                .map(mapper::toDto);
+        RegisterDeviceCommand command = RegisterDeviceCommand.builder()
+                .id(request.getDeviceId())
+                .userId(request.getUserId())
+                .name(request.getFriendlyName())
+                .type(type)
+                .build();
+
+        return Mono.from(mediator.send(command)).map(mapper::toDto);
     }
 }

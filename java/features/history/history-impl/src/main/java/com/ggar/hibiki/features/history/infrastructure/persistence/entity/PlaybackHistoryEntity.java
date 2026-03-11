@@ -15,11 +15,11 @@ public class PlaybackHistoryEntity {
     private UUID id;
 
     private UUID userId;
-    private String sessionId;
+    private UUID sessionId;
     private UUID deviceId;
-    private String songId;
+    private UUID songId;
     private String contextType;
-    private String contextId;
+    private UUID contextId;
     private Instant playedAt;
 
     public PlaybackHistoryEntity() {}
@@ -27,11 +27,11 @@ public class PlaybackHistoryEntity {
     public PlaybackHistoryEntity(
             UUID id,
             UUID userId,
-            String sessionId,
+            UUID sessionId,
             UUID deviceId,
-            String songId,
+            UUID songId,
             String contextType,
-            String contextId,
+            UUID contextId,
             Instant playedAt) {
         this.id = id;
         this.userId = userId;
@@ -59,11 +59,11 @@ public class PlaybackHistoryEntity {
         this.userId = userId;
     }
 
-    public String getSessionId() {
+    public UUID getSessionId() {
         return sessionId;
     }
 
-    public void setSessionId(String sessionId) {
+    public void setSessionId(UUID sessionId) {
         this.sessionId = sessionId;
     }
 
@@ -75,11 +75,11 @@ public class PlaybackHistoryEntity {
         this.deviceId = deviceId;
     }
 
-    public String getSongId() {
+    public UUID getSongId() {
         return songId;
     }
 
-    public void setSongId(String songId) {
+    public void setSongId(UUID songId) {
         this.songId = songId;
     }
 
@@ -91,11 +91,11 @@ public class PlaybackHistoryEntity {
         this.contextType = contextType;
     }
 
-    public String getContextId() {
+    public UUID getContextId() {
         return contextId;
     }
 
-    public void setContextId(String contextId) {
+    public void setContextId(UUID contextId) {
         this.contextId = contextId;
     }
 

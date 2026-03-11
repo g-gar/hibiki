@@ -8,6 +8,7 @@ import com.ggar.hibiki.features.library.model.AccessIntent;
 import com.ggar.hibiki.features.library.model.AlbumLibraryItem;
 import com.ggar.hibiki.features.library.model.LibraryFilter;
 import com.ggar.hibiki.features.library.model.LibraryItem;
+import com.ggar.hibiki.features.library.model.LibraryItemId;
 import com.ggar.hibiki.features.library.model.Pagination;
 import com.ggar.hibiki.features.library.model.User;
 import com.ggar.hibiki.features.library.model.Visibility;
@@ -285,7 +286,7 @@ public class Neo4jLibraryRepository implements LibraryRepository {
             // In a more complex setup, we'd use the mapper on a reconstructed entity
             AlbumEntity albumEntity = (AlbumEntity) li;
             return AlbumLibraryItem.builder()
-                    .id(albumEntity.getId())
+                    .id(LibraryItemId.of(albumEntity.getId()))
                     .user(user)
                     .visibility(Visibility.PRIVATE)
                     .owner(false)

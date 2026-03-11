@@ -8,10 +8,9 @@ import com.ggar.hibiki.features.ingestion.dto.GetUploadSessionByIdQuery;
 import com.ggar.hibiki.features.ingestion.dto.InitiateUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.ItemDescriptor;
 import com.ggar.hibiki.features.ingestion.dto.UploadChunkCommand;
+import com.ggar.hibiki.features.ingestion.dto.UploadProgressDto;
+import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
 import com.ggar.hibiki.features.ingestion.model.IdentityContext;
-import com.ggar.hibiki.features.ingestion.model.UploadItem;
-import com.ggar.hibiki.features.ingestion.model.UploadProgress;
-import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
 import com.ggar.hibiki.features.metadata.dto.FetchMetadataCommand;
@@ -67,13 +66,13 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                 .build();
 
         InitiateUploadCommand initiateCmd = InitiateUploadCommand.builder()
-                .identityContext(identityContext)
+                .userId(identityContext.getUser().getId().getId())
                 .items(List.of(itemDescriptor))
                 .build();
 
         return Mono.from(mediator.send(initiateCmd))
                 .flatMap(session -> {
-                    UploadItem item = session.getItems().get(0);
+                    UploadSessionDto.UploadItemDto item = session.getItems().get(0);
 
                     AtomicReference<String> resolvedMimeType = new AtomicReference<>(null);
                     AtomicReference<ContentHasher.HashState> hashState = new AtomicReference<>(contentHasher.init());
@@ -94,9 +93,9 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                     };
 
                     UploadChunkCommand chunkCmd = UploadChunkCommand.builder()
-                            .identityContext(identityContext)
-                            .uploadSessionId(session.getId())
-                            .itemId(item.getId())
+                            .userId(identityContext.getUser().getId().getId())
+                            .uploadSessionId(UUID.fromString(session.getId()))
+                            .itemId(UUID.fromString(item.getId()))
                             .chunkIndex(0) // Logical single chunk mapping the whole flux
                             .content(content)
                             .onUploadStarted(onStart)
@@ -105,27 +104,28 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                             .build();
 
                     return Mono.from(mediator.send(chunkCmd)).map(r -> {
-                        UploadProgress progress = (UploadProgress) r;
+                        UploadProgressDto progress = (UploadProgressDto) r;
                         String mimeTypeStr =
                                 resolvedMimeType.get() != null ? resolvedMimeType.get() : "application/octet-stream";
                         return Tuples.of(
-                                progress.getUploadSessionId(), mimeTypeStr, contentHasher.finalize(hashState.get()));
+                                UUID.fromString(progress.getUploadSessionId()),
+                                mimeTypeStr,
+                                contentHasher.finalize(hashState.get()));
                     });
                 })
                 .flatMap(tuple -> {
-                    UploadSessionId sessionId = tuple.getT1();
+                    UUID sessionId = tuple.getT1();
                     String mimeType = tuple.getT2();
                     String finalHash = tuple.getT3();
 
                     CompleteUploadCommand completeCmd = CompleteUploadCommand.builder()
-                            .identityContext(identityContext)
+                            .userId(identityContext.getUser().getId().getId())
                             .uploadSessionId(sessionId)
                             .mimeType(mimeType)
                             .contentHash(finalHash)
                             .build();
 
-                    return Mono.from(mediator.send(completeCmd))
-                            .thenReturn(sessionId.getId().toString());
+                    return Mono.from(mediator.send(completeCmd)).thenReturn(sessionId.toString());
                 });
     }
 
@@ -141,8 +141,8 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                 fingerprintId);
 
         FetchMetadataCommand fetchCmd = FetchMetadataCommand.builder()
-                .mediaId(mediaId)
-                .acoustId(fingerprintId)
+                .mediaId(mediaId.getId())
+                .acoustId(fingerprintId.getValue())
                 .mimeType("audio/mpeg") // Safe fallback, assuming audio for fingerprinting
                 .build();
 
@@ -150,7 +150,7 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                 .cast(FetchMetadataResult.class)
                 .flatMap(metadataResult -> {
                     MapToId3Command mapCmd = MapToId3Command.builder()
-                            .mediaId(mediaId)
+                            .mediaId(mediaId.getId())
                             .rawMetadata(metadataResult.getMetadata())
                             .build();
                     return Mono.from(mediator.send(mapCmd)).cast(Id3Result.class);
@@ -170,20 +170,14 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
 
                     // We need the User Identity context to add the item to their Library
                     GetUploadSessionByIdQuery sessionQuery = GetUploadSessionByIdQuery.builder()
-                            .uploadSessionId(new UploadSessionId(mediaId.getId()))
+                            .uploadSessionId(mediaId.getId())
                             .build();
 
                     return Mono.from(mediator.send(sessionQuery)).flatMap(uploadSession -> {
-                        com.ggar.hibiki.features.library.model.User libraryUser =
-                                new com.ggar.hibiki.features.library.model.User(
-                                        uploadSession.getUserId().getId().getId());
-                        com.ggar.hibiki.features.library.model.IdentityContext libraryIdentity =
-                                com.ggar.hibiki.features.library.model.IdentityContext.builder()
-                                        .user(libraryUser)
-                                        .build();
+                        UUID userId = UUID.fromString(uploadSession.getUserId());
 
                         AddMediaToLibraryCommand addLibraryCmd = AddMediaToLibraryCommand.builder()
-                                .identityContext(libraryIdentity)
+                                .userId(userId)
                                 .mediaId(UUID.fromString(catalogResult.getSongId()))
                                 .type(LibraryItemType.SONG)
                                 .build();

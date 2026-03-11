@@ -2,6 +2,7 @@ package com.ggar.hibiki.features.history.infrastructure.handler;
 
 import com.ggar.hibiki.features.history.dto.GetPlaybackHistoryQuery;
 import com.ggar.hibiki.features.history.model.PlaybackHistoryEntry;
+import com.ggar.hibiki.features.history.model.UserId;
 import com.ggar.hibiki.features.history.port.PlaybackHistoryRepository;
 import com.ggar.hibiki.features.history.service.GetPlaybackHistoryQueryHandler;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class GetPlaybackHistoryQueryHandlerImpl implements GetPlaybackHistoryQue
             return Flux.empty();
         }
         return repository
-                .findByUserId(query.getUserId())
+                .findByUserId(UserId.of(query.getUserId()))
                 .skip((long) query.getPage() * query.getSize())
                 .take(query.getSize());
     }

@@ -4,6 +4,7 @@ import com.ggar.hibiki.core.shared.event.EventBus;
 import com.ggar.hibiki.features.library.dto.DeletePlaylistCommand;
 import com.ggar.hibiki.features.library.event.PlaylistDeletedEvent;
 import com.ggar.hibiki.features.library.model.User;
+import com.ggar.hibiki.features.library.model.UserId;
 import com.ggar.hibiki.features.library.port.PlaylistRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +23,15 @@ public class DeletePlaylistCommandHandlerImpl implements DeletePlaylistCommandHa
 
     @Override
     public Mono<UUID> handle(DeletePlaylistCommand command) {
-        User user = command.getIdentityContext().getUser();
+        User user = User.builder().id(UserId.of(command.getUserId())).build();
         UUID playlistId = command.getPlaylistId();
 
         return playlistRepository
                 .delete(user, playlistId)
-                .then(eventBus.publish(new PlaylistDeletedEvent(user.getId(), playlistId)))
+                .then(eventBus.publish(PlaylistDeletedEvent.builder()
+                        .userId(user.getId())
+                        .playlistId(playlistId)
+                        .build()))
                 .thenReturn(playlistId);
     }
 }

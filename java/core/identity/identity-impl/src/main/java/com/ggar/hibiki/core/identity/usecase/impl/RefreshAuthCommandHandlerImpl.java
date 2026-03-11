@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.identity.usecase.impl;
 
+import com.ggar.hibiki.core.identity.dto.AuthResponse;
 import com.ggar.hibiki.core.identity.dto.RefreshAuthRequest;
-import com.ggar.hibiki.core.identity.model.AuthResponse;
 import com.ggar.hibiki.core.identity.service.RefreshAuthCommandHandler;
 import com.ggar.hibiki.packages.jwt.signer.JwtSigner;
 import com.ggar.hibiki.packages.jwt.verifier.JwtVerifier;

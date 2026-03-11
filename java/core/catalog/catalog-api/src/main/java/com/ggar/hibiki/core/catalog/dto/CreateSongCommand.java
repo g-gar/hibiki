@@ -1,6 +1,5 @@
 package com.ggar.hibiki.core.catalog.dto;
 
-import com.ggar.hibiki.core.catalog.model.Song;
 import com.ggar.hibiki.core.shared.mediator.Command;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateSongCommand implements Command<Song> {
+public class CreateSongCommand implements Command<SongDto> {
     private String title;
     private String filePath;
     private Long durationMs;

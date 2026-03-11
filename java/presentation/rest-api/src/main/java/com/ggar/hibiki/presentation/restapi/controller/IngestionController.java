@@ -43,7 +43,7 @@ public class IngestionController {
 
         // TODO: In a real environment, extract User from Spring Security context
         IdentityContext identityContext = IdentityContext.builder()
-                .user(new User(new UserId(UUID.fromString("00000000-0000-0000-0000-000000000000"))))
+                .user(new User(UserId.of(UUID.fromString("00000000-0000-0000-0000-000000000000"))))
                 .build();
 
         return filePartMono

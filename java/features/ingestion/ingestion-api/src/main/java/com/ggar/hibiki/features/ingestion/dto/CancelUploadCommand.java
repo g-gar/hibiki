@@ -1,9 +1,7 @@
 package com.ggar.hibiki.features.ingestion.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Command;
-import com.ggar.hibiki.features.ingestion.model.IdentityContext;
-import com.ggar.hibiki.features.ingestion.model.UploadSession;
-import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
 
@@ -13,7 +11,7 @@ import lombok.Value;
  */
 @Value
 @Builder
-public class CancelUploadCommand implements Command<UploadSession> {
-    IdentityContext identityContext;
-    UploadSessionId uploadSessionId;
+public class CancelUploadCommand implements Command<UploadSessionDto> {
+    UUID userId;
+    UUID uploadSessionId;
 }

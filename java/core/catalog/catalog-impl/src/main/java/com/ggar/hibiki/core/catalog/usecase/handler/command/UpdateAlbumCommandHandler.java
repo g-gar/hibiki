@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.catalog.usecase.handler.command;
 
+import com.ggar.hibiki.core.catalog.dto.AlbumDto;
 import com.ggar.hibiki.core.catalog.dto.UpdateAlbumCommand;
-import com.ggar.hibiki.core.catalog.model.Album;
 import com.ggar.hibiki.core.catalog.persistence.mapper.AlbumMapper;
 import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;
@@ -11,13 +11,13 @@ import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
-public class UpdateAlbumCommandHandler implements CommandHandler<UpdateAlbumCommand, Album> {
+public class UpdateAlbumCommandHandler implements CommandHandler<UpdateAlbumCommand, AlbumDto> {
 
     private final AlbumRepository albumRepository;
     private final AlbumMapper albumMapper;
 
     @Override
-    public Mono<Album> handle(UpdateAlbumCommand command) {
+    public Mono<AlbumDto> handle(UpdateAlbumCommand command) {
         return albumRepository
                 .findById(command.getId())
                 .flatMap(entity -> {
@@ -26,6 +26,6 @@ public class UpdateAlbumCommandHandler implements CommandHandler<UpdateAlbumComm
                     if (command.getBarcode() != null) entity.setBarcode(command.getBarcode());
                     return albumRepository.save(entity);
                 })
-                .map(albumMapper::toDomain);
+                .map(albumMapper::toDto);
     }
 }

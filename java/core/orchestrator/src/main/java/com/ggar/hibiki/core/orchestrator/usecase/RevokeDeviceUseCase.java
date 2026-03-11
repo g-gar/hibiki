@@ -14,9 +14,10 @@ public class RevokeDeviceUseCase extends BaseOrchestratorUseCase {
     }
 
     public Mono<Void> execute(RevokeDeviceRequestDTO request) {
-        return Mono.from(mediator.send(RevokeDeviceCommand.builder()
+        RevokeDeviceCommand command = RevokeDeviceCommand.builder()
                 .userId(request.getUserId())
                 .deviceId(request.getDeviceId())
-                .build()));
+                .build();
+        return Mono.from(mediator.send(command));
     }
 }

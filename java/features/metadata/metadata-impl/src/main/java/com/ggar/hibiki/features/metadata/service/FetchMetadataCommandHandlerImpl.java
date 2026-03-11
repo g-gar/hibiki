@@ -2,6 +2,7 @@ package com.ggar.hibiki.features.metadata.service;
 
 import com.ggar.hibiki.features.metadata.dto.FetchMetadataCommand;
 import com.ggar.hibiki.features.metadata.model.FetchMetadataResult;
+import com.ggar.hibiki.features.metadata.model.MediaId;
 import com.ggar.hibiki.packages.acoustid.client.AcoustIdWebClient;
 import com.ggar.hibiki.packages.musicbrainz.MusicBrainz;
 import com.ggar.hibiki.packages.musicbrainz.model.Include;
@@ -28,7 +29,7 @@ public class FetchMetadataCommandHandlerImpl implements FetchMetadataCommandHand
         // 1. Query AcoustID to resolve the fingerprint into an ISRC.
         // The API requires a duration; we'll provide an estimated 120s if not given.
         return acoustIdWebClient
-                .lookupByFingerprint(command.getAcoustId().getValue(), 120)
+                .lookupByFingerprint(command.getAcoustId(), 120)
                 .flatMap(acoustIdResponse -> {
                     if (!"ok".equals(acoustIdResponse.getStatus())
                             || acoustIdResponse.getResults() == null
@@ -56,7 +57,7 @@ public class FetchMetadataCommandHandlerImpl implements FetchMetadataCommandHand
                     return musicBrainz.lookupByIsrc(isrc, IsrcResponse.class, includeMask);
                 })
                 .map(isrcResponse -> FetchMetadataResult.builder()
-                        .mediaId(command.getMediaId())
+                        .mediaId(MediaId.of(command.getMediaId()))
                         .metadata(isrcResponse)
                         .build())
                 .doOnError(e -> log.error("Error fetching metadata for mediaId: {}", command.getMediaId(), e));

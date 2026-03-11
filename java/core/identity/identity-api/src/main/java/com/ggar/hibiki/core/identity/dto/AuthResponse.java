@@ -1,4 +1,4 @@
-package com.ggar.hibiki.core.identity.model;
+package com.ggar.hibiki.core.identity.dto;
 
 import java.util.UUID;
 import lombok.AllArgsConstructor;

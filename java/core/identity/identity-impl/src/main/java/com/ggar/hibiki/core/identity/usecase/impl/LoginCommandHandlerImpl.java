@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.identity.usecase.impl;
 
+import com.ggar.hibiki.core.identity.dto.AuthResponse;
 import com.ggar.hibiki.core.identity.dto.LoginRequest;
-import com.ggar.hibiki.core.identity.model.AuthResponse;
 import com.ggar.hibiki.core.identity.port.UserRepository;
 import com.ggar.hibiki.core.identity.service.LoginCommandHandler;
 import com.ggar.hibiki.packages.jwt.signer.JwtSigner;

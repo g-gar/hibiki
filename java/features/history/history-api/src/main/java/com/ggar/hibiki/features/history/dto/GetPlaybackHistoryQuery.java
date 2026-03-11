@@ -4,31 +4,34 @@ import com.ggar.hibiki.core.shared.mediator.Query;
 import com.ggar.hibiki.features.history.model.PlaybackHistoryEntry;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Value;
+import lombok.experimental.FieldDefaults;
 
 /**
  * Query to retrieve playback history with optional filters and pagination.
  */
-@Data
-@Builder
-@NoArgsConstructor
+@Value
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@Builder(toBuilder = true)
 public class GetPlaybackHistoryQuery implements Query<PlaybackHistoryEntry> {
-    private UUID userId;
-    private UUID songId;
-    private UUID artistId;
-    private UUID albumId;
-    private UUID playlistId;
-    private String deviceId;
-    private Instant fromDate;
-    private Instant toDate;
+    UUID userId;
+    UUID songId;
+    UUID artistId;
+    UUID albumId;
+    UUID playlistId;
+    UUID deviceId;
+    Instant fromDate;
+    Instant toDate;
 
     @Builder.Default
-    private Integer page = 0;
+    Integer page = 0;
 
     @Builder.Default
-    private Integer size = 20;
+    Integer size = 20;
 }
