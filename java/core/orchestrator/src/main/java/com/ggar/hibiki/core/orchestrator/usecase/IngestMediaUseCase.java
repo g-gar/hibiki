@@ -139,8 +139,8 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                 fingerprintId);
 
         FetchMetadataCommand fetchCmd = FetchMetadataCommand.builder()
-                .mediaId(mediaId)
-                .acoustId(fingerprintId)
+                .mediaId(mediaId.getId())
+                .acoustId(fingerprintId.getValue())
                 .mimeType("audio/mpeg") // Safe fallback, assuming audio for fingerprinting
                 .build();
 
@@ -148,7 +148,7 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                 .cast(FetchMetadataResult.class)
                 .flatMap(metadataResult -> {
                     MapToId3Command mapCmd = MapToId3Command.builder()
-                            .mediaId(mediaId)
+                            .mediaId(mediaId.getId())
                             .rawMetadata(metadataResult.getMetadata())
                             .build();
                     return Mono.from(mediator.send(mapCmd)).cast(Id3Result.class);

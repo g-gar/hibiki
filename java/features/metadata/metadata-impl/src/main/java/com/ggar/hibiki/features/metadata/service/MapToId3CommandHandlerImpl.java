@@ -1,26 +1,51 @@
 package com.ggar.hibiki.features.metadata.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ggar.hibiki.features.metadata.dto.MapToId3Command;
 import com.ggar.hibiki.features.metadata.model.Id3Result;
+import com.ggar.hibiki.features.metadata.model.MediaId;
 import com.ggar.hibiki.packages.id3v2.model.Id3v2Frame;
-import com.ggar.hibiki.packages.id3v2.model.Id3v2FrameId;
 import com.ggar.hibiki.packages.id3v2.model.Id3v2Tag;
-import com.ggar.hibiki.packages.musicbrainz.model.ArtistCredit;
-import com.ggar.hibiki.packages.musicbrainz.model.Recording;
-import com.ggar.hibiki.packages.musicbrainz.model.Release;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.Yaml;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class MapToId3CommandHandlerImpl implements MapToId3CommandHandler {
+
+    private final Map<String, String> mappings;
+    private final Configuration jsonPathConfig;
+
+    public MapToId3CommandHandlerImpl(ObjectMapper objectMapper) {
+        this.jsonPathConfig = Configuration.builder()
+                .mappingProvider(new JacksonMappingProvider(objectMapper))
+                .jsonProvider(new JacksonJsonProvider(objectMapper))
+                .options(Option.SUPPRESS_EXCEPTIONS)
+                .build();
+        
+        try (InputStream is = getClass().getResourceAsStream("/mapping/musicbrainz_to_id3.yml")) {
+            if (is == null) {
+                throw new IllegalStateException("Mapping file not found: /mapping/musicbrainz_to_id3.yml");
+            }
+            Yaml yaml = new Yaml();
+            Map<String, Map<String, String>> yamlMap = yaml.load(is);
+            this.mappings = yamlMap.get("mapping");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load ID3 mapping", e);
+        }
+    }
 
     @Override
     public Publisher<Id3Result> handle(MapToId3Command command) {
@@ -29,79 +54,46 @@ public class MapToId3CommandHandlerImpl implements MapToId3CommandHandler {
         return Mono.fromCallable(() -> {
             Id3v2Tag tag = new Id3v2Tag();
 
-            if (command.getRawMetadata() == null
-                    || command.getRawMetadata().getRecordings() == null
-                    || command.getRawMetadata().getRecordings().isEmpty()) {
-                log.warn("No recordings found in raw metadata for mediaId: {}", command.getMediaId());
+            if (command.getRawMetadata() == null) {
                 return Id3Result.builder()
-                        .mediaId(command.getMediaId())
+                        .mediaId(MediaId.of(command.getMediaId()))
                         .tags(tag)
                         .build();
             }
 
-            Recording recording = command.getRawMetadata().getRecordings().get(0);
+            DocumentContext context = JsonPath.using(jsonPathConfig).parse(command.getRawMetadata());
 
-            // TIT2: Title
-            if (recording.getTitle() != null) {
-                tag.addFrame(createTextFrame(Id3v2FrameId.TIT2, recording.getTitle()));
-            }
-
-            // TPE1: Artist
-            if (recording.getArtistCredit() != null
-                    && !recording.getArtistCredit().isEmpty()) {
-                String artistName = recording.getArtistCredit().stream()
-                        .map(ArtistCredit::getName)
-                        .collect(Collectors.joining("; "));
-                tag.addFrame(createTextFrame(Id3v2FrameId.TPE1, artistName));
-            }
-
-            // TSRC: ISRC
-            if (command.getRawMetadata().getIsrc() != null) {
-                tag.addFrame(createTextFrame(
-                        Id3v2FrameId.TSRC, command.getRawMetadata().getIsrc()));
-            }
-
-            // Extract Release info (Album, Year, Track Number)
-            List<Release> releases = recording.getReleases();
-            if (releases != null && !releases.isEmpty()) {
-                Release release = releases.get(0);
-
-                // TALB: Album
-                if (release.getTitle() != null) {
-                    tag.addFrame(createTextFrame(Id3v2FrameId.TALB, release.getTitle()));
+            mappings.forEach((frameId, jsonPath) -> {
+                try {
+                    Object value = context.read(jsonPath);
+                    if (value != null) {
+                        String textValue = String.valueOf(value);
+                        if (!textValue.isEmpty()) {
+                            tag.addFrame(createTextFrame(frameId, textValue));
+                        }
+                    }
+                } catch (Exception e) {
+                    log.debug("Could not resolve path {} for frame {}", jsonPath, frameId, e);
                 }
+            });
 
-                // TYER: Release Year
-                if (release.getDate() != null && release.getDate().length() >= 4) {
-                    String year = release.getDate().substring(0, 4);
-                    tag.addFrame(createTextFrame(Id3v2FrameId.TYER, year));
-                }
-
-                // TPE2: Album Artist (Usually the same as Artist for singles, or "Various Artists" for compilations)
-                if (release.getArtistCredit() != null
-                        && !release.getArtistCredit().isEmpty()) {
-                    String albumArtist = release.getArtistCredit().stream()
-                            .map(ArtistCredit::getName)
-                            .collect(Collectors.joining("; "));
-                    tag.addFrame(createTextFrame(Id3v2FrameId.TPE2, albumArtist));
-                }
-            }
-
-            return Id3Result.builder().mediaId(command.getMediaId()).tags(tag).build();
+            return Id3Result.builder()
+                    .mediaId(MediaId.of(command.getMediaId()))
+                    .tags(tag)
+                    .build();
         });
     }
 
-    private Id3v2Frame createTextFrame(Id3v2FrameId frameId, String text) {
+    private Id3v2Frame createTextFrame(String frameIdName, String text) {
         // ID3v2 text frames start with an encoding byte.
         // 0x00 = ISO-8859-1. 0x01 = UTF-16. 0x03 = UTF-8.
-        // We'll use 0x03 UTF-8 for simplicity, though support depends on the standard version.
         byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
         byte[] data = new byte[textBytes.length + 1];
         data[0] = 0x03; // UTF-8 encoding flag
         System.arraycopy(textBytes, 0, data, 1, textBytes.length);
 
         return new Id3v2Frame(
-                frameId.name(),
+                frameIdName,
                 data.length,
                 new byte[] {0, 0}, // Flags
                 data);
