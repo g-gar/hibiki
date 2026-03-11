@@ -16,8 +16,10 @@ import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.Playlist;
 import com.ggar.hibiki.features.library.model.PlaylistItem;
 import com.ggar.hibiki.features.library.model.Song;
+import com.ggar.hibiki.features.library.model.SongId;
 import com.ggar.hibiki.features.library.model.SongLibraryItem;
 import com.ggar.hibiki.features.library.model.User;
+import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -84,4 +86,12 @@ public interface LibraryMapper {
     Album toDomain(AlbumEntity entity);
 
     Artist toDomain(ArtistEntity entity);
+
+    default UUID map(SongId value) {
+        return value != null ? value.getValue() : null;
+    }
+
+    default SongId mapToSongId(UUID value) {
+        return value != null ? SongId.of(value) : null;
+    }
 }

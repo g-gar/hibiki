@@ -1,7 +1,6 @@
 package com.ggar.hibiki.features.library.model;
 
 import java.util.List;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +22,7 @@ public class Song {
     /**
      * Unique identifier for the song in the catalog.
      */
-    UUID id;
+    SongId id;
     /**
      * The album this song belongs to.
      */

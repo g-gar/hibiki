@@ -19,8 +19,8 @@ Hibiki is organized into several top-level directories under `java/`:
 
 For modules following this pattern (mostly under `features/` and some under `core/`):
 
-*   **`<module-name>-api`**: Contains all interfaces, models, DTOs, ports, and domain event definitions. This module should have minimal dependencies.
-*   **`<module-name>-impl`**: Contains concrete implementations, infrastructure details, and persistence logic.
+*   **`<module-name>-api`**: Contains all interfaces, models, DTOs, ports, and domain event definitions. **CRITICAL**: This module MUST be self-contained and NOT depend on any other feature or core module API (except `core:shared`).
+*   **`<module-name>-impl`**: Contains concrete implementations, infrastructure details, and persistence logic. It MAY depend on other modules' `-api` to access system-wide infrastructure (e.g., `CommandBus`, `EventBus`).
 
 ### 3. Package Conventions (`-api` module)
 
@@ -44,11 +44,16 @@ The following packages are standard in the `-impl` module:
 
 ### 5. Coding Patterns
 
-#### 4.1 Value Objects for Identifiers
-Identifiers should not be raw `UUID`s or `String`s. Use dedicated Value Objects (e.g., `UserId`, `DeviceId`) with Lombok's `@Value(staticConstructor = "of")`.
+#### 4.1 Value Objects vs. Primitive Types
+*   **Domain Models:** Identifiers in domain models MUST NOT be raw `UUID`s or `String`s. Use dedicated Value Objects (e.g., `UserId`, `DeviceId`) with Lombok's `@Value` stack.
+*   **DTOs (Commands, Queries, Responses):** DTOs MUST use primitive types (e.g., `UUID`, `String`, `Instant`) for all fields, including identifiers. DTOs are the system's contract and should be as simple and serialization-friendly as possible, without tying external callers to internal domain Value Objects. The mapping from primitive types to Value Objects must happen within the Handlers (implementation layer).
 
 ```java
-@Value(staticConstructor = "of")
+@Value
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+@AllArgsConstructor(staticName = "of")
+@Builder(toBuilder = true)
 public class DeviceId {
     UUID value;
 }
@@ -56,13 +61,18 @@ public class DeviceId {
 
 #### 4.2 Lombok Usage for DTOs and Models
 Standardize on the following annotations for classes in the `-api` module:
-*   `@Value`: For immutability.
-*   `@Builder(toBuilder = true)`: For flexible object creation.
-*   `@With`: For creating modified copies.
+*   **Attribute Standards**: All attributes must be `private final`.
+*   **Lombok Annotations for Domain Models**:
+    *   `@Getter`, `@Value` or `@Data` (as appropriate, favoring immutability).
+    *   `@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)`: To ensure all attributes are private and final by default.
+    *   `@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)`: To provide an empty constructor (required by frameworks), using `force = true` for final fields.
+    *   `@AllArgsConstructor`: To provide a constructor with all arguments.
+    *   `@Builder(toBuilder = true)`: For object building.
+    *   `@With`: For modified copies.
 *   Include comprehensive Javadocs for all public classes and fields.
 
 #### 4.3 No Nested Classes
-Nested classes are generally forbidden to maintain a clear and flat class structure. 
+Nested classes are generally forbidden to maintain a clear and flat class structure.
 *   **Exception**: Nested classes ARE allowed in the `presentation/rest-api` layer (e.g., for simple internal DTOs or request/response structures).
 
 ## Dependency Management

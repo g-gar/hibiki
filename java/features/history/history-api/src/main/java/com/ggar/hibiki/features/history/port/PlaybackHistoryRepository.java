@@ -1,15 +1,18 @@
 package com.ggar.hibiki.features.history.port;
 
 import com.ggar.hibiki.features.history.model.PlaybackHistoryEntry;
-import java.util.UUID;
+import com.ggar.hibiki.features.history.model.PlaybackHistoryId;
+import com.ggar.hibiki.features.history.model.UserId;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * Outbound port for managing playback history persistence.
+ * Repository interface for managing playback history entries.
  */
 public interface PlaybackHistoryRepository {
     Mono<PlaybackHistoryEntry> save(PlaybackHistoryEntry entry);
 
-    Flux<PlaybackHistoryEntry> findByUserId(UUID userId);
+    Flux<PlaybackHistoryEntry> findByUserId(UserId userId);
+
+    Mono<Void> deleteById(PlaybackHistoryId id);
 }

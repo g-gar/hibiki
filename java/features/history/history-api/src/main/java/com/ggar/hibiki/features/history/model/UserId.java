@@ -1,6 +1,6 @@
 package com.ggar.hibiki.features.history.model;
 
-import java.time.Instant;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,17 +9,13 @@ import lombok.Value;
 import lombok.experimental.FieldDefaults;
 
 /**
- * Domain entity representing a single playback event in the user's history.
+ * Value object representing a unique identifier for a user within the history context.
  */
 @Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 @Builder(toBuilder = true)
-public class PlaybackHistoryEntry {
-    PlaybackHistoryId id;
-    IdentityContext identityContext;
-    SongId songId;
-    PlaybackContext playbackContext;
-    Instant playedAt;
+public class UserId {
+    UUID value;
 }

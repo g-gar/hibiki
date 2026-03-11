@@ -7,6 +7,7 @@ import com.ggar.hibiki.features.library.model.Playlist;
 import com.ggar.hibiki.features.library.model.PlaylistItem;
 import com.ggar.hibiki.features.library.model.PlaylistOperation;
 import com.ggar.hibiki.features.library.model.Song;
+import com.ggar.hibiki.features.library.model.SongId;
 import com.ggar.hibiki.features.library.model.User;
 import com.ggar.hibiki.features.library.port.PlaylistRepository;
 import java.time.Instant;
@@ -53,7 +54,7 @@ public class UpdatePlaylistCommandHandlerImpl implements UpdatePlaylistCommandHa
                         for (UUID songId : op.getSongIds()) {
                             items.add(PlaylistItem.builder()
                                     .id(UUID.randomUUID())
-                                    .song(Song.builder().id(songId).build())
+                                    .song(Song.builder().id(SongId.of(songId)).build())
                                     .addedAt(Instant.now())
                                     .position(items.size())
                                     .build());
@@ -62,13 +63,13 @@ public class UpdatePlaylistCommandHandlerImpl implements UpdatePlaylistCommandHa
                 }
                 case REMOVE_SONGS -> {
                     if (op.getSongIds() != null) {
-                        items.removeIf(
-                                item -> op.getSongIds().contains(item.getSong().getId()));
+                        items.removeIf(item ->
+                                op.getSongIds().contains(item.getSong().getId().getValue()));
                     }
                 }
                 case MOVE_SONG -> {
                     PlaylistItem itemToMove = items.stream()
-                            .filter(i -> i.getSong().getId().equals(op.getSongId()))
+                            .filter(i -> i.getSong().getId().getValue().equals(op.getSongId()))
                             .findFirst()
                             .orElse(null);
                     if (itemToMove != null) {
