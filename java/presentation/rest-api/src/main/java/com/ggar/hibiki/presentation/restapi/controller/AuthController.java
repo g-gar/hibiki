@@ -1,6 +1,6 @@
 package com.ggar.hibiki.presentation.restapi.controller;
 
-import com.ggar.hibiki.core.identity.model.AuthResponse;
+import com.ggar.hibiki.core.identity.dto.AuthResponse;
 import com.ggar.hibiki.core.orchestrator.dto.LoginRequestDTO;
 import com.ggar.hibiki.core.orchestrator.dto.RefreshRequestDTO;
 import com.ggar.hibiki.core.orchestrator.dto.SignupRequestDTO;

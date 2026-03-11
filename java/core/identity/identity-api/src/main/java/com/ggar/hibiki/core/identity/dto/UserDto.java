@@ -1,6 +1,6 @@
 package com.ggar.hibiki.core.identity.dto;
 
-import com.ggar.hibiki.core.shared.mediator.Command;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefreshAuthRequest implements Command<AuthResponse> {
-    private String refreshToken;
-    private String deviceId;
+public class UserDto {
+    private String id;
+    private String username;
+    private String email;
+    private Set<String> roles;
+    private boolean twoFactorEnabled;
 }

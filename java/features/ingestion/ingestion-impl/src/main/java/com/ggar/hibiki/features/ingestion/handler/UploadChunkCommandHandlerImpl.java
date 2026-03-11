@@ -2,7 +2,9 @@ package com.ggar.hibiki.features.ingestion.handler;
 
 import com.ggar.hibiki.core.shared.event.EventBus;
 import com.ggar.hibiki.features.ingestion.dto.UploadChunkCommand;
+import com.ggar.hibiki.features.ingestion.dto.UploadProgressDto;
 import com.ggar.hibiki.features.ingestion.event.ChunkUploadedEvent;
+import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadItemId;
@@ -29,10 +31,11 @@ public class UploadChunkCommandHandlerImpl implements UploadChunkCommandHandler 
 
     private final UploadSessionRepository uploadSessionRepository;
     private final MediaStorage mediaStorage;
+    private final MediaMapper mediaMapper;
     private final EventBus eventBus;
 
     @Override
-    public Publisher<UploadProgress> handle(UploadChunkCommand command) {
+    public Publisher<UploadProgressDto> handle(UploadChunkCommand command) {
         return uploadSessionRepository
                 .findById(UploadSessionId.of(command.getUploadSessionId()))
                 .flatMap(session -> {
@@ -101,13 +104,13 @@ public class UploadChunkCommandHandlerImpl implements UploadChunkCommandHandler 
                                                 int progress = (int) ((double) updatedItem.getReceivedChunks()
                                                         / updatedItem.getTotalChunks()
                                                         * 100);
-                                                return UploadProgress.builder()
+                                                return mediaMapper.toDto(UploadProgress.builder()
                                                         .uploadSessionId(
                                                                 session.getId().getId())
                                                         .itemId(item.getId().getId())
                                                         .phase(updatedItem.getPhase())
                                                         .progress(progress)
-                                                        .build();
+                                                        .build());
                                             });
                                 })
                                 .doOnSuccess(progress -> {

@@ -1,7 +1,6 @@
 package com.ggar.hibiki.features.ingestion.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Command;
-import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
@@ -12,7 +11,7 @@ import lombok.Value;
  */
 @Value
 @Builder
-public class CompleteUploadCommand implements Command<UploadSession> {
+public class CompleteUploadCommand implements Command<UploadSessionDto> {
     UUID userId;
     UUID uploadSessionId;
     String mimeType;

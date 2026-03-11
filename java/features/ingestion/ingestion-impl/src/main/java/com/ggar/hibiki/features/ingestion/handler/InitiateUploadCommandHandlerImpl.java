@@ -2,6 +2,8 @@ package com.ggar.hibiki.features.ingestion.handler;
 
 import com.ggar.hibiki.features.ingestion.dto.InitiateUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.ItemDescriptor;
+import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
+import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadItemId;
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
@@ -31,10 +34,11 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
 
     private final UploadSessionRepository uploadSessionRepository;
     private final MediaStorage mediaStorage;
+    private final MediaMapper mediaMapper;
     private final UuidV7Generator idGenerator;
 
     @Override
-    public Publisher<UploadSession> handle(InitiateUploadCommand command) {
+    public Publisher<UploadSessionDto> handle(InitiateUploadCommand command) {
         var sessionId = idGenerator.generate();
         var userId = UserId.of(command.getUserId());
 
@@ -64,7 +68,8 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
         return Flux.fromIterable(items)
                 .flatMap(item -> mediaStorage.initiateMultipartUpload(
                         item.getId().getId().toString()))
-                .then(uploadSessionRepository.save(session))
+                .then(Mono.from(uploadSessionRepository.save(session)))
+                .map(mediaMapper::toDto)
                 .doOnSuccess(saved -> log.info("Upload session {} created with {} items", sessionId, items.size()));
     }
 }

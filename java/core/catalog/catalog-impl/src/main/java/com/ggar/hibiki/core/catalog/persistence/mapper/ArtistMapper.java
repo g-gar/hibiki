@@ -1,5 +1,6 @@
 package com.ggar.hibiki.core.catalog.persistence.mapper;
 
+import com.ggar.hibiki.core.catalog.dto.ArtistDto;
 import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.core.catalog.persistence.entity.ArtistEntity;
 import org.mapstruct.Mapper;
@@ -10,4 +11,8 @@ public interface ArtistMapper {
     Artist toDomain(ArtistEntity entity);
 
     ArtistEntity toEntity(Artist domain);
+
+    ArtistDto toDto(Artist domain);
+
+    ArtistDto toDto(ArtistEntity entity);
 }

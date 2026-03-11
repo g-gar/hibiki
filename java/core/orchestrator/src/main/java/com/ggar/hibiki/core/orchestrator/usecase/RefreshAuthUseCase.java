@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.orchestrator.usecase;
 
+import com.ggar.hibiki.core.identity.dto.AuthResponse;
 import com.ggar.hibiki.core.identity.dto.RefreshAuthRequest;
-import com.ggar.hibiki.core.identity.model.AuthResponse;
 import com.ggar.hibiki.core.orchestrator.dto.RefreshRequestDTO;
 import com.ggar.hibiki.core.orchestrator.mapper.RefreshRequestMapper;
 import com.ggar.hibiki.core.shared.mediator.Mediator;

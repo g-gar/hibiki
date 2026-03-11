@@ -1,7 +1,6 @@
 package com.ggar.hibiki.features.library.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Command;
-import com.ggar.hibiki.features.library.model.Playlist;
 import com.ggar.hibiki.features.library.model.Visibility;
 import java.util.UUID;
 import lombok.Builder;
@@ -14,7 +13,7 @@ import lombok.With;
 @Value
 @Builder(toBuilder = true)
 @With
-public class CreatePlaylistCommand implements Command<Playlist> {
+public class CreatePlaylistCommand implements Command<PlaylistDto> {
     /**
      * User identifier.
      */

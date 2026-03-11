@@ -8,9 +8,9 @@ import com.ggar.hibiki.features.ingestion.dto.GetUploadSessionByIdQuery;
 import com.ggar.hibiki.features.ingestion.dto.InitiateUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.ItemDescriptor;
 import com.ggar.hibiki.features.ingestion.dto.UploadChunkCommand;
+import com.ggar.hibiki.features.ingestion.dto.UploadProgressDto;
+import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
 import com.ggar.hibiki.features.ingestion.model.IdentityContext;
-import com.ggar.hibiki.features.ingestion.model.UploadItem;
-import com.ggar.hibiki.features.ingestion.model.UploadProgress;
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
 import com.ggar.hibiki.features.metadata.dto.FetchMetadataCommand;
@@ -72,7 +72,7 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
 
         return Mono.from(mediator.send(initiateCmd))
                 .flatMap(session -> {
-                    UploadItem item = session.getItems().get(0);
+                    UploadSessionDto.UploadItemDto item = session.getItems().get(0);
 
                     AtomicReference<String> resolvedMimeType = new AtomicReference<>(null);
                     AtomicReference<ContentHasher.HashState> hashState = new AtomicReference<>(contentHasher.init());
@@ -94,8 +94,8 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
 
                     UploadChunkCommand chunkCmd = UploadChunkCommand.builder()
                             .userId(identityContext.getUser().getId().getId())
-                            .uploadSessionId(session.getId().getId())
-                            .itemId(item.getId().getId())
+                            .uploadSessionId(UUID.fromString(session.getId()))
+                            .itemId(UUID.fromString(item.getId()))
                             .chunkIndex(0) // Logical single chunk mapping the whole flux
                             .content(content)
                             .onUploadStarted(onStart)
@@ -104,11 +104,13 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                             .build();
 
                     return Mono.from(mediator.send(chunkCmd)).map(r -> {
-                        UploadProgress progress = (UploadProgress) r;
+                        UploadProgressDto progress = (UploadProgressDto) r;
                         String mimeTypeStr =
                                 resolvedMimeType.get() != null ? resolvedMimeType.get() : "application/octet-stream";
                         return Tuples.of(
-                                progress.getUploadSessionId(), mimeTypeStr, contentHasher.finalize(hashState.get()));
+                                UUID.fromString(progress.getUploadSessionId()),
+                                mimeTypeStr,
+                                contentHasher.finalize(hashState.get()));
                     });
                 })
                 .flatMap(tuple -> {
@@ -172,7 +174,7 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                             .build();
 
                     return Mono.from(mediator.send(sessionQuery)).flatMap(uploadSession -> {
-                        UUID userId = uploadSession.getUserId().getId().getId();
+                        UUID userId = UUID.fromString(uploadSession.getUserId());
 
                         AddMediaToLibraryCommand addLibraryCmd = AddMediaToLibraryCommand.builder()
                                 .userId(userId)

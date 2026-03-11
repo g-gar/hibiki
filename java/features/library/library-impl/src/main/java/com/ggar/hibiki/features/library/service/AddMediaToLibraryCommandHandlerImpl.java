@@ -2,7 +2,9 @@ package com.ggar.hibiki.features.library.service;
 
 import com.ggar.hibiki.core.shared.event.EventBus;
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
+import com.ggar.hibiki.features.library.dto.LibraryItemDto;
 import com.ggar.hibiki.features.library.event.MediaAddedToLibraryEvent;
+import com.ggar.hibiki.features.library.infrastructure.persistence.mapper.LibraryMapper;
 import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.User;
 import com.ggar.hibiki.features.library.model.UserId;
@@ -21,10 +23,11 @@ public class AddMediaToLibraryCommandHandlerImpl implements AddMediaToLibraryCom
 
     private final LibraryRepository libraryRepository;
     private final LibraryItemFactory itemFactory;
+    private final LibraryMapper libraryMapper;
     private final EventBus eventBus;
 
     @Override
-    public Mono<LibraryItem> handle(AddMediaToLibraryCommand command) {
+    public Mono<LibraryItemDto> handle(AddMediaToLibraryCommand command) {
         User user = User.builder().id(UserId.of(command.getUserId())).build();
 
         return libraryRepository
@@ -38,6 +41,6 @@ public class AddMediaToLibraryCommandHandlerImpl implements AddMediaToLibraryCom
                                 .mediaId(command.getMediaId())
                                 .type(command.getType())
                                 .build())
-                        .thenReturn(item));
+                        .thenReturn(libraryMapper.toDto(item)));
     }
 }

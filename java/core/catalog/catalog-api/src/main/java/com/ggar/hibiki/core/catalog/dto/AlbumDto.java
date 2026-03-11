@@ -1,6 +1,5 @@
 package com.ggar.hibiki.core.catalog.dto;
 
-import com.ggar.hibiki.core.shared.mediator.Command;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateAlbumCommand implements Command<AlbumDto> {
+public class AlbumDto {
+    private String id;
     private String title;
     private Integer releaseYear;
-    private String artistName;
+    private String barcode;
+    private ArtistDto artist;
 }

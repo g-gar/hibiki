@@ -1,5 +1,6 @@
 package com.ggar.hibiki.core.catalog.persistence.mapper;
 
+import com.ggar.hibiki.core.catalog.dto.SongDto;
 import com.ggar.hibiki.core.catalog.model.Song;
 import com.ggar.hibiki.core.catalog.persistence.entity.SongEntity;
 import org.mapstruct.Mapper;
@@ -13,4 +14,8 @@ public interface SongMapper {
     Song toDomain(SongEntity entity);
 
     SongEntity toEntity(Song domain);
+
+    SongDto toDto(Song domain);
+
+    SongDto toDto(SongEntity entity);
 }

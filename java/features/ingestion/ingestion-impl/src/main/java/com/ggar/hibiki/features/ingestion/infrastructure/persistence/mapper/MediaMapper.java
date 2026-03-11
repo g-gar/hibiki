@@ -1,5 +1,7 @@
 package com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper;
 
+import com.ggar.hibiki.features.ingestion.dto.UploadProgressDto;
+import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.entity.MediaEntity;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.entity.UploadItemEntity;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.entity.UploadSessionEntity;
@@ -10,6 +12,7 @@ import com.ggar.hibiki.features.ingestion.model.MediaId;
 import com.ggar.hibiki.features.ingestion.model.MediaStatus;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadItemId;
+import com.ggar.hibiki.features.ingestion.model.UploadProgress;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.User;
@@ -56,6 +59,43 @@ public interface MediaMapper {
     @Mapping(target = "phase", source = "phase", qualifiedByName = "phaseToEntity")
     @Mapping(target = "media", source = "mediaId", qualifiedByName = "mediaIdToMediaEntity")
     UploadItemEntity toEntity(UploadItem domain);
+
+    // --- Domain to DTO ---
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "mapUploadSessionIdToString")
+    @Mapping(target = "userId", source = "userId", qualifiedByName = "mapUserToUserIdString")
+    UploadSessionDto toDto(UploadSession domain);
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "mapUploadItemIdToString")
+    @Mapping(target = "originalFilename", source = "originalFilename")
+    @Mapping(target = "expectedSize", source = "expectedSize")
+    @Mapping(target = "phase", source = "phase")
+    UploadSessionDto.UploadItemDto toDto(UploadItem domain);
+
+    @Mapping(target = "uploadSessionId", source = "uploadSessionId")
+    @Mapping(target = "itemId", source = "itemId")
+    @Mapping(target = "mediaId", source = "mediaId")
+    UploadProgressDto toDto(UploadProgress domain);
+
+    @Named("mapUploadSessionIdToString")
+    default String mapUploadSessionIdToString(UploadSessionId value) {
+        return value != null ? value.getId().toString() : null;
+    }
+
+    @Named("mapUploadItemIdToString")
+    default String mapUploadItemIdToString(UploadItemId value) {
+        return value != null ? value.getId().toString() : null;
+    }
+
+    @Named("mapMediaIdToString")
+    default String mapMediaIdToString(MediaId value) {
+        return value != null ? value.getId().toString() : null;
+    }
+
+    @Named("mapUserToUserIdString")
+    default String mapUserToUserIdString(User value) {
+        return (value != null && value.getId() != null) ? value.getId().getId().toString() : null;
+    }
 
     @Named("mediaStatusToDomain")
     default MediaStatus mediaStatusToDomain(String status) {

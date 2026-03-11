@@ -1,7 +1,6 @@
 package com.ggar.hibiki.features.ingestion.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Command;
-import com.ggar.hibiki.features.ingestion.model.UploadProgress;
 import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.Builder;
@@ -15,7 +14,7 @@ import reactor.core.publisher.Flux;
  */
 @Value
 @Builder
-public class UploadChunkCommand implements Command<UploadProgress> {
+public class UploadChunkCommand implements Command<UploadProgressDto> {
     UUID userId;
     UUID uploadSessionId;
     UUID itemId;

@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.catalog.usecase.handler.command;
 
 import com.ggar.hibiki.core.catalog.dto.CreateSongCommand;
-import com.ggar.hibiki.core.catalog.model.Song;
+import com.ggar.hibiki.core.catalog.dto.SongDto;
 import com.ggar.hibiki.core.catalog.persistence.entity.SongEntity;
 import com.ggar.hibiki.core.catalog.persistence.mapper.SongMapper;
 import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
-public class CreateSongCommandHandler implements CommandHandler<CreateSongCommand, Song> {
+public class CreateSongCommandHandler implements CommandHandler<CreateSongCommand, SongDto> {
 
     private final SongRepository songRepository;
     private final AlbumRepository albumRepository;
@@ -23,11 +23,11 @@ public class CreateSongCommandHandler implements CommandHandler<CreateSongComman
     private final SongMapper songMapper;
 
     @Override
-    public Mono<Song> handle(CreateSongCommand command) {
+    public Mono<SongDto> handle(CreateSongCommand command) {
         return songRepository
                 .findByIsrc(command.getIsrc())
                 .switchIfEmpty(Mono.defer(() -> createNewSong(command)))
-                .map(songMapper::toDomain);
+                .map(songMapper::toDto);
     }
 
     private Mono<SongEntity> createNewSong(CreateSongCommand command) {

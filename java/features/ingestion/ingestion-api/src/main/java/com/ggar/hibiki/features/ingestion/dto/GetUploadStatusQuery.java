@@ -1,7 +1,6 @@
 package com.ggar.hibiki.features.ingestion.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Query;
-import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
@@ -11,7 +10,7 @@ import lombok.Value;
  */
 @Value
 @Builder
-public class GetUploadStatusQuery implements Query<UploadSession> {
+public class GetUploadStatusQuery implements Query<UploadSessionDto> {
     UUID userId;
     UUID uploadSessionId;
 }

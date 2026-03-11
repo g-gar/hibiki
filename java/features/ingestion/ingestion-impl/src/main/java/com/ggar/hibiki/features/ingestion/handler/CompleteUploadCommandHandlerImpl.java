@@ -2,8 +2,10 @@ package com.ggar.hibiki.features.ingestion.handler;
 
 import com.ggar.hibiki.core.shared.event.EventBus;
 import com.ggar.hibiki.features.ingestion.dto.CompleteUploadCommand;
+import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
 import com.ggar.hibiki.features.ingestion.event.MediaIngestedEvent;
 import com.ggar.hibiki.features.ingestion.event.UploadCompletedEvent;
+import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.Media;
 import com.ggar.hibiki.features.ingestion.model.MediaId;
@@ -37,10 +39,11 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
     private final MediaStorage mediaStorage;
     private final MediaRepository mediaRepository;
     private final IngestionPipeline ingestionPipeline;
+    private final MediaMapper mediaMapper;
     private final EventBus eventBus;
 
     @Override
-    public Publisher<UploadSession> handle(CompleteUploadCommand command) {
+    public Publisher<UploadSessionDto> handle(CompleteUploadCommand command) {
         var userId = UserId.of(command.getUserId());
 
         return uploadSessionRepository
@@ -57,8 +60,9 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
                                     .then(createAndPersistMedia(
                                             item, userId, command.getMimeType(), command.getContentHash()))
                                     .flatMap(media -> runPipelineAndPublishEvents(media, item, session, userId)))
-                            .then(uploadSessionRepository.save(
-                                    session.withPhase(IngestionPhase.COMPLETED).withCompletedAt(Instant.now())));
+                            .then(Mono.from(uploadSessionRepository.save(
+                                    session.withPhase(IngestionPhase.COMPLETED).withCompletedAt(Instant.now()))))
+                            .map(mediaMapper::toDto);
                 });
     }
 

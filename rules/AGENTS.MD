@@ -47,7 +47,7 @@ The following packages are standard in the `-impl` module:
 #### 4.1 Value Objects vs. Primitive Types
 *   **Domain Models:** Identifiers in domain models MUST NOT be raw `UUID`s or `String`s. Use dedicated Value Objects (e.g., `UserId`, `DeviceId`) with Lombok's `@Value` stack.
 *   **DTOs (Commands, Queries, Responses):** DTOs MUST use primitive types (e.g., `UUID`, `String`, `Instant`) for all fields, including identifiers. DTOs are the system's contract and should be as simple and serialization-friendly as possible, without tying external callers to internal domain Value Objects. The mapping from primitive types to Value Objects must happen within the Handlers (implementation layer).
-
+*   **CQRS Handlers:** Command and Query Handlers (`CommandHandler`, `QueryHandler`) MUST return DTOs, not Domain Models. This ensures that the domain layer's internal representation remains decoupled from external API contracts.
 ```java
 @Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

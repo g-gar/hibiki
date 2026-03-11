@@ -34,7 +34,7 @@ public class MapToId3CommandHandlerImpl implements MapToId3CommandHandler {
                 .jsonProvider(new JacksonJsonProvider(objectMapper))
                 .options(Option.SUPPRESS_EXCEPTIONS)
                 .build();
-        
+
         try (InputStream is = getClass().getResourceAsStream("/mapping/musicbrainz_to_id3.yml")) {
             if (is == null) {
                 throw new IllegalStateException("Mapping file not found: /mapping/musicbrainz_to_id3.yml");

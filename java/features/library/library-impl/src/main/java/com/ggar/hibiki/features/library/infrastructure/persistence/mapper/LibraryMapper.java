@@ -1,5 +1,8 @@
 package com.ggar.hibiki.features.library.infrastructure.persistence.mapper;
 
+import com.ggar.hibiki.features.library.dto.LibraryItemDto;
+import com.ggar.hibiki.features.library.dto.PlaylistDto;
+import com.ggar.hibiki.features.library.dto.PlaylistItemDto;
 import com.ggar.hibiki.features.library.infrastructure.persistence.entity.AlbumEntity;
 import com.ggar.hibiki.features.library.infrastructure.persistence.entity.AlbumLibraryItemEntity;
 import com.ggar.hibiki.features.library.infrastructure.persistence.entity.ArtistEntity;
@@ -27,6 +30,7 @@ import com.ggar.hibiki.features.library.model.UserId;
 import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface LibraryMapper {
@@ -61,6 +65,78 @@ public interface LibraryMapper {
     AlbumEntity toEntity(Album domain);
 
     ArtistEntity toEntity(Artist domain);
+
+    // --- Domain to DTO ---
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "mapLibraryItemIdToString")
+    @Mapping(target = "userId", source = "user", qualifiedByName = "mapUserToUserIdString")
+    @Mapping(target = "songId", ignore = true)
+    @Mapping(target = "albumId", ignore = true)
+    default LibraryItemDto toDto(LibraryItem domain) {
+        if (domain instanceof SongLibraryItem) {
+            return toDto((SongLibraryItem) domain);
+        } else if (domain instanceof AlbumLibraryItem) {
+            return toDto((AlbumLibraryItem) domain);
+        } else if (domain instanceof Playlist) {
+            return toDto((Playlist) domain);
+        }
+        return null;
+    }
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "mapLibraryItemIdToString")
+    @Mapping(target = "userId", source = "user", qualifiedByName = "mapUserToUserIdString")
+    @Mapping(target = "songId", source = "song.id", qualifiedByName = "mapSongIdToString")
+    @Mapping(target = "albumId", ignore = true)
+    LibraryItemDto toDto(SongLibraryItem domain);
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "mapLibraryItemIdToString")
+    @Mapping(target = "userId", source = "user", qualifiedByName = "mapUserToUserIdString")
+    @Mapping(target = "albumId", source = "album.id", qualifiedByName = "mapAlbumIdToString")
+    @Mapping(target = "songId", ignore = true)
+    LibraryItemDto toDto(AlbumLibraryItem domain);
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "mapLibraryItemIdToString")
+    @Mapping(target = "userId", source = "user", qualifiedByName = "mapUserToUserIdString")
+    @Mapping(target = "items", source = "items")
+    @Mapping(target = "songId", ignore = true)
+    @Mapping(target = "albumId", ignore = true)
+    PlaylistDto toDto(Playlist domain);
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "mapPlaylistItemIdToString")
+    @Mapping(target = "songId", source = "song.id", qualifiedByName = "mapSongIdToString")
+    PlaylistItemDto toDto(PlaylistItem domain);
+
+    @Named("mapLibraryItemIdToString")
+    default String mapLibraryItemIdToString(LibraryItemId value) {
+        return value != null ? value.getValue().toString() : null;
+    }
+
+    @Named("mapPlaylistItemIdToString")
+    default String mapPlaylistItemIdToString(PlaylistItemId value) {
+        return value != null ? value.getValue().toString() : null;
+    }
+
+    @Named("mapSongIdToString")
+    default String mapSongIdToString(SongId value) {
+        return value != null ? value.getValue().toString() : null;
+    }
+
+    @Named("mapAlbumIdToString")
+    default String mapAlbumIdToString(AlbumId value) {
+        return value != null ? value.getValue().toString() : null;
+    }
+
+    @Named("mapArtistIdToString")
+    default String mapArtistIdToString(ArtistId value) {
+        return value != null ? value.getValue().toString() : null;
+    }
+
+    @Named("mapUserToUserIdString")
+    default String mapUserToUserIdString(User value) {
+        return (value != null && value.getId() != null)
+                ? value.getId().getValue().toString()
+                : null;
+    }
 
     // --- Entity to Domain ---
 
