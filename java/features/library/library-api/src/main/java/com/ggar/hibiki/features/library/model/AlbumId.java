@@ -1,25 +1,21 @@
 package com.ggar.hibiki.features.library.model;
 
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Value;
-import lombok.With;
 import lombok.experimental.FieldDefaults;
 
 /**
- * Context information identifying the user for library operations.
+ * Value object representing a unique identifier for an album.
  */
 @Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 @Builder(toBuilder = true)
-@With
-public class IdentityContext {
-    /**
-     * The user context for library operations.
-     */
-    User user;
+public class AlbumId {
+    UUID value;
 }

@@ -172,16 +172,10 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                             .build();
 
                     return Mono.from(mediator.send(sessionQuery)).flatMap(uploadSession -> {
-                        com.ggar.hibiki.features.library.model.User libraryUser =
-                                new com.ggar.hibiki.features.library.model.User(
-                                        uploadSession.getUserId().getId().getId());
-                        com.ggar.hibiki.features.library.model.IdentityContext libraryIdentity =
-                                com.ggar.hibiki.features.library.model.IdentityContext.builder()
-                                        .user(libraryUser)
-                                        .build();
+                        UUID userId = uploadSession.getUserId().getId().getId();
 
                         AddMediaToLibraryCommand addLibraryCmd = AddMediaToLibraryCommand.builder()
-                                .identityContext(libraryIdentity)
+                                .userId(userId)
                                 .mediaId(UUID.fromString(catalogResult.getSongId()))
                                 .type(LibraryItemType.SONG)
                                 .build();

@@ -9,6 +9,7 @@ import com.ggar.hibiki.features.library.model.PlaylistOperation;
 import com.ggar.hibiki.features.library.model.Song;
 import com.ggar.hibiki.features.library.model.SongId;
 import com.ggar.hibiki.features.library.model.User;
+import com.ggar.hibiki.features.library.model.UserId;
 import com.ggar.hibiki.features.library.port.PlaylistRepository;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -31,21 +32,28 @@ public class UpdatePlaylistCommandHandlerImpl implements UpdatePlaylistCommandHa
 
     @Override
     public Mono<Playlist> handle(UpdatePlaylistCommand command) {
-        User user = command.getIdentityContext().getUser();
+        User user = User.builder().id(UserId.of(command.getUserId())).build();
         return playlistRepository
                 .findById(user, command.getPlaylistId())
                 .flatMap(playlist -> {
-                    Playlist updatedPlaylist = applyOperations(playlist, command.getOperations());
-                    updatedPlaylist.setUpdatedAt(Instant.now());
+                    Playlist updatedPlaylist = applyOperations(playlist, command.getOperations()).toBuilder()
+                            .updatedAt(Instant.now())
+                            .build();
                     return playlistRepository.save(user, updatedPlaylist);
                 })
-                .flatMap(saved -> eventBus.publish(new PlaylistUpdatedEvent(user.getId(), saved.getId()))
+                .flatMap(saved -> eventBus.publish(PlaylistUpdatedEvent.builder()
+                                .userId(user.getId())
+                                .playlistId(saved.getId().getValue())
+                                .build())
                         .thenReturn(saved));
     }
 
     private Playlist applyOperations(Playlist playlist, List<PlaylistOperation> operations) {
         // Create a mutable copy of the items list
         List<PlaylistItem> items = new ArrayList<>(playlist.getItems());
+        String name = playlist.getName();
+        String description = playlist.getDescription();
+        com.ggar.hibiki.features.library.model.Visibility visibility = playlist.getVisibility();
 
         for (PlaylistOperation op : operations) {
             switch (op.getType()) {
@@ -53,7 +61,7 @@ public class UpdatePlaylistCommandHandlerImpl implements UpdatePlaylistCommandHa
                     if (op.getSongIds() != null) {
                         for (UUID songId : op.getSongIds()) {
                             items.add(PlaylistItem.builder()
-                                    .id(UUID.randomUUID())
+                                    .id(com.ggar.hibiki.features.library.model.PlaylistItemId.of(UUID.randomUUID()))
                                     .song(Song.builder().id(SongId.of(songId)).build())
                                     .addedAt(Instant.now())
                                     .position(items.size())
@@ -78,11 +86,11 @@ public class UpdatePlaylistCommandHandlerImpl implements UpdatePlaylistCommandHa
                     }
                 }
                 case UPDATE_METADATA -> {
-                    if (op.getNewName() != null) playlist.setName(op.getNewName());
-                    if (op.getNewDescription() != null) playlist.setDescription(op.getNewDescription());
+                    if (op.getNewName() != null) name = op.getNewName();
+                    if (op.getNewDescription() != null) description = op.getNewDescription();
                 }
                 case UPDATE_VISIBILITY -> {
-                    if (op.getVisibility() != null) playlist.setVisibility(op.getVisibility());
+                    if (op.getVisibility() != null) visibility = op.getVisibility();
                 }
                 default -> throw new IllegalArgumentException("Unknown operation type: " + op.getType());
             }
@@ -93,6 +101,11 @@ public class UpdatePlaylistCommandHandlerImpl implements UpdatePlaylistCommandHa
             items.set(i, items.get(i).toBuilder().position(i).build());
         }
 
-        return playlist.toBuilder().items(items).build();
+        return playlist.toBuilder()
+                .items(items)
+                .name(name)
+                .description(description)
+                .visibility(visibility)
+                .build();
     }
 }

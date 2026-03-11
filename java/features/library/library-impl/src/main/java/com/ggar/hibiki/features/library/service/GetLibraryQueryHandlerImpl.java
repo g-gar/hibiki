@@ -4,6 +4,7 @@ import com.ggar.hibiki.features.library.dto.GetLibraryQuery;
 import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.Page;
 import com.ggar.hibiki.features.library.model.User;
+import com.ggar.hibiki.features.library.model.UserId;
 import com.ggar.hibiki.features.library.port.LibraryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class GetLibraryQueryHandlerImpl implements GetLibraryQueryHandler {
 
     @Override
     public Mono<Page<LibraryItem>> handle(GetLibraryQuery query) {
-        User user = query.getIdentityContext().getUser();
+        User user = User.builder().id(UserId.of(query.getUserId())).build();
 
         return libraryRepository
                 .findAll(user, query.getFilter(), query.getPagination())

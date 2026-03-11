@@ -5,6 +5,7 @@ import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.event.MediaAddedToLibraryEvent;
 import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.User;
+import com.ggar.hibiki.features.library.model.UserId;
 import com.ggar.hibiki.features.library.port.LibraryRepository;
 import com.ggar.hibiki.features.library.service.factory.LibraryItemFactory;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class AddMediaToLibraryCommandHandlerImpl implements AddMediaToLibraryCom
 
     @Override
     public Mono<LibraryItem> handle(AddMediaToLibraryCommand command) {
-        User user = command.getIdentityContext().getUser();
+        User user = User.builder().id(UserId.of(command.getUserId())).build();
 
         return libraryRepository
                 .findById(user, command.getMediaId())
@@ -32,8 +33,11 @@ public class AddMediaToLibraryCommandHandlerImpl implements AddMediaToLibraryCom
                     LibraryItem item = itemFactory.create(command.getType(), user, command.getMediaId());
                     return libraryRepository.save(user, item);
                 }))
-                .flatMap(item -> eventBus.publish(
-                                new MediaAddedToLibraryEvent(user.getId(), command.getMediaId(), command.getType()))
+                .flatMap(item -> eventBus.publish(MediaAddedToLibraryEvent.builder()
+                                .userId(user.getId())
+                                .mediaId(command.getMediaId())
+                                .type(command.getType())
+                                .build())
                         .thenReturn(item));
     }
 }

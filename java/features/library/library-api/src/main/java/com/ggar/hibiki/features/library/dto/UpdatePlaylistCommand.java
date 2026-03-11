@@ -1,7 +1,6 @@
 package com.ggar.hibiki.features.library.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Command;
-import com.ggar.hibiki.features.library.model.IdentityContext;
 import com.ggar.hibiki.features.library.model.Playlist;
 import com.ggar.hibiki.features.library.model.PlaylistOperation;
 import java.util.List;
@@ -18,9 +17,9 @@ import lombok.With;
 @With
 public class UpdatePlaylistCommand implements Command<Playlist> {
     /**
-     * User identity context.
+     * User identifier.
      */
-    IdentityContext identityContext;
+    UUID userId;
     /**
      * Identifier of the playlist to update.
      */

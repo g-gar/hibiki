@@ -1,6 +1,7 @@
 package com.ggar.hibiki.features.library.service.factory;
 
 import com.ggar.hibiki.features.library.model.Album;
+import com.ggar.hibiki.features.library.model.AlbumId;
 import com.ggar.hibiki.features.library.model.AlbumLibraryItem;
 import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
@@ -25,7 +26,7 @@ public class AlbumLibraryItemCreator implements LibraryItemCreator {
     public LibraryItem create(User user, UUID mediaId) {
         return AlbumLibraryItem.builder()
                 .user(user)
-                .album(Album.builder().id(mediaId).build())
+                .album(Album.builder().id(AlbumId.of(mediaId)).build())
                 .visibility(Visibility.PRIVATE)
                 .owner(true)
                 .addedAt(Instant.now())

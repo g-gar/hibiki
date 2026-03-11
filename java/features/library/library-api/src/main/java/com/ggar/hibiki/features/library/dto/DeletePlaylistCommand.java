@@ -1,7 +1,6 @@
 package com.ggar.hibiki.features.library.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Command;
-import com.ggar.hibiki.features.library.model.IdentityContext;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
@@ -15,9 +14,9 @@ import lombok.With;
 @With
 public class DeletePlaylistCommand implements Command<UUID> {
     /**
-     * User identity context.
+     * User identifier.
      */
-    IdentityContext identityContext;
+    UUID userId;
     /**
      * Identifier of the playlist to delete.
      */

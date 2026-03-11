@@ -1,10 +1,9 @@
 package com.ggar.hibiki.features.library.model;
 
 import java.time.Instant;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -13,16 +12,16 @@ import lombok.experimental.SuperBuilder;
  * Base abstract class for items saved in the user's library.
  * Uses inheritance to distinguish between different types of media.
  */
-@Data
-@SuperBuilder(toBuilder = true)
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@SuperBuilder(toBuilder = true)
 public abstract class LibraryItem {
     /**
      * Unique identifier for this library entry.
      */
-    UUID id;
+    LibraryItemId id;
     /**
      * The user who owns this library entry.
      */

@@ -102,7 +102,8 @@ public class Neo4jPlaylistRepository implements PlaylistRepository {
     @Override
     public Mono<Void> delete(User user, UUID playlistId) {
         // Enforce access control on delete
-        return findById(user, playlistId).flatMap(p -> playlistRepository.deleteById(p.getId()));
+        return findById(user, playlistId)
+                .flatMap(p -> playlistRepository.deleteById(p.getId().getValue()));
     }
 
     @Override

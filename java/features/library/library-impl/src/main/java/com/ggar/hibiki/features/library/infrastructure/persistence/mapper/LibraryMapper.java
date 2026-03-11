@@ -10,15 +10,20 @@ import com.ggar.hibiki.features.library.infrastructure.persistence.entity.SongEn
 import com.ggar.hibiki.features.library.infrastructure.persistence.entity.SongLibraryItemEntity;
 import com.ggar.hibiki.features.library.infrastructure.persistence.entity.UserEntity;
 import com.ggar.hibiki.features.library.model.Album;
+import com.ggar.hibiki.features.library.model.AlbumId;
 import com.ggar.hibiki.features.library.model.AlbumLibraryItem;
 import com.ggar.hibiki.features.library.model.Artist;
+import com.ggar.hibiki.features.library.model.ArtistId;
 import com.ggar.hibiki.features.library.model.LibraryItem;
+import com.ggar.hibiki.features.library.model.LibraryItemId;
 import com.ggar.hibiki.features.library.model.Playlist;
 import com.ggar.hibiki.features.library.model.PlaylistItem;
+import com.ggar.hibiki.features.library.model.PlaylistItemId;
 import com.ggar.hibiki.features.library.model.Song;
 import com.ggar.hibiki.features.library.model.SongId;
 import com.ggar.hibiki.features.library.model.SongLibraryItem;
 import com.ggar.hibiki.features.library.model.User;
+import com.ggar.hibiki.features.library.model.UserId;
 import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -93,5 +98,45 @@ public interface LibraryMapper {
 
     default SongId mapToSongId(UUID value) {
         return value != null ? SongId.of(value) : null;
+    }
+
+    default UUID map(LibraryItemId value) {
+        return value != null ? value.getValue() : null;
+    }
+
+    default LibraryItemId mapToLibraryItemId(UUID value) {
+        return value != null ? LibraryItemId.of(value) : null;
+    }
+
+    default UUID map(UserId value) {
+        return value != null ? value.getValue() : null;
+    }
+
+    default UserId mapToUserId(UUID value) {
+        return value != null ? UserId.of(value) : null;
+    }
+
+    default UUID map(AlbumId value) {
+        return value != null ? value.getValue() : null;
+    }
+
+    default AlbumId mapToAlbumId(UUID value) {
+        return value != null ? AlbumId.of(value) : null;
+    }
+
+    default UUID map(ArtistId value) {
+        return value != null ? value.getValue() : null;
+    }
+
+    default ArtistId mapToArtistId(UUID value) {
+        return value != null ? ArtistId.of(value) : null;
+    }
+
+    default UUID map(PlaylistItemId value) {
+        return value != null ? value.getValue() : null;
+    }
+
+    default PlaylistItemId mapToPlaylistItemId(UUID value) {
+        return value != null ? PlaylistItemId.of(value) : null;
     }
 }
