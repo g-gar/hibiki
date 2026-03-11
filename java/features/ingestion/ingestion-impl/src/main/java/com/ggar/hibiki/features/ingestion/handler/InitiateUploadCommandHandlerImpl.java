@@ -8,6 +8,7 @@ import com.ggar.hibiki.features.ingestion.model.UploadItemId;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.User;
+import com.ggar.hibiki.features.ingestion.model.UserId;
 import com.ggar.hibiki.features.ingestion.port.MediaStorage;
 import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
 import com.ggar.hibiki.features.ingestion.service.InitiateUploadCommandHandler;
@@ -35,7 +36,7 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
     @Override
     public Publisher<UploadSession> handle(InitiateUploadCommand command) {
         var sessionId = idGenerator.generate();
-        var userId = command.getIdentityContext().getUser().getId();
+        var userId = UserId.of(command.getUserId());
 
         log.info("Initiating upload session {} for user {}", sessionId, userId);
 
@@ -43,7 +44,7 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
         for (ItemDescriptor descriptor : command.getItems()) {
             int totalChunks = (int) Math.ceil((double) descriptor.getExpectedSize() / DEFAULT_CHUNK_SIZE);
             items.add(UploadItem.builder()
-                    .id(new UploadItemId(idGenerator.generate()))
+                    .id(UploadItemId.of(idGenerator.generate()))
                     .originalFilename(descriptor.getOriginalFilename())
                     .expectedSize(descriptor.getExpectedSize())
                     .totalChunks(totalChunks)
@@ -53,7 +54,7 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
         }
 
         UploadSession session = UploadSession.builder()
-                .id(new UploadSessionId(sessionId))
+                .id(UploadSessionId.of(sessionId))
                 .userId(new User(userId))
                 .items(items)
                 .phase(IngestionPhase.INITIATED)

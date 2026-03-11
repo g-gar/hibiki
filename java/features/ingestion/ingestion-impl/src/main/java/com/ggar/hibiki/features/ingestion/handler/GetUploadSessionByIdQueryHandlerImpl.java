@@ -2,6 +2,7 @@ package com.ggar.hibiki.features.ingestion.handler;
 
 import com.ggar.hibiki.features.ingestion.dto.GetUploadSessionByIdQuery;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
+import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
 import com.ggar.hibiki.features.ingestion.service.GetUploadSessionByIdQueryHandler;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,6 @@ public class GetUploadSessionByIdQueryHandlerImpl implements GetUploadSessionByI
 
     @Override
     public Publisher<UploadSession> handle(GetUploadSessionByIdQuery query) {
-        return uploadSessionRepository.findById(query.getUploadSessionId());
+        return uploadSessionRepository.findById(UploadSessionId.of(query.getUploadSessionId()));
     }
 }

@@ -79,7 +79,7 @@ public interface MediaMapper {
 
     @Named("mediaEntityToMediaId")
     default MediaId mediaEntityToMediaId(MediaEntity entity) {
-        return entity != null ? new MediaId(entity.getId()) : null;
+        return entity != null ? MediaId.of(entity.getId()) : null;
     }
 
     @Named("mediaIdToMediaEntity")
@@ -89,7 +89,7 @@ public interface MediaMapper {
 
     @Named("uuidToMediaId")
     default MediaId uuidToMediaId(UUID id) {
-        return id != null ? new MediaId(id) : null;
+        return id != null ? MediaId.of(id) : null;
     }
 
     @Named("mediaIdToUuid")
@@ -99,7 +99,7 @@ public interface MediaMapper {
 
     @Named("uuidToUserId")
     default UserId uuidToUserId(UUID id) {
-        return id != null ? new UserId(id) : null;
+        return id != null ? UserId.of(id) : null;
     }
 
     @Named("userIdToUuid")
@@ -109,7 +109,7 @@ public interface MediaMapper {
 
     @Named("uuidToUploadSessionId")
     default UploadSessionId uuidToUploadSessionId(UUID id) {
-        return id != null ? new UploadSessionId(id) : null;
+        return id != null ? UploadSessionId.of(id) : null;
     }
 
     @Named("uploadSessionIdToUuid")
@@ -119,7 +119,7 @@ public interface MediaMapper {
 
     @Named("uuidToUploadItemId")
     default UploadItemId uuidToUploadItemId(UUID id) {
-        return id != null ? new UploadItemId(id) : null;
+        return id != null ? UploadItemId.of(id) : null;
     }
 
     @Named("uploadItemIdToUuid")

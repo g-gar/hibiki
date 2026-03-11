@@ -10,6 +10,7 @@ import com.ggar.hibiki.features.ingestion.model.MediaId;
 import com.ggar.hibiki.features.ingestion.model.MediaStatus;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
+import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.User;
 import com.ggar.hibiki.features.ingestion.model.UserId;
 import com.ggar.hibiki.features.ingestion.pipeline.IngestionContext;
@@ -40,27 +41,30 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
 
     @Override
     public Publisher<UploadSession> handle(CompleteUploadCommand command) {
-        var userId = command.getIdentityContext().getUser().getId();
+        var userId = UserId.of(command.getUserId());
 
-        return uploadSessionRepository.findById(command.getUploadSessionId()).flatMap(session -> {
-            log.info("Completing upload session {} for user {}", session.getId(), userId);
+        return uploadSessionRepository
+                .findById(UploadSessionId.of(command.getUploadSessionId()))
+                .flatMap(session -> {
+                    log.info("Completing upload session {} for user {}", session.getId(), userId);
 
-            return Flux.fromIterable(session.getItems())
-                    .flatMap(item -> mediaStorage
-                            .completeMultipartUpload(
-                                    item.getId().getId().toString(),
-                                    session.getId().getId().toString(),
-                                    List.of())
-                            .then(createAndPersistMedia(item, userId, command.getMimeType(), command.getContentHash()))
-                            .flatMap(media -> runPipelineAndPublishEvents(media, item, session, userId)))
-                    .then(uploadSessionRepository.save(
-                            session.withPhase(IngestionPhase.COMPLETED).withCompletedAt(Instant.now())));
-        });
+                    return Flux.fromIterable(session.getItems())
+                            .flatMap(item -> mediaStorage
+                                    .completeMultipartUpload(
+                                            item.getId().getId().toString(),
+                                            session.getId().getId().toString(),
+                                            List.of())
+                                    .then(createAndPersistMedia(
+                                            item, userId, command.getMimeType(), command.getContentHash()))
+                                    .flatMap(media -> runPipelineAndPublishEvents(media, item, session, userId)))
+                            .then(uploadSessionRepository.save(
+                                    session.withPhase(IngestionPhase.COMPLETED).withCompletedAt(Instant.now())));
+                });
     }
 
     private Mono<Media> createAndPersistMedia(UploadItem item, UserId userId, String mimeType, String contentHash) {
         Media media = Media.builder()
-                .id(new MediaId(item.getId().getId()))
+                .id(MediaId.of(item.getId().getId()))
                 .filename(item.getOriginalFilename())
                 .mimeType(mimeType)
                 .status(MediaStatus.PENDING)
