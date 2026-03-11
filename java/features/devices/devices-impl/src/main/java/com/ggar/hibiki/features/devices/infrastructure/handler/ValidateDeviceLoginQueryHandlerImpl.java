@@ -1,6 +1,6 @@
 package com.ggar.hibiki.features.devices.infrastructure.handler;
 
-import com.ggar.hibiki.core.shared.auth.query.ValidateDeviceLoginQuery;
+import com.ggar.hibiki.features.devices.dto.ValidateDeviceLoginQuery;
 import com.ggar.hibiki.features.devices.model.DeviceStatus;
 import com.ggar.hibiki.features.devices.port.DeviceRepository;
 import com.ggar.hibiki.features.devices.service.ValidateDeviceLoginQueryHandler;
@@ -27,7 +27,10 @@ public class ValidateDeviceLoginQueryHandlerImpl implements ValidateDeviceLoginQ
 
     @Override
     public Mono<Boolean> handle(ValidateDeviceLoginQuery query) {
-        log.info("Validating device login for user {} and device {}", query.getUserId(), query.getDeviceId());
+        log.info(
+                "Validating device login for user {} and device {}",
+                query.getIdentityContext().getUser().getId(),
+                query.getDeviceId());
 
         return deviceRepository
                 .findById(query.getDeviceId())
@@ -37,8 +40,12 @@ public class ValidateDeviceLoginQueryHandlerImpl implements ValidateDeviceLoginQ
                         return Mono.error(new RuntimeException("Device is revoked"));
                     }
 
-                    if (!device.getUserId().equals(query.getUserId())) {
-                        log.warn("Device {} does not belong to user {}", query.getDeviceId(), query.getUserId());
+                    if (!device.getUserId()
+                            .equals(query.getIdentityContext().getUser().getId())) {
+                        log.warn(
+                                "Device {} does not belong to user {}",
+                                query.getDeviceId(),
+                                query.getIdentityContext().getUser().getId());
                         return Mono.error(new RuntimeException("Device ownership mismatch"));
                     }
 

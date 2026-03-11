@@ -42,9 +42,9 @@ public class RegisterDeviceCommandHandlerImpl implements RegisterDeviceCommandHa
                     return deviceRepository.save(updated);
                 })
                 .switchIfEmpty(Mono.defer(() -> {
-                    var newDevice = Device.builder()
+                    Device newDevice = Device.builder()
                             .id(command.getId())
-                            .userId(command.getUserId())
+                            .userId(command.getIdentityContext().getUser().getId())
                             .name(command.getName())
                             .type(command.getType())
                             .status(DeviceStatus.ACTIVE)

@@ -1,7 +1,8 @@
 package com.ggar.hibiki.features.devices.port;
 
 import com.ggar.hibiki.features.devices.model.Device;
-import java.util.UUID;
+import com.ggar.hibiki.features.devices.model.DeviceId;
+import com.ggar.hibiki.features.devices.model.UserId;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,7 +27,7 @@ public interface DeviceRepository {
      * @param id the unique device identifier
      * @return a {@link Mono} emitting the found device, or empty if not found
      */
-    Mono<Device> findById(UUID id);
+    Mono<Device> findById(DeviceId id);
 
     /**
      * Retrieves all devices associated with a specific user.
@@ -34,5 +35,5 @@ public interface DeviceRepository {
      * @param userId the user identifier
      * @return a {@link Flux} emitting the user's devices
      */
-    Flux<Device> findByUserId(UUID userId);
+    Flux<Device> findByUserId(UserId userId);
 }

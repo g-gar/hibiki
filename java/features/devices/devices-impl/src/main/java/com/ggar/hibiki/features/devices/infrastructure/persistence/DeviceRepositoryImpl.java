@@ -3,8 +3,9 @@ package com.ggar.hibiki.features.devices.infrastructure.persistence;
 import com.ggar.hibiki.features.devices.infrastructure.persistence.mapper.DeviceMapper;
 import com.ggar.hibiki.features.devices.infrastructure.persistence.repository.ReactiveNeo4jDeviceRepository;
 import com.ggar.hibiki.features.devices.model.Device;
+import com.ggar.hibiki.features.devices.model.DeviceId;
+import com.ggar.hibiki.features.devices.model.UserId;
 import com.ggar.hibiki.features.devices.port.DeviceRepository;
-import java.util.UUID;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -32,12 +33,12 @@ public class DeviceRepositoryImpl implements DeviceRepository {
     }
 
     @Override
-    public Mono<Device> findById(UUID id) {
-        return repository.findById(id).map(mapper::toDomain);
+    public Mono<Device> findById(DeviceId id) {
+        return repository.findById(id.getValue()).map(mapper::toDomain);
     }
 
     @Override
-    public Flux<Device> findByUserId(UUID userId) {
-        return repository.findByUserId(userId).map(mapper::toDomain);
+    public Flux<Device> findByUserId(UserId userId) {
+        return repository.findByUserId(userId.getValue()).map(mapper::toDomain);
     }
 }

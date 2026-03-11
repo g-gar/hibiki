@@ -6,6 +6,6 @@ import com.ggar.hibiki.features.devices.model.Device;
 import java.util.List;
 
 /**
- * Inbound service for handling device retrieval queries.
+ * Interface for the handler responsible for retrieving user devices.
  */
 public interface GetDevicesQueryHandler extends QueryHandler<GetDevicesQuery, List<Device>> {}

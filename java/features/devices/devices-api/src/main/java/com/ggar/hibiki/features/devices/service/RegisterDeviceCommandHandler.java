@@ -5,6 +5,6 @@ import com.ggar.hibiki.features.devices.dto.RegisterDeviceCommand;
 import com.ggar.hibiki.features.devices.model.Device;
 
 /**
- * Inbound service for handling device registration commands.
+ * Interface for the handler responsible for registering new devices.
  */
 public interface RegisterDeviceCommandHandler extends CommandHandler<RegisterDeviceCommand, Device> {}

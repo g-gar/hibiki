@@ -2,13 +2,21 @@ package com.ggar.hibiki.features.devices.dto;
 
 import com.ggar.hibiki.core.shared.mediator.Query;
 import com.ggar.hibiki.features.devices.model.Device;
+import com.ggar.hibiki.features.devices.model.IdentityContext;
 import java.util.List;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
+import lombok.With;
 
+/**
+ * Query to retrieve all devices associated with a user.
+ */
 @Value
-@Builder
+@Builder(toBuilder = true)
+@With
 public class GetDevicesQuery implements Query<List<Device>> {
-    UUID userId;
+    /**
+     * User identity context.
+     */
+    IdentityContext identityContext;
 }
