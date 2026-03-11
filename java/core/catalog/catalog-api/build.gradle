@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation project(':core:shared')
+    api project(':packages:id3v2')
     
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

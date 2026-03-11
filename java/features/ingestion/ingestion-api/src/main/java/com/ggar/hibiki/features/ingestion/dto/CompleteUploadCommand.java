@@ -16,4 +16,6 @@ import lombok.Value;
 public class CompleteUploadCommand implements Command<UploadSession> {
     IdentityContext identityContext;
     UploadSessionId uploadSessionId;
+    String mimeType;
+    String contentHash;
 }

@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.catalog.usecase.handler.query;
 
-import com.ggar.hibiki.core.catalog.model.domain.Artist;
-import com.ggar.hibiki.core.catalog.model.query.FindArtistQuery;
+import com.ggar.hibiki.core.catalog.dto.FindArtistQuery;
+import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.core.catalog.persistence.mapper.ArtistMapper;
 import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
 import com.ggar.hibiki.core.shared.mediator.QueryHandler;

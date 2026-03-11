@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.catalog.usecase.handler.query;
 
-import com.ggar.hibiki.core.catalog.model.domain.Album;
-import com.ggar.hibiki.core.catalog.model.query.FindAlbumQuery;
+import com.ggar.hibiki.core.catalog.dto.FindAlbumQuery;
+import com.ggar.hibiki.core.catalog.model.Album;
 import com.ggar.hibiki.core.catalog.persistence.mapper.AlbumMapper;
 import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;
 import com.ggar.hibiki.core.shared.mediator.QueryHandler;

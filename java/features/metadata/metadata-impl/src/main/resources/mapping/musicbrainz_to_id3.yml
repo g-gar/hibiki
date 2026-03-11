@@ -1,0 +1,6 @@
+mapping:
+  TIT2: "$.recordings[0].title" # Title
+  TPE1: "$.recordings[0].artist-credit[0].name" # Artist
+  TALB: "$.recordings[0].releases[0].title" # Album
+  TSRC: "$.isrc" # ISRC
+  TRCK: "$.recordings[0].releases[0].release-events[0].date" # Date/Year (fallback if no specific frame exists)

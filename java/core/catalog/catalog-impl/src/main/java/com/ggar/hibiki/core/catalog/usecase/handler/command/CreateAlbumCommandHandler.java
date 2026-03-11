@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.catalog.usecase.handler.command;
 
-import com.ggar.hibiki.core.catalog.model.command.CreateAlbumCommand;
-import com.ggar.hibiki.core.catalog.model.domain.Album;
+import com.ggar.hibiki.core.catalog.dto.CreateAlbumCommand;
+import com.ggar.hibiki.core.catalog.model.Album;
 import com.ggar.hibiki.core.catalog.persistence.entity.AlbumEntity;
 import com.ggar.hibiki.core.catalog.persistence.mapper.AlbumMapper;
 import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;

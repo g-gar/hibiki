@@ -11,9 +11,18 @@ dependencies {
 
     // Domain Modules we orchestrate
     implementation project(':core:identity:identity-api')
+    implementation project(':core:player:player-api')
     implementation project(':features:devices:devices-api')
+    
     implementation project(':features:ingestion:ingestion-api')
-
+    implementation project(':features:metadata:metadata-api')
+    implementation project(':core:catalog:catalog-api')
+    implementation project(':features:library:library-api')
+    implementation project(':features:social:social-api')
+    implementation project(':features:metrics:metrics-api')
+    
+    // Spring Boot
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     // Add Spring Context for @Service annotations and Reactor Core for Mono/Flux
     implementation 'org.springframework:spring-context'
     implementation 'io.projectreactor:reactor-core'

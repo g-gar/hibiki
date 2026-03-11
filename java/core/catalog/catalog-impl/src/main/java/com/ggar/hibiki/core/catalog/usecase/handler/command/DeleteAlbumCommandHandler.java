@@ -1,6 +1,6 @@
 package com.ggar.hibiki.core.catalog.usecase.handler.command;
 
-import com.ggar.hibiki.core.catalog.model.command.DeleteAlbumCommand;
+import com.ggar.hibiki.core.catalog.dto.DeleteAlbumCommand;
 import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;
 import lombok.RequiredArgsConstructor;
