@@ -5,6 +5,7 @@ import com.ggar.hibiki.features.ingestion.model.IdentityContext;
 import com.ggar.hibiki.features.ingestion.model.UploadItemId;
 import com.ggar.hibiki.features.ingestion.model.UploadProgress;
 import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
+import java.util.function.Consumer;
 import lombok.Builder;
 import lombok.Value;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -22,4 +23,8 @@ public class UploadChunkCommand implements Command<UploadProgress> {
     UploadItemId itemId;
     int chunkIndex;
     Flux<DataBuffer> content;
+
+    Runnable onUploadStarted;
+    Runnable onUploadCompleted;
+    Consumer<byte[]> onChunkProcessed;
 }

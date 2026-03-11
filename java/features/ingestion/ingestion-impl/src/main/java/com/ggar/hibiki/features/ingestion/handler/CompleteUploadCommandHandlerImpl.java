@@ -51,20 +51,20 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
                                     item.getId().getId().toString(),
                                     session.getId().getId().toString(),
                                     List.of())
-                            .then(createAndPersistMedia(item, userId))
+                            .then(createAndPersistMedia(item, userId, command.getMimeType(), command.getContentHash()))
                             .flatMap(media -> runPipelineAndPublishEvents(media, item, session, userId)))
                     .then(uploadSessionRepository.save(
                             session.withPhase(IngestionPhase.COMPLETED).withCompletedAt(Instant.now())));
         });
     }
 
-    private Mono<Media> createAndPersistMedia(UploadItem item, UserId userId) {
+    private Mono<Media> createAndPersistMedia(UploadItem item, UserId userId, String mimeType, String contentHash) {
         Media media = Media.builder()
                 .id(new MediaId(item.getId().getId()))
                 .filename(item.getOriginalFilename())
-                .mimeType(item.getMimeType())
+                .mimeType(mimeType)
                 .status(MediaStatus.PENDING)
-                .contentHash(item.getAccumulatedHash())
+                .contentHash(contentHash)
                 .uploadedAt(Instant.now())
                 .uploadedBy(new User(userId))
                 .build();

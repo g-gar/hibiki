@@ -1,6 +1,6 @@
 package com.ggar.hibiki.core.catalog.persistence.mapper;
 
-import com.ggar.hibiki.core.catalog.model.domain.Song;
+import com.ggar.hibiki.core.catalog.model.Song;
 import com.ggar.hibiki.core.catalog.persistence.entity.SongEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;

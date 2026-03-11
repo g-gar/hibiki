@@ -2,6 +2,8 @@ package com.ggar.hibiki.packages.musicbrainz;
 
 import com.ggar.hibiki.packages.musicbrainz.client.MusicBrainzWebClient;
 import com.ggar.hibiki.packages.musicbrainz.model.EntityType;
+import com.ggar.hibiki.packages.musicbrainz.model.Include;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -52,12 +54,12 @@ public class DefaultMusicBrainz implements MusicBrainz {
         return webClient.get(uri, responseType);
     }
 
-    private java.util.Optional<String> buildIncParam(long includeMask) {
+    private Optional<String> buildIncParam(long includeMask) {
         if (includeMask == 0) {
             return java.util.Optional.empty();
         }
 
-        String[] incs = com.ggar.hibiki.packages.musicbrainz.model.Include.extractIncludes(includeMask);
-        return java.util.Optional.of(String.join("+", incs));
+        String[] incs = Include.extractIncludes(includeMask);
+        return Optional.of(String.join("+", incs));
     }
 }

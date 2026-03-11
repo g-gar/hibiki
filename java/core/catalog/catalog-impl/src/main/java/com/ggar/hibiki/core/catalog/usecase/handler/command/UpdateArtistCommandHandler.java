@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.catalog.usecase.handler.command;
 
-import com.ggar.hibiki.core.catalog.model.command.UpdateArtistCommand;
-import com.ggar.hibiki.core.catalog.model.domain.Artist;
+import com.ggar.hibiki.core.catalog.dto.UpdateArtistCommand;
+import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.core.catalog.persistence.mapper.ArtistMapper;
 import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;

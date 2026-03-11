@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.catalog.usecase.handler.command;
 
-import com.ggar.hibiki.core.catalog.model.command.CreateSongCommand;
-import com.ggar.hibiki.core.catalog.model.domain.Song;
+import com.ggar.hibiki.core.catalog.dto.CreateSongCommand;
+import com.ggar.hibiki.core.catalog.model.Song;
 import com.ggar.hibiki.core.catalog.persistence.entity.SongEntity;
 import com.ggar.hibiki.core.catalog.persistence.mapper.SongMapper;
 import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;
