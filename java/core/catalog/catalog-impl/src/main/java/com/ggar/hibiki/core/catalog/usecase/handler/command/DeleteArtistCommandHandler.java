@@ -20,16 +20,14 @@ public class DeleteArtistCommandHandler implements CommandHandler<DeleteArtistCo
 
     @Override
     public Mono<Void> handle(DeleteArtistCommand command) {
-        return artistRepository.findById(command.getId())
-                .flatMap(artist -> {
-                    // 1. Publish event
-                    ArtistDeletedEvent event = ArtistDeletedEvent.builder()
-                            .artistId(artist.getId())
-                            .name(artist.getName())
-                            .build();
-                    
-                    return eventBus.publish(event)
-                            .then(artistRepository.deleteById(artist.getId()));
-                });
+        return artistRepository.findById(command.getId()).flatMap(artist -> {
+            // 1. Publish event
+            ArtistDeletedEvent event = ArtistDeletedEvent.builder()
+                    .artistId(artist.getId())
+                    .name(artist.getName())
+                    .build();
+
+            return eventBus.publish(event).then(artistRepository.deleteById(artist.getId()));
+        });
     }
 }

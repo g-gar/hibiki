@@ -1,11 +1,10 @@
 package com.ggar.hibiki.test.support;
 
 import com.ggar.hibiki.core.shared.event.DomainEvent;
-import lombok.Builder;
-import lombok.Value;
-
 import java.util.List;
 import java.util.Map;
+import lombok.Builder;
+import lombok.Value;
 
 /**
  * Agnostically captures the result of a test scenario execution.

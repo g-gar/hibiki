@@ -1,5 +1,8 @@
 package com.ggar.hibiki.test.integration.mocked.catalog;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.ggar.hibiki.core.catalog.dto.ArtistDto;
 import com.ggar.hibiki.core.catalog.dto.CreateArtistCommand;
 import com.ggar.hibiki.core.catalog.persistence.entity.ArtistEntity;
@@ -8,19 +11,15 @@ import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
 import com.ggar.hibiki.core.catalog.usecase.handler.command.CreateArtistCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.CreateArtistContractTest;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateArtistMockedIntegrationTest extends CreateArtistContractTest {
@@ -40,7 +39,7 @@ public class CreateArtistMockedIntegrationTest extends CreateArtistContractTest 
         String generatedId = UUID.randomUUID().toString();
         ArtistEntity savedEntity = new ArtistEntity(name);
         savedEntity.setId(generatedId);
-        
+
         ArtistDto expectedDto = ArtistDto.builder().id(generatedId).name(name).build();
 
         when(artistRepository.findByNameIgnoreCase(name)).thenReturn(Mono.empty());
@@ -69,7 +68,7 @@ public class CreateArtistMockedIntegrationTest extends CreateArtistContractTest 
         String existingId = UUID.randomUUID().toString();
         ArtistEntity existingEntity = new ArtistEntity(name);
         existingEntity.setId(existingId);
-        
+
         ArtistDto existingDto = ArtistDto.builder().id(existingId).name(name).build();
 
         when(artistRepository.findByNameIgnoreCase(name)).thenReturn(Mono.just(existingEntity));

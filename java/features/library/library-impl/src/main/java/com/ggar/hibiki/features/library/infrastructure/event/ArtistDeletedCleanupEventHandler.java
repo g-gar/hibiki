@@ -3,11 +3,10 @@ package com.ggar.hibiki.features.library.infrastructure.event;
 import com.ggar.hibiki.core.catalog.event.ArtistDeletedEvent;
 import com.ggar.hibiki.core.shared.event.EventHandler;
 import com.ggar.hibiki.features.library.port.LibraryRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.UUID;
 
 /**
  * Event handler that cleanup library entries when an artist is deleted from Catalog.

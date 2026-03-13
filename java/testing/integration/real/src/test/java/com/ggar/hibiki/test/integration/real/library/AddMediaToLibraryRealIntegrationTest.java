@@ -1,6 +1,5 @@
 package com.ggar.hibiki.test.integration.real.library;
 
-import com.ggar.hibiki.core.shared.event.EventBus;
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.dto.LibraryItemDto;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
@@ -9,6 +8,9 @@ import com.ggar.hibiki.features.library.service.AddMediaToLibraryCommandHandler;
 import com.ggar.hibiki.test.contracts.library.AddMediaToLibraryContractTest;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,17 +24,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-
 @SpringBootTest
 @Testcontainers
 public class AddMediaToLibraryRealIntegrationTest extends AddMediaToLibraryContractTest {
 
     @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5")
-            .withoutAuthentication();
+    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
 
     @DynamicPropertySource
     static void neo4jProperties(DynamicPropertyRegistry registry) {
@@ -93,11 +90,8 @@ public class AddMediaToLibraryRealIntegrationTest extends AddMediaToLibraryContr
                 .build();
 
         // 1. First addition
-        handler.handle(command)
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .verifyComplete();
-        
+        handler.handle(command).as(StepVerifier::create).expectNextCount(1).verifyComplete();
+
         // 2. Second addition (idempotency)
         AtomicReference<LibraryItemDto> responseRef = new AtomicReference<>();
         handler.handle(command)

@@ -1,5 +1,8 @@
 package com.ggar.hibiki.test.integration.mocked.library;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.dto.LibraryItemDto;
 import com.ggar.hibiki.features.library.infrastructure.persistence.entity.LibraryItemEntity;
@@ -8,19 +11,15 @@ import com.ggar.hibiki.features.library.infrastructure.persistence.repository.Li
 import com.ggar.hibiki.features.library.service.AddMediaToLibraryCommandHandlerImpl;
 import com.ggar.hibiki.test.contracts.library.AddMediaToLibraryContractTest;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AddMediaToLibraryMockedIntegrationTest extends AddMediaToLibraryContractTest {
@@ -49,11 +48,9 @@ public class AddMediaToLibraryMockedIntegrationTest extends AddMediaToLibraryCon
         LibraryItemEntity entity = new LibraryItemEntity();
         entity.setMediaId(songId);
         entity.setUserId(userId);
-        
-        LibraryItemDto dto = LibraryItemDto.builder()
-                .mediaId(songId)
-                .userId(userId)
-                .build();
+
+        LibraryItemDto dto =
+                LibraryItemDto.builder().mediaId(songId).userId(userId).build();
 
         when(libraryRepository.findByUserIdAndMediaId(userId, songId)).thenReturn(Mono.empty());
         when(libraryRepository.save(any(LibraryItemEntity.class))).thenReturn(Mono.just(entity));
@@ -78,11 +75,9 @@ public class AddMediaToLibraryMockedIntegrationTest extends AddMediaToLibraryCon
         LibraryItemEntity entity = new LibraryItemEntity();
         entity.setMediaId(songId);
         entity.setUserId(userId);
-        
-        LibraryItemDto dto = LibraryItemDto.builder()
-                .mediaId(songId)
-                .userId(userId)
-                .build();
+
+        LibraryItemDto dto =
+                LibraryItemDto.builder().mediaId(songId).userId(userId).build();
 
         when(libraryRepository.findByUserIdAndMediaId(userId, songId)).thenReturn(Mono.just(entity));
         when(libraryMapper.toDto(any(LibraryItemEntity.class))).thenReturn(dto);

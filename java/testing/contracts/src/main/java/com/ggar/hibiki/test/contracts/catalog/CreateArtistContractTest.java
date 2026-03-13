@@ -1,18 +1,18 @@
 package com.ggar.hibiki.test.contracts.catalog;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.ggar.hibiki.core.catalog.dto.ArtistDto;
-import com.ggar.hibiki.core.catalog.dto.CreateArtistCommand;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public abstract class CreateArtistContractTest {
 
     protected abstract ScenarioResult<ArtistDto> givenArtistDoesNotExist(String name);
+
     protected abstract ScenarioResult<ArtistDto> givenArtistAlreadyExists(String name);
 
     @Nested
@@ -62,7 +62,8 @@ public abstract class CreateArtistContractTest {
         @Test
         @DisplayName("then NO new artist should be created in persistence")
         final void thenNoDuplicate() {
-            assertThat(result.getState().get("countAfter")).isEqualTo(result.getState().get("countBefore"));
+            assertThat(result.getState().get("countAfter"))
+                    .isEqualTo(result.getState().get("countBefore"));
         }
     }
 }

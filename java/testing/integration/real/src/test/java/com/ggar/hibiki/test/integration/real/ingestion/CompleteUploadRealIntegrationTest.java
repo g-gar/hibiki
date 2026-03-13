@@ -1,9 +1,9 @@
 package com.ggar.hibiki.test.integration.real.ingestion;
 
 import com.ggar.hibiki.features.ingestion.dto.CompleteUploadCommand;
-import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
 import com.ggar.hibiki.features.ingestion.service.CompleteUploadCommandHandler;
 import com.ggar.hibiki.test.support.CapturingEventBus;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,15 +19,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-import java.util.UUID;
-
 @SpringBootTest
 @Testcontainers
 public class CompleteUploadRealIntegrationTest {
 
     @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5")
-            .withoutAuthentication();
+    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
 
     @DynamicPropertySource
     static void neo4jProperties(DynamicPropertyRegistry registry) {
@@ -61,7 +58,7 @@ public class CompleteUploadRealIntegrationTest {
         // 1. Crear una sesiÃ³n en Neo4j
         // 2. Ejecutar el handler
         // 3. Verificar eventos y el estado de la sesiÃ³n
-        
+
         // Dado que esto es parte de un refactor de patrones reactivos:
         UUID userId = UUID.randomUUID();
         UUID sessionId = UUID.randomUUID();

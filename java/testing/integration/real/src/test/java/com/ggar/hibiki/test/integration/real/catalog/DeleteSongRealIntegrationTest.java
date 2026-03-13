@@ -6,6 +6,8 @@ import com.ggar.hibiki.core.catalog.persistence.repository.SongRepository;
 import com.ggar.hibiki.core.catalog.usecase.handler.command.DeleteSongCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.DeleteSongContractTest;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -15,16 +17,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 @SpringBootTest
 @Testcontainers
 public class DeleteSongRealIntegrationTest extends DeleteSongContractTest {
 
     @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5")
-            .withoutAuthentication();
+    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
 
     @DynamicPropertySource
     static void neo4jProperties(DynamicPropertyRegistry registry) {
@@ -43,24 +41,20 @@ public class DeleteSongRealIntegrationTest extends DeleteSongContractTest {
         SongEntity song = new SongEntity();
         song.setId(songId);
         song.setTitle("Test Song");
-        
-        songRepository.save(song)
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .verifyComplete();
+
+        songRepository.save(song).as(StepVerifier::create).expectNextCount(1).verifyComplete();
 
         // Act & Assert
-        handler.handle(new DeleteSongCommand(songId))
-                .as(StepVerifier::create)
-                .verifyComplete();
+        handler.handle(new DeleteSongCommand(songId)).as(StepVerifier::create).verifyComplete();
 
         // Check persistence
         AtomicBoolean exists = new AtomicBoolean(true);
-        songRepository.findById(songId)
+        songRepository
+                .findById(songId)
                 .as(StepVerifier::create)
                 .expectNextCount(0)
                 .verifyComplete();
-        
+
         exists.set(false); // If verifyComplete passes without expectNext, it's gone.
 
         return ScenarioResult.<Void>builder()
@@ -71,11 +65,8 @@ public class DeleteSongRealIntegrationTest extends DeleteSongContractTest {
     @Override
     protected ScenarioResult<Void> givenSongDoesNotExist(String songId) {
         // Act & Assert
-        handler.handle(new DeleteSongCommand(songId))
-                .as(StepVerifier::create)
-                .verifyComplete();
+        handler.handle(new DeleteSongCommand(songId)).as(StepVerifier::create).verifyComplete();
 
-        return ScenarioResult.<Void>builder()
-                .build();
+        return ScenarioResult.<Void>builder().build();
     }
 }

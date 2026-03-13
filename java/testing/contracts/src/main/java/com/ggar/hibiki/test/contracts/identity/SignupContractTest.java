@@ -1,17 +1,17 @@
 package com.ggar.hibiki.test.contracts.identity;
 
-import com.ggar.hibiki.core.identity.dto.UserDto;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.ggar.hibiki.test.support.ScenarioResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public abstract class SignupContractTest {
 
     protected abstract ScenarioResult<Void> givenUserRegistersWithValidData(String email, String password);
+
     protected abstract ScenarioResult<Void> givenEmailIsAlreadyTaken(String email, String password);
 
     @Nested

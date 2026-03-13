@@ -1,5 +1,7 @@
 package com.ggar.hibiki.test.integration.mocked.catalog;
 
+import static org.mockito.Mockito.*;
+
 import com.ggar.hibiki.core.catalog.dto.DeleteArtistCommand;
 import com.ggar.hibiki.core.catalog.persistence.entity.ArtistEntity;
 import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;
@@ -8,16 +10,13 @@ import com.ggar.hibiki.core.catalog.usecase.handler.command.DeleteArtistCommandH
 import com.ggar.hibiki.test.contracts.catalog.DeleteArtistContractTest;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.Map;
-
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteArtistMockedIntegrationTest extends DeleteArtistContractTest {
@@ -56,14 +55,15 @@ public class DeleteArtistMockedIntegrationTest extends DeleteArtistContractTest 
         return ScenarioResult.<Void>builder()
                 .events(eventBus.getPublishedEvents())
                 .state(Map.of(
-                    "artistExists", false,
-                    "albumExists", false // Contract expectation for Sole Owner
-                ))
+                        "artistExists", false,
+                        "albumExists", false // Contract expectation for Sole Owner
+                        ))
                 .build();
     }
 
     @Override
-    protected ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(String artistId, String albumId, String otherArtistId) {
+    protected ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(
+            String artistId, String albumId, String otherArtistId) {
         // Arrange
         ArtistEntity artist = new ArtistEntity("Featured Artist");
         artist.setId(artistId);
@@ -79,10 +79,9 @@ public class DeleteArtistMockedIntegrationTest extends DeleteArtistContractTest 
         return ScenarioResult.<Void>builder()
                 .events(eventBus.getPublishedEvents())
                 .state(Map.of(
-                    "artistExists", false,
-                    "albumExists", true, 
-                    "otherArtistLinked", true
-                ))
+                        "artistExists", false,
+                        "albumExists", true,
+                        "otherArtistLinked", true))
                 .build();
     }
 }

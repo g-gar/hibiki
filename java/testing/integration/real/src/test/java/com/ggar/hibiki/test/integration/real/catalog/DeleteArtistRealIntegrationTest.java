@@ -9,6 +9,9 @@ import com.ggar.hibiki.core.catalog.usecase.handler.command.DeleteArtistCommandH
 import com.ggar.hibiki.test.contracts.catalog.DeleteArtistContractTest;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,17 +25,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
 @SpringBootTest
 @Testcontainers
 public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
 
     @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5")
-            .withoutAuthentication();
+    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
 
     @DynamicPropertySource
     static void neo4jProperties(DynamicPropertyRegistry registry) {
@@ -70,7 +68,8 @@ public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
         // Arrange
         ArtistEntity artist = new ArtistEntity("Solo Artist");
         artist.setId(artistId);
-        artistRepository.save(artist)
+        artistRepository
+                .save(artist)
                 .as(StepVerifier::create)
                 .expectNextCount(1)
                 .verifyComplete();
@@ -78,10 +77,7 @@ public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
         AlbumEntity album = new AlbumEntity("Solo Album", 2024);
         album.setId(albumId);
         album.setArtist(artist);
-        albumRepository.save(album)
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .verifyComplete();
+        albumRepository.save(album).as(StepVerifier::create).expectNextCount(1).verifyComplete();
 
         // Act & Assert
         handler.handle(new DeleteArtistCommand(artistId))
@@ -90,13 +86,15 @@ public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
 
         // Check effects reactively
         AtomicBoolean artistExists = new AtomicBoolean(true);
-        artistRepository.existsById(artistId)
+        artistRepository
+                .existsById(artistId)
                 .as(StepVerifier::create)
                 .assertNext(artistExists::set)
                 .verifyComplete();
 
         AtomicBoolean albumExists = new AtomicBoolean(true);
-        albumRepository.existsById(albumId)
+        albumRepository
+                .existsById(albumId)
                 .as(StepVerifier::create)
                 .assertNext(albumExists::set)
                 .verifyComplete();
@@ -104,36 +102,35 @@ public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
         return ScenarioResult.<Void>builder()
                 .events(eventBus.getPublishedEvents())
                 .state(Map.of(
-                    "artistExists", artistExists.get(),
-                    "albumExists", albumExists.get()
-                ))
+                        "artistExists", artistExists.get(),
+                        "albumExists", albumExists.get()))
                 .build();
     }
 
     @Override
-    protected ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(String artistId, String albumId, String otherArtistId) {
+    protected ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(
+            String artistId, String albumId, String otherArtistId) {
         // Arrange
         ArtistEntity mainArtist = new ArtistEntity("Main Artist");
         mainArtist.setId(otherArtistId);
-        artistRepository.save(mainArtist)
+        artistRepository
+                .save(mainArtist)
                 .as(StepVerifier::create)
                 .expectNextCount(1)
                 .verifyComplete();
 
         ArtistEntity collaborator = new ArtistEntity("Collaborator");
         collaborator.setId(artistId);
-        artistRepository.save(collaborator)
+        artistRepository
+                .save(collaborator)
                 .as(StepVerifier::create)
                 .expectNextCount(1)
                 .verifyComplete();
 
         AlbumEntity album = new AlbumEntity("Main Album", 2024);
         album.setId(albumId);
-        album.setArtist(mainArtist); 
-        albumRepository.save(album)
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .verifyComplete();
+        album.setArtist(mainArtist);
+        albumRepository.save(album).as(StepVerifier::create).expectNextCount(1).verifyComplete();
 
         // Act & Assert
         handler.handle(new DeleteArtistCommand(artistId))
@@ -142,32 +139,35 @@ public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
 
         // Check effects reactively
         AtomicBoolean artistExists = new AtomicBoolean(true);
-        artistRepository.existsById(artistId)
+        artistRepository
+                .existsById(artistId)
                 .as(StepVerifier::create)
                 .assertNext(artistExists::set)
                 .verifyComplete();
 
         AtomicBoolean albumExists = new AtomicBoolean(true);
-        albumRepository.existsById(albumId)
+        albumRepository
+                .existsById(albumId)
                 .as(StepVerifier::create)
                 .assertNext(albumExists::set)
                 .verifyComplete();
-        
+
         AtomicReference<AlbumEntity> reloadedAlbum = new AtomicReference<>();
-        albumRepository.findById(albumId)
+        albumRepository
+                .findById(albumId)
                 .as(StepVerifier::create)
                 .assertNext(reloadedAlbum::set)
                 .verifyComplete();
 
-        boolean otherArtistLinked = reloadedAlbum.get() != null && reloadedAlbum.get().getArtist().getId().equals(otherArtistId);
+        boolean otherArtistLinked = reloadedAlbum.get() != null
+                && reloadedAlbum.get().getArtist().getId().equals(otherArtistId);
 
         return ScenarioResult.<Void>builder()
                 .events(eventBus.getPublishedEvents())
                 .state(Map.of(
-                    "artistExists", artistExists.get(),
-                    "albumExists", albumExists.get(),
-                    "otherArtistLinked", otherArtistLinked
-                ))
+                        "artistExists", artistExists.get(),
+                        "albumExists", albumExists.get(),
+                        "otherArtistLinked", otherArtistLinked))
                 .build();
     }
 }

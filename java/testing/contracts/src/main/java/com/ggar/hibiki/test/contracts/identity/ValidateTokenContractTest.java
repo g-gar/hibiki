@@ -1,5 +1,7 @@
 package com.ggar.hibiki.test.contracts.identity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.ggar.hibiki.core.identity.dto.UserDto;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,12 +9,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public abstract class ValidateTokenContractTest {
 
     protected abstract ScenarioResult<UserDto> givenTokenIsValid(String token);
+
     protected abstract ScenarioResult<UserDto> givenTokenIsExpired(String token);
+
     protected abstract ScenarioResult<UserDto> givenTokenIsInvalid(String token);
 
     @Nested

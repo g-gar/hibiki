@@ -1,12 +1,15 @@
 package com.ggar.hibiki.test.integration.real.library;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.dto.RemoveMediaFromLibraryCommand;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
-import com.ggar.hibiki.features.library.port.LibraryRepository;
 import com.ggar.hibiki.features.library.service.AddMediaToLibraryCommandHandler;
 import com.ggar.hibiki.features.library.service.RemoveMediaFromLibraryCommandHandler;
 import com.ggar.hibiki.test.support.CapturingEventBus;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,18 +25,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @SpringBootTest
 @Testcontainers
 public class RemoveMediaFromLibraryRealIntegrationTest {
 
     @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5")
-            .withoutAuthentication();
+    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
 
     @DynamicPropertySource
     static void neo4jProperties(DynamicPropertyRegistry registry) {
@@ -70,18 +67,20 @@ public class RemoveMediaFromLibraryRealIntegrationTest {
         UUID mediaId = UUID.randomUUID();
 
         // 1. Add first
-        addHandler.handle(AddMediaToLibraryCommand.builder()
-                .userId(userId)
-                .mediaId(mediaId)
-                .type(LibraryItemType.SONG)
-                .build())
+        addHandler
+                .handle(AddMediaToLibraryCommand.builder()
+                        .userId(userId)
+                        .mediaId(mediaId)
+                        .type(LibraryItemType.SONG)
+                        .build())
                 .as(StepVerifier::create)
                 .expectNextCount(1)
                 .verifyComplete();
 
         // 2. Remove
         AtomicReference<UUID> resultRef = new AtomicReference<>();
-        removeHandler.handle(new RemoveMediaFromLibraryCommand(userId, mediaId))
+        removeHandler
+                .handle(new RemoveMediaFromLibraryCommand(userId, mediaId))
                 .as(StepVerifier::create)
                 .assertNext(resultRef::set)
                 .verifyComplete();

@@ -1,18 +1,18 @@
 package com.ggar.hibiki.test.contracts.catalog;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public abstract class DeleteSongContractTest {
 
     protected abstract ScenarioResult<Void> givenSongExists(String songId);
+
     protected abstract ScenarioResult<Void> givenSongDoesNotExist(String songId);
 
     @Nested

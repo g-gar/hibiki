@@ -1,19 +1,19 @@
 package com.ggar.hibiki.test.contracts.library;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.ggar.hibiki.features.library.dto.LibraryItemDto;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public abstract class AddMediaToLibraryContractTest {
 
     protected abstract ScenarioResult<LibraryItemDto> givenUserAddsSongToLibrary(String userId, String songId);
+
     protected abstract ScenarioResult<LibraryItemDto> givenSongIsAlreadyInLibrary(String userId, String songId);
 
     @Nested
@@ -32,7 +32,7 @@ public abstract class AddMediaToLibraryContractTest {
         @DisplayName("then logical library item should be created")
         final void thenCreated() {
             assertThat(result.getReturnValue()).isNotNull();
-            assertThat(result.getReturnValue().getMediaId()).isEqualTo(song);
+            assertThat(result.getReturnValue().getSongId()).isEqualTo(song);
         }
 
         @Test
@@ -63,7 +63,8 @@ public abstract class AddMediaToLibraryContractTest {
         @Test
         @DisplayName("then NO duplicate records should exist")
         final void thenNoDuplicates() {
-            assertThat(result.getState().get("countBefore")).isEqualTo(result.getState().get("countAfter"));
+            assertThat(result.getState().get("countBefore"))
+                    .isEqualTo(result.getState().get("countAfter"));
         }
     }
 }

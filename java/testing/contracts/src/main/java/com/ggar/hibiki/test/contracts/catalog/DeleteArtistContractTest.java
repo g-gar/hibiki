@@ -1,20 +1,21 @@
 package com.ggar.hibiki.test.contracts.catalog;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.ggar.hibiki.core.catalog.event.ArtistDeletedEvent;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public abstract class DeleteArtistContractTest {
 
     protected abstract ScenarioResult<Void> givenArtistIsSoleOwnerOfAlbum(String artistId, String albumId);
-    protected abstract ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(String artistId, String albumId, String otherArtistId);
+
+    protected abstract ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(
+            String artistId, String albumId, String otherArtistId);
 
     @Nested
     @DisplayName("Scenario: artist is the sole owner of an album")
@@ -43,7 +44,9 @@ public abstract class DeleteArtistContractTest {
         @Test
         @DisplayName("then ArtistDeletedEvent should be published")
         final void thenEventPublished() {
-            assertThat(result.getEvents()).filteredOn(e -> e instanceof ArtistDeletedEvent).hasSize(1);
+            assertThat(result.getEvents())
+                    .filteredOn(e -> e instanceof ArtistDeletedEvent)
+                    .hasSize(1);
             ArtistDeletedEvent event = (ArtistDeletedEvent) result.getEvents().get(0);
             assertThat(event.getArtistId()).isEqualTo(artistId);
         }
@@ -83,7 +86,9 @@ public abstract class DeleteArtistContractTest {
         @Test
         @DisplayName("then ArtistDeletedEvent should be published")
         final void thenEventPublished() {
-            assertThat(result.getEvents()).filteredOn(e -> e instanceof ArtistDeletedEvent).hasSize(1);
+            assertThat(result.getEvents())
+                    .filteredOn(e -> e instanceof ArtistDeletedEvent)
+                    .hasSize(1);
         }
     }
 }

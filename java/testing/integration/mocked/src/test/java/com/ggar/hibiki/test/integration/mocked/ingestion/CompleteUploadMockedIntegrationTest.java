@@ -1,6 +1,9 @@
 package com.ggar.hibiki.test.integration.mocked.ingestion;
 
-import com.ggar.hibiki.core.shared.event.EventBus;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.ggar.hibiki.features.ingestion.dto.CompleteUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
 import com.ggar.hibiki.features.ingestion.handler.CompleteUploadCommandHandlerImpl;
@@ -14,6 +17,8 @@ import com.ggar.hibiki.features.ingestion.port.MediaRepository;
 import com.ggar.hibiki.features.ingestion.port.MediaStorage;
 import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
 import com.ggar.hibiki.test.support.CapturingEventBus;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,24 +28,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 public class CompleteUploadMockedIntegrationTest {
 
     @Mock
     private UploadSessionRepository uploadSessionRepository;
+
     @Mock
     private MediaStorage mediaStorage;
+
     @Mock
     private MediaRepository mediaRepository;
+
     @Mock
     private IngestionPipeline ingestionPipeline;
+
     @Mock
     private MediaMapper mediaMapper;
 
@@ -50,13 +52,7 @@ public class CompleteUploadMockedIntegrationTest {
     @BeforeEach
     void setup() {
         handler = new CompleteUploadCommandHandlerImpl(
-                uploadSessionRepository,
-                mediaStorage,
-                mediaRepository,
-                ingestionPipeline,
-                mediaMapper,
-                eventBus
-        );
+                uploadSessionRepository, mediaStorage, mediaRepository, ingestionPipeline, mediaMapper, eventBus);
         eventBus.clear();
     }
 
@@ -67,7 +63,7 @@ public class CompleteUploadMockedIntegrationTest {
         UUID userId = UUID.randomUUID();
         UUID sessionId = UUID.randomUUID();
         UUID itemId = UUID.randomUUID();
-        
+
         UploadSession session = UploadSession.builder()
                 .id(UploadSessionId.of(sessionId))
                 .items(List.of(UploadItem.builder()
@@ -79,8 +75,10 @@ public class CompleteUploadMockedIntegrationTest {
 
         when(uploadSessionRepository.findById(any())).thenReturn(Mono.just(session));
         when(mediaStorage.completeMultipartUpload(any(), any(), any())).thenReturn(Mono.empty());
-        when(mediaRepository.save(any())).thenReturn(Mono.just(mock(com.ggar.hibiki.features.ingestion.model.Media.class)));
-        when(ingestionPipeline.execute(any())).thenReturn(Mono.just(mock(com.ggar.hibiki.features.ingestion.pipeline.IngestionContext.class)));
+        when(mediaRepository.save(any()))
+                .thenReturn(Mono.just(mock(com.ggar.hibiki.features.ingestion.model.Media.class)));
+        when(ingestionPipeline.execute(any()))
+                .thenReturn(Mono.just(mock(com.ggar.hibiki.features.ingestion.pipeline.IngestionContext.class)));
         when(uploadSessionRepository.save(any())).thenReturn(Mono.just(session));
         when(mediaMapper.toDto(any())).thenReturn(UploadSessionDto.builder().build());
 
@@ -92,10 +90,7 @@ public class CompleteUploadMockedIntegrationTest {
                 .build();
 
         // Act & Assert
-        handler.handle(command)
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .verifyComplete();
+        handler.handle(command).as(StepVerifier::create).expectNextCount(1).verifyComplete();
 
         // Verification
         verify(mediaStorage).completeMultipartUpload(any(), any(), any());

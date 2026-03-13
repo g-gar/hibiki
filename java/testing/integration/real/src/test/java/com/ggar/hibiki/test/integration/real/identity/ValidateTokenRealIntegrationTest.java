@@ -1,15 +1,17 @@
 package com.ggar.hibiki.test.integration.real.identity;
 
+import com.ggar.hibiki.core.identity.dto.AuthResponse;
+import com.ggar.hibiki.core.identity.dto.LoginRequest;
+import com.ggar.hibiki.core.identity.dto.SignupRequest;
 import com.ggar.hibiki.core.identity.dto.UserDto;
 import com.ggar.hibiki.core.identity.dto.ValidateTokenQuery;
 import com.ggar.hibiki.core.identity.service.LoginCommandHandler;
 import com.ggar.hibiki.core.identity.service.SignupCommandHandler;
 import com.ggar.hibiki.core.identity.service.ValidateTokenQueryHandler;
-import com.ggar.hibiki.core.identity.dto.LoginRequest;
-import com.ggar.hibiki.core.identity.dto.SignupRequest;
-import com.ggar.hibiki.core.identity.dto.AuthResponse;
 import com.ggar.hibiki.test.contracts.identity.ValidateTokenContractTest;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -19,16 +21,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-
 @SpringBootTest
 @Testcontainers
 public class ValidateTokenRealIntegrationTest extends ValidateTokenContractTest {
 
     @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5")
-            .withoutAuthentication();
+    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
 
     @DynamicPropertySource
     static void neo4jProperties(DynamicPropertyRegistry registry) {
@@ -52,13 +50,15 @@ public class ValidateTokenRealIntegrationTest extends ValidateTokenContractTest 
         String username = "user_" + System.currentTimeMillis();
 
         // 1. Signup
-        signupHandler.handle(new SignupRequest(username, email, password))
+        signupHandler
+                .handle(new SignupRequest(username, email, password))
                 .as(StepVerifier::create)
                 .verifyComplete();
 
         // 2. Login to get token
         AtomicReference<AuthResponse> authRef = new AtomicReference<>();
-        loginHandler.handle(new LoginRequest(username, password))
+        loginHandler
+                .handle(new LoginRequest(username, password))
                 .as(StepVerifier::create)
                 .assertNext(authRef::set)
                 .verifyComplete();
@@ -67,18 +67,15 @@ public class ValidateTokenRealIntegrationTest extends ValidateTokenContractTest 
 
         // 3. Act: Validate
         AtomicReference<Map<String, Object>> resultRef = new AtomicReference<>();
-        validateTokenHandler.handle(new ValidateTokenQuery(realToken))
+        validateTokenHandler
+                .handle(new ValidateTokenQuery(realToken))
                 .as(StepVerifier::create)
                 .assertNext(resultRef::set)
                 .verifyComplete();
 
-        UserDto userDto = UserDto.builder()
-                .email(email)
-                .build();
+        UserDto userDto = UserDto.builder().email(email).build();
 
-        return ScenarioResult.<UserDto>builder()
-                .returnValue(userDto)
-                .build();
+        return ScenarioResult.<UserDto>builder().returnValue(userDto).build();
     }
 
     @Override
@@ -95,7 +92,8 @@ public class ValidateTokenRealIntegrationTest extends ValidateTokenContractTest 
     protected ScenarioResult<UserDto> givenTokenIsInvalid(String token) {
         // Act & Assert
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
-        validateTokenHandler.handle(new ValidateTokenQuery("invalid-token"))
+        validateTokenHandler
+                .handle(new ValidateTokenQuery("invalid-token"))
                 .as(StepVerifier::create)
                 .consumeErrorWith(errorRef::set)
                 .verify();

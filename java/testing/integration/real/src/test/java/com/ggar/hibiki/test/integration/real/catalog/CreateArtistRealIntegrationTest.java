@@ -7,6 +7,9 @@ import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
 import com.ggar.hibiki.core.catalog.usecase.handler.command.CreateArtistCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.CreateArtistContractTest;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -16,17 +19,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-
 @SpringBootTest
 @Testcontainers
 public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
 
     @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5")
-            .withoutAuthentication();
+    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
 
     @DynamicPropertySource
     static void neo4jProperties(DynamicPropertyRegistry registry) {
@@ -43,7 +41,8 @@ public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
     protected ScenarioResult<ArtistDto> givenArtistDoesNotExist(String name) {
         // Arrange
         AtomicLong countBefore = new AtomicLong();
-        artistRepository.count()
+        artistRepository
+                .count()
                 .as(StepVerifier::create)
                 .assertNext(countBefore::set)
                 .verifyComplete();
@@ -57,7 +56,8 @@ public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
 
         // Post-condition
         AtomicReference<Boolean> persisted = new AtomicReference<>(false);
-        artistRepository.findByNameIgnoreCase(name)
+        artistRepository
+                .findByNameIgnoreCase(name)
                 .as(StepVerifier::create)
                 .expectNextCount(1)
                 .verifyComplete();
@@ -73,13 +73,15 @@ public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
     protected ScenarioResult<ArtistDto> givenArtistAlreadyExists(String name) {
         // Arrange
         ArtistEntity existing = new ArtistEntity(name);
-        artistRepository.save(existing)
+        artistRepository
+                .save(existing)
                 .as(StepVerifier::create)
                 .expectNextCount(1)
                 .verifyComplete();
-        
+
         AtomicLong countBefore = new AtomicLong();
-        artistRepository.count()
+        artistRepository
+                .count()
                 .as(StepVerifier::create)
                 .assertNext(countBefore::set)
                 .verifyComplete();
@@ -93,7 +95,8 @@ public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
 
         // Post-condition
         AtomicLong countAfter = new AtomicLong();
-        artistRepository.count()
+        artistRepository
+                .count()
                 .as(StepVerifier::create)
                 .assertNext(countAfter::set)
                 .verifyComplete();

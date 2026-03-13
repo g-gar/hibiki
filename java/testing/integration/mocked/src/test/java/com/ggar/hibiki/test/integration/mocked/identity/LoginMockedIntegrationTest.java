@@ -1,5 +1,8 @@
 package com.ggar.hibiki.test.integration.mocked.identity;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
 import com.ggar.hibiki.core.identity.dto.AuthResponse;
 import com.ggar.hibiki.core.identity.dto.LoginRequest;
 import com.ggar.hibiki.core.identity.model.User;
@@ -8,19 +11,15 @@ import com.ggar.hibiki.core.identity.usecase.impl.LoginCommandHandlerImpl;
 import com.ggar.hibiki.packages.jwt.signer.JwtSigner;
 import com.ggar.hibiki.test.contracts.identity.LoginContractTest;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class LoginMockedIntegrationTest extends LoginContractTest {
@@ -43,11 +42,8 @@ public class LoginMockedIntegrationTest extends LoginContractTest {
         // Arrange
         String username = email.split("@")[0];
         UUID userId = UUID.randomUUID();
-        User user = User.builder()
-                .id(userId)
-                .username(username)
-                .password(password)
-                .build();
+        User user =
+                User.builder().id(userId).username(username).password(password).build();
 
         when(userRepository.findByUsername(username)).thenReturn(Mono.just(user));
         when(jwtSigner.generateToken(anyString())).thenReturn(Mono.just("access-token"));

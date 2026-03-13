@@ -1,5 +1,7 @@
 package com.ggar.hibiki.test.contracts.orchestrator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.ggar.hibiki.core.identity.dto.AuthResponse;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,15 +9,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public abstract class LoginUseCaseContractTest {
 
-    protected abstract ScenarioResult<AuthResponse> givenCredentialsAndDeviceAreValid(String username, String password, String deviceId);
-    protected abstract ScenarioResult<AuthResponse> givenInvalidCredentials(String username, String password, String deviceId);
-    protected abstract ScenarioResult<AuthResponse> givenInvalidDevice(String username, String password, String deviceId);
+    protected abstract ScenarioResult<AuthResponse> givenCredentialsAndDeviceAreValid(
+            String username, String password, String deviceId);
+
+    protected abstract ScenarioResult<AuthResponse> givenInvalidCredentials(
+            String username, String password, String deviceId);
+
+    protected abstract ScenarioResult<AuthResponse> givenInvalidDevice(
+            String username, String password, String deviceId);
 
     @Nested
     @DisplayName("Scenario: successful login")
@@ -34,7 +37,7 @@ public abstract class LoginUseCaseContractTest {
         @DisplayName("then it should return an AuthResponse with tokens")
         final void thenReturnsTokens() {
             assertThat(result.getReturnValue()).isNotNull();
-            assertThat(result.getReturnValue().getAccessToken()).isNotEmpty();
+            assertThat(result.getReturnValue().getToken()).isNotEmpty();
         }
 
         @Test

@@ -6,6 +6,8 @@ import com.ggar.hibiki.core.identity.usecase.impl.SignupCommandHandlerImpl;
 import com.ggar.hibiki.test.contracts.identity.SignupContractTest;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,16 +21,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-
 @SpringBootTest
 @Testcontainers
 public class SignupRealIntegrationTest extends SignupContractTest {
 
     @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5")
-            .withoutAuthentication();
+    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
 
     @DynamicPropertySource
     static void neo4jProperties(DynamicPropertyRegistry registry) {
@@ -62,7 +60,7 @@ public class SignupRealIntegrationTest extends SignupContractTest {
     @Override
     protected ScenarioResult<Void> givenUserRegistersWithValidData(String email, String password) {
         String username = "realuser" + System.currentTimeMillis();
-        
+
         // Act & Assert
         handler.handle(new SignupRequest(username, email, password))
                 .as(StepVerifier::create)
@@ -70,7 +68,8 @@ public class SignupRealIntegrationTest extends SignupContractTest {
 
         // Verify persistence
         AtomicReference<Boolean> persisted = new AtomicReference<>(false);
-        userRepository.findByEmail(email)
+        userRepository
+                .findByEmail(email)
                 .as(StepVerifier::create)
                 .expectNextCount(1)
                 .verifyComplete();
@@ -79,16 +78,18 @@ public class SignupRealIntegrationTest extends SignupContractTest {
         return ScenarioResult.<Void>builder()
                 .events(eventBus.getPublishedEvents())
                 .state(Map.of(
-                    "persisted", persisted.get(),
-                    "passwordHashed", true // Verification of hashing would happen here in a real impl
-                ))
+                        "persisted",
+                        persisted.get(),
+                        "passwordHashed",
+                        true // Verification of hashing would happen here in a real impl
+                        ))
                 .build();
     }
 
     @Override
     protected ScenarioResult<Void> givenEmailIsAlreadyTaken(String email, String password) {
         String username = "taken" + System.currentTimeMillis();
-        
+
         // Arrange: first registration
         handler.handle(new SignupRequest(username, email, password))
                 .as(StepVerifier::create)

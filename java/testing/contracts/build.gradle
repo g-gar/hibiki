@@ -12,6 +12,9 @@ dependencies {
     // Reactor Test — para testear streams reactivos
     api 'io.projectreactor:reactor-test'
 
+    // AssertJ — para aserciones fluidas en los contratos
+    api 'org.assertj:assertj-core'
+
     // Lombok — para builders y reducción de boilerplate en fixtures
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -22,4 +25,5 @@ dependencies {
     api project(':core:identity:identity-api')
     api project(':core:orchestrator')
     api project(':features:devices:devices-api')
+    api project(':features:library:library-api')
 }
