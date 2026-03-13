@@ -30,7 +30,7 @@ public class SignupCommandHandlerImpl implements SignupCommandHandler {
                             .username(request.getUsername())
                             .email(request.getEmail())
                             .password(request.getPassword()) // TODO: Hash password
-                            .roles(Collections.singleton("ROLE_USER"))
+                            .roles(Collections.singleton("ROLE_USER")) // TODO: change this
                             .twoFactorEnabled(false)
                             .build();
                     return userRepository.save(user);
