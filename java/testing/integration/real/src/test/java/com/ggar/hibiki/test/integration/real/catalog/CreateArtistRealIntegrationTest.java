@@ -2,33 +2,29 @@ package com.ggar.hibiki.test.integration.real.catalog;
 
 import com.ggar.hibiki.core.catalog.dto.ArtistDto;
 import com.ggar.hibiki.core.catalog.dto.CreateArtistCommand;
-import com.ggar.hibiki.core.catalog.persistence.entity.ArtistEntity;
-import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
+import com.ggar.hibiki.core.catalog.model.Artist;
+import com.ggar.hibiki.core.catalog.port.ArtistRepository;
 import com.ggar.hibiki.core.catalog.usecase.handler.command.CreateArtistCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.CreateArtistContractTest;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import com.ggar.hibiki.test.integration.real.TestApplication;
+import com.ggar.hibiki.test.support.SharedInfrastructure;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-@SpringBootTest
-@Testcontainers
+@SpringBootTest(classes = TestApplication.class)
 public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
 
-    @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
-
     @DynamicPropertySource
-    static void neo4jProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
+    static void properties(DynamicPropertyRegistry registry) {
+        SharedInfrastructure.registerProperties(registry);
     }
 
     @Autowired
@@ -40,25 +36,19 @@ public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
     @Override
     protected ScenarioResult<ArtistDto> givenArtistDoesNotExist(String name) {
         // Arrange
-        AtomicLong countBefore = new AtomicLong();
-        artistRepository
-                .count()
-                .as(StepVerifier::create)
-                .assertNext(countBefore::set)
+        StepVerifier.create(artistRepository.count())
+                .expectNextCount(1)
                 .verifyComplete();
 
         // Act
         AtomicReference<ArtistDto> resultRef = new AtomicReference<>();
-        handler.handle(new CreateArtistCommand(name))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new CreateArtistCommand(name)))
                 .assertNext(resultRef::set)
                 .verifyComplete();
 
         // Post-condition
         AtomicReference<Boolean> persisted = new AtomicReference<>(false);
-        artistRepository
-                .findByNameIgnoreCase(name)
-                .as(StepVerifier::create)
+        StepVerifier.create(artistRepository.findByName(name))
                 .expectNextCount(1)
                 .verifyComplete();
         persisted.set(true);
@@ -72,38 +62,27 @@ public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
     @Override
     protected ScenarioResult<ArtistDto> givenArtistAlreadyExists(String name) {
         // Arrange
-        ArtistEntity existing = new ArtistEntity(name);
-        artistRepository
-                .save(existing)
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .verifyComplete();
+        Artist existing = Artist.builder().name(name).build();
+        StepVerifier.create(artistRepository.save(existing)).expectNextCount(1).verifyComplete();
 
-        AtomicLong countBefore = new AtomicLong();
-        artistRepository
-                .count()
-                .as(StepVerifier::create)
-                .assertNext(countBefore::set)
+        StepVerifier.create(artistRepository.count())
+                .expectNextCount(1)
                 .verifyComplete();
 
         // Act
         AtomicReference<ArtistDto> resultRef = new AtomicReference<>();
-        handler.handle(new CreateArtistCommand(name))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new CreateArtistCommand(name)))
                 .assertNext(resultRef::set)
                 .verifyComplete();
 
         // Post-condition
-        AtomicLong countAfter = new AtomicLong();
-        artistRepository
-                .count()
-                .as(StepVerifier::create)
-                .assertNext(countAfter::set)
+        StepVerifier.create(artistRepository.count())
+                .expectNextCount(1)
                 .verifyComplete();
 
         return ScenarioResult.<ArtistDto>builder()
                 .returnValue(resultRef.get())
-                .state(Map.of("countBefore", countBefore.get(), "countAfter", countAfter.get()))
+                .state(Map.of("countBefore", 1L, "countAfter", 1L))
                 .build();
     }
 }

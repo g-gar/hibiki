@@ -3,7 +3,6 @@ package com.ggar.hibiki.features.library.infrastructure.event;
 import com.ggar.hibiki.core.catalog.event.ArtistDeletedEvent;
 import com.ggar.hibiki.core.shared.event.EventHandler;
 import com.ggar.hibiki.features.library.port.LibraryRepository;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -19,6 +18,6 @@ public class ArtistDeletedCleanupEventHandler implements EventHandler<ArtistDele
 
     @Override
     public Mono<Void> handle(ArtistDeletedEvent event) {
-        return libraryRepository.removeByArtistId(UUID.fromString(event.getArtistId()));
+        return libraryRepository.removeByArtistId(event.getArtistId());
     }
 }

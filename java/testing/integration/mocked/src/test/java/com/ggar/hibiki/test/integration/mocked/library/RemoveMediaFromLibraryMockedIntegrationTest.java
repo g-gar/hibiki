@@ -2,7 +2,9 @@ package com.ggar.hibiki.test.integration.mocked.library;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.ggar.hibiki.features.library.dto.RemoveMediaFromLibraryCommand;
 import com.ggar.hibiki.features.library.port.LibraryRepository;
@@ -44,7 +46,11 @@ public class RemoveMediaFromLibraryMockedIntegrationTest {
 
         // Act & Assert
         AtomicReference<UUID> resultRef = new AtomicReference<>();
-        handler.handle(new RemoveMediaFromLibraryCommand(userId, mediaId))
+        handler.handle(RemoveMediaFromLibraryCommand.builder()
+                        .userId(userId)
+                        .type(com.ggar.hibiki.features.library.model.LibraryItemType.SONG)
+                        .mediaId(mediaId)
+                        .build())
                 .as(StepVerifier::create)
                 .assertNext(resultRef::set)
                 .verifyComplete();
@@ -64,7 +70,12 @@ public class RemoveMediaFromLibraryMockedIntegrationTest {
         when(libraryRepository.remove(any(), eq(mediaId))).thenReturn(Mono.empty());
 
         // Act & Assert
-        handler.handle(new RemoveMediaFromLibraryCommand(userId, mediaId))
+        // Act & Assert
+        handler.handle(RemoveMediaFromLibraryCommand.builder()
+                        .userId(userId)
+                        .type(com.ggar.hibiki.features.library.model.LibraryItemType.SONG)
+                        .mediaId(mediaId)
+                        .build())
                 .as(StepVerifier::create)
                 .expectNext(mediaId)
                 .verifyComplete();

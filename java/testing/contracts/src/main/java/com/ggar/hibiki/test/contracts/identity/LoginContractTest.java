@@ -17,44 +17,34 @@ public abstract class LoginContractTest {
 
     protected abstract ScenarioResult<AuthResponse> givenUserDoesNotExist(String email, String password);
 
-    @Nested
+    @Test
     @DisplayName("Scenario: successful login")
-    class Success {
+    void successfulLoginScenario() {
+        // Arrange
         String email = "user@example.com";
         String pass = "correctPass";
-        ScenarioResult<AuthResponse> result;
 
-        @BeforeEach
-        void act() {
-            result = givenCredentialsAreValid(email, pass);
-        }
+        // Act
+        ScenarioResult<AuthResponse> result = givenCredentialsAreValid(email, pass);
 
-        @Test
-        @DisplayName("then it should return access and refresh tokens")
-        final void thenReturnsTokens() {
-            assertThat(result.getReturnValue()).isNotNull();
-            assertThat(result.getReturnValue().getToken()).isNotEmpty();
-            assertThat(result.getReturnValue().getRefreshToken()).isNotEmpty();
-        }
+        // Assert
+        assertThat(result.getReturnValue()).isNotNull();
+        assertThat(result.getReturnValue().getToken()).isNotEmpty();
+        assertThat(result.getReturnValue().getRefreshToken()).isNotEmpty();
     }
 
-    @Nested
+    @Test
     @DisplayName("Scenario: wrong password")
-    class WrongPassword {
+    void wrongPasswordScenario() {
+        // Arrange
         String email = "user@example.com";
         String pass = "wrongPass";
-        ScenarioResult<AuthResponse> result;
 
-        @BeforeEach
-        void act() {
-            result = givenPasswordIsIncorrect(email, pass);
-        }
+        // Act
+        ScenarioResult<AuthResponse> result = givenPasswordIsIncorrect(email, pass);
 
-        @Test
-        @DisplayName("then it should return an unauthorized error")
-        final void thenError() {
-            assertThat(result.getError()).isNotNull();
-            assertThat(result.getState().get("errorCode")).isEqualTo("INVALID_CREDENTIALS");
-        }
+        // Assert
+        assertThat(result.getError()).isNotNull();
+        assertThat(result.getState().get("errorCode")).isEqualTo("INVALID_CREDENTIALS");
     }
 }

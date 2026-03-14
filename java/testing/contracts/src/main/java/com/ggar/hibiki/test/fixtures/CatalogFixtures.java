@@ -10,12 +10,12 @@ public final class CatalogFixtures {
     private CatalogFixtures() {}
 
     public static ArtistDto artistDto(UUID id, String name) {
-        return ArtistDto.builder().id(id.toString()).name(name).build();
+        return ArtistDto.builder().id(id).name(name).build();
     }
 
     public static AlbumDto albumDto(UUID id, String title, Integer year, String artistName) {
         return AlbumDto.builder()
-                .id(id.toString())
+                .id(id)
                 .title(title)
                 .releaseYear(year)
                 .artist(ArtistDto.builder().name(artistName).build())
@@ -24,9 +24,9 @@ public final class CatalogFixtures {
 
     public static SongDto songDto(UUID id, String title, UUID albumId) {
         return SongDto.builder()
-                .id(id.toString())
+                .id(id)
                 .title(title)
-                .album(AlbumDto.builder().id(albumId.toString()).build())
+                .album(AlbumDto.builder().id(albumId).build())
                 .build();
     }
 }

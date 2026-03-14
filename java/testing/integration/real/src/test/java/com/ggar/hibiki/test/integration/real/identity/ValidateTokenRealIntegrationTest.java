@@ -5,6 +5,7 @@ import com.ggar.hibiki.core.identity.dto.LoginRequest;
 import com.ggar.hibiki.core.identity.dto.SignupRequest;
 import com.ggar.hibiki.core.identity.dto.UserDto;
 import com.ggar.hibiki.core.identity.dto.ValidateTokenQuery;
+import com.ggar.hibiki.core.identity.persistence.repository.ReactiveNeo4jUserRepository;
 import com.ggar.hibiki.core.identity.service.LoginCommandHandler;
 import com.ggar.hibiki.core.identity.service.SignupCommandHandler;
 import com.ggar.hibiki.core.identity.service.ValidateTokenQueryHandler;
@@ -12,26 +13,27 @@ import com.ggar.hibiki.test.contracts.identity.ValidateTokenContractTest;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import com.ggar.hibiki.test.integration.real.TestApplication;
+import com.ggar.hibiki.test.support.SharedInfrastructure;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-@SpringBootTest
-@Testcontainers
+@SpringBootTest(classes = TestApplication.class)
+@ActiveProfiles("test")
 public class ValidateTokenRealIntegrationTest extends ValidateTokenContractTest {
 
-    @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
-
     @DynamicPropertySource
-    static void neo4jProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
+    static void properties(DynamicPropertyRegistry registry) {
+        SharedInfrastructure.registerProperties(registry);
     }
+
+    @Autowired
+    private ReactiveNeo4jUserRepository neo4jUserRepository;
 
     @Autowired
     private SignupCommandHandler signupHandler;
@@ -42,6 +44,11 @@ public class ValidateTokenRealIntegrationTest extends ValidateTokenContractTest 
     @Autowired
     private ValidateTokenQueryHandler validateTokenHandler;
 
+    @BeforeEach
+    void setup() {
+        neo4jUserRepository.deleteAll().block();
+    }
+
     @Override
     protected ScenarioResult<UserDto> givenTokenIsValid(String token) {
         // En un test real, 'token' viene del contrato pero queremos uno vÃ¡lido real
@@ -50,26 +57,21 @@ public class ValidateTokenRealIntegrationTest extends ValidateTokenContractTest 
         String username = "user_" + System.currentTimeMillis();
 
         // 1. Signup
-        signupHandler
-                .handle(new SignupRequest(username, email, password))
-                .as(StepVerifier::create)
+        StepVerifier.create(signupHandler.handle(new SignupRequest(username, email, password)))
                 .verifyComplete();
 
         // 2. Login to get token
         AtomicReference<AuthResponse> authRef = new AtomicReference<>();
-        loginHandler
-                .handle(new LoginRequest(username, password))
-                .as(StepVerifier::create)
+        StepVerifier.create(loginHandler.handle(
+                        new LoginRequest(username, password, "test-device", "127.0.0.1", "test-agent")))
                 .assertNext(authRef::set)
                 .verifyComplete();
 
-        String realToken = authRef.get().getAccessToken();
+        String realToken = authRef.get().getToken();
 
         // 3. Act: Validate
         AtomicReference<Map<String, Object>> resultRef = new AtomicReference<>();
-        validateTokenHandler
-                .handle(new ValidateTokenQuery(realToken))
-                .as(StepVerifier::create)
+        StepVerifier.create(validateTokenHandler.handle(new ValidateTokenQuery(realToken)))
                 .assertNext(resultRef::set)
                 .verifyComplete();
 
@@ -92,9 +94,7 @@ public class ValidateTokenRealIntegrationTest extends ValidateTokenContractTest 
     protected ScenarioResult<UserDto> givenTokenIsInvalid(String token) {
         // Act & Assert
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
-        validateTokenHandler
-                .handle(new ValidateTokenQuery("invalid-token"))
-                .as(StepVerifier::create)
+        StepVerifier.create(validateTokenHandler.handle(new ValidateTokenQuery("invalid-token")))
                 .consumeErrorWith(errorRef::set)
                 .verify();
 

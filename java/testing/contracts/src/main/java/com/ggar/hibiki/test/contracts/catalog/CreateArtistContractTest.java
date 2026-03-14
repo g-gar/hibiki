@@ -15,55 +15,35 @@ public abstract class CreateArtistContractTest {
 
     protected abstract ScenarioResult<ArtistDto> givenArtistAlreadyExists(String name);
 
-    @Nested
+    @Test
     @DisplayName("Scenario: artist does not exist")
-    class NewArtist {
+    void newArtistScenario() {
+        // Arrange
         String name = "New Artist";
-        ScenarioResult<ArtistDto> result;
 
-        @BeforeEach
-        void act() {
-            result = givenArtistDoesNotExist(name);
-        }
+        // Act
+        ScenarioResult<ArtistDto> result = givenArtistDoesNotExist(name);
 
-        @Test
-        @DisplayName("then it should return the created artist with a generated ID")
-        final void thenReturnsCreatedArtist() {
-            assertThat(result.getReturnValue()).isNotNull();
-            assertThat(result.getReturnValue().getId()).isNotNull();
-            assertThat(result.getReturnValue().getName()).isEqualTo(name);
-        }
-
-        @Test
-        @DisplayName("then it should be saved in persistence")
-        final void thenSaved() {
-            assertThat(result.getState().get("persisted")).isEqualTo(true);
-        }
+        // Assert
+        assertThat(result.getReturnValue()).isNotNull();
+        assertThat(result.getReturnValue().getId()).isNotNull();
+        assertThat(result.getReturnValue().getName()).isEqualTo(name);
+        assertThat(result.getState().get("persisted")).isEqualTo(true);
     }
 
-    @Nested
+    @Test
     @DisplayName("Scenario: artist already exists")
-    class ExistingArtist {
+    void existingArtistScenario() {
+        // Arrange
         String name = "Existing Artist";
-        ScenarioResult<ArtistDto> result;
 
-        @BeforeEach
-        void act() {
-            result = givenArtistAlreadyExists(name);
-        }
+        // Act
+        ScenarioResult<ArtistDto> result = givenArtistAlreadyExists(name);
 
-        @Test
-        @DisplayName("then it should return the existing artist (idempotent)")
-        final void thenReturnsExisting() {
-            assertThat(result.getReturnValue()).isNotNull();
-            assertThat(result.getReturnValue().getName()).isEqualTo(name);
-        }
-
-        @Test
-        @DisplayName("then NO new artist should be created in persistence")
-        final void thenNoDuplicate() {
-            assertThat(result.getState().get("countAfter"))
-                    .isEqualTo(result.getState().get("countBefore"));
-        }
+        // Assert
+        assertThat(result.getReturnValue()).isNotNull();
+        assertThat(result.getReturnValue().getName()).isEqualTo(name);
+        assertThat(result.getState().get("countAfter"))
+                .isEqualTo(result.getState().get("countBefore"));
     }
 }

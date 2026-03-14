@@ -2,9 +2,9 @@ package com.ggar.hibiki.core.catalog.usecase.handler.command;
 
 import com.ggar.hibiki.core.catalog.dto.ArtistDto;
 import com.ggar.hibiki.core.catalog.dto.CreateArtistCommand;
-import com.ggar.hibiki.core.catalog.persistence.entity.ArtistEntity;
+import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.core.catalog.persistence.mapper.ArtistMapper;
-import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
+import com.ggar.hibiki.core.catalog.port.ArtistRepository;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,10 +20,10 @@ public class CreateArtistCommandHandler implements CommandHandler<CreateArtistCo
     @Override
     public Mono<ArtistDto> handle(CreateArtistCommand command) {
         return artistRepository
-                .findByNameIgnoreCase(command.getName())
+                .findByName(command.getName())
                 .switchIfEmpty(Mono.defer(() -> {
-                    ArtistEntity entity = new ArtistEntity(command.getName());
-                    return artistRepository.save(entity);
+                    Artist artist = Artist.builder().name(command.getName()).build();
+                    return artistRepository.save(artist);
                 }))
                 .map(artistMapper::toDto);
     }

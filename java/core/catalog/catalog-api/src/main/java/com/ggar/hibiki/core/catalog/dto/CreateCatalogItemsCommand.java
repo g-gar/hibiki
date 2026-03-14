@@ -4,6 +4,7 @@ import com.ggar.hibiki.core.shared.mediator.Command;
 import com.ggar.hibiki.packages.id3v2.model.Id3v2Tag;
 import lombok.Builder;
 import lombok.Value;
+import java.util.UUID;
 
 /**
  * Creates artists, albums, and songs in the catalog by parsing standard ID3 frames.
@@ -13,6 +14,6 @@ import lombok.Value;
 @Value
 @Builder
 public class CreateCatalogItemsCommand implements Command<CatalogCreationResult> {
-    String mediaId;
+    UUID mediaId;
     Id3v2Tag id3Tag;
 }

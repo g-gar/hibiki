@@ -1,32 +1,28 @@
 package com.ggar.hibiki.test.integration.real.catalog;
 
 import com.ggar.hibiki.core.catalog.dto.DeleteSongCommand;
-import com.ggar.hibiki.core.catalog.persistence.entity.SongEntity;
-import com.ggar.hibiki.core.catalog.persistence.repository.SongRepository;
+import com.ggar.hibiki.core.catalog.model.Song;
+import com.ggar.hibiki.core.catalog.port.SongRepository;
 import com.ggar.hibiki.core.catalog.usecase.handler.command.DeleteSongCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.DeleteSongContractTest;
+import com.ggar.hibiki.test.integration.real.TestApplication;
+import com.ggar.hibiki.test.support.SharedInfrastructure;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-@SpringBootTest
-@Testcontainers
+@SpringBootTest(classes = TestApplication.class)
 public class DeleteSongRealIntegrationTest extends DeleteSongContractTest {
 
-    @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
-
     @DynamicPropertySource
-    static void neo4jProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
+    static void properties(DynamicPropertyRegistry registry) {
+        SharedInfrastructure.registerProperties(registry);
     }
 
     @Autowired
@@ -36,24 +32,18 @@ public class DeleteSongRealIntegrationTest extends DeleteSongContractTest {
     private DeleteSongCommandHandler handler;
 
     @Override
-    protected ScenarioResult<Void> givenSongExists(String songId) {
+    protected ScenarioResult<Void> givenSongExists(UUID songId) {
         // Arrange
-        SongEntity song = new SongEntity();
-        song.setId(songId);
-        song.setTitle("Test Song");
+        Song song = Song.builder().id(songId).title("Test Song").build();
 
-        songRepository.save(song).as(StepVerifier::create).expectNextCount(1).verifyComplete();
+        StepVerifier.create(songRepository.save(song)).expectNextCount(1).verifyComplete();
 
         // Act & Assert
-        handler.handle(new DeleteSongCommand(songId)).as(StepVerifier::create).verifyComplete();
+        StepVerifier.create(handler.handle(new DeleteSongCommand(songId))).verifyComplete();
 
         // Check persistence
         AtomicBoolean exists = new AtomicBoolean(true);
-        songRepository
-                .findById(songId)
-                .as(StepVerifier::create)
-                .expectNextCount(0)
-                .verifyComplete();
+        StepVerifier.create(songRepository.findById(songId)).expectNextCount(0).verifyComplete();
 
         exists.set(false); // If verifyComplete passes without expectNext, it's gone.
 
@@ -63,9 +53,9 @@ public class DeleteSongRealIntegrationTest extends DeleteSongContractTest {
     }
 
     @Override
-    protected ScenarioResult<Void> givenSongDoesNotExist(String songId) {
+    protected ScenarioResult<Void> givenSongDoesNotExist(UUID songId) {
         // Act & Assert
-        handler.handle(new DeleteSongCommand(songId)).as(StepVerifier::create).verifyComplete();
+        StepVerifier.create(handler.handle(new DeleteSongCommand(songId))).verifyComplete();
 
         return ScenarioResult.<Void>builder().build();
     }

@@ -2,8 +2,8 @@ package com.ggar.hibiki.core.catalog.usecase.handler.command;
 
 import com.ggar.hibiki.core.catalog.dto.DeleteArtistCommand;
 import com.ggar.hibiki.core.catalog.event.ArtistDeletedEvent;
-import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;
-import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
+import com.ggar.hibiki.core.catalog.port.AlbumRepository;
+import com.ggar.hibiki.core.catalog.port.ArtistRepository;
 import com.ggar.hibiki.core.shared.event.EventBus;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,9 @@ public class DeleteArtistCommandHandler implements CommandHandler<DeleteArtistCo
                     .name(artist.getName())
                     .build();
 
-            return eventBus.publish(event).then(artistRepository.deleteById(artist.getId()));
+            return eventBus.publish(event)
+                    .then(albumRepository.deleteByArtistId(artist.getId()))
+                    .then(artistRepository.deleteById(artist.getId()));
         });
     }
 }

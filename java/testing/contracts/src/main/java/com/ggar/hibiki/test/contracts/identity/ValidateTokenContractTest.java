@@ -17,41 +17,45 @@ public abstract class ValidateTokenContractTest {
 
     protected abstract ScenarioResult<UserDto> givenTokenIsInvalid(String token);
 
-    @Nested
+    @Test
     @DisplayName("Scenario: valid token")
-    class ValidToken {
+    void validTokenScenario() {
+        // Arrange
         String token = "valid.jwt.token";
-        ScenarioResult<UserDto> result;
 
-        @BeforeEach
-        void act() {
-            result = givenTokenIsValid(token);
-        }
+        // Act
+        ScenarioResult<UserDto> result = givenTokenIsValid(token);
 
-        @Test
-        @DisplayName("then it should return the user associated with the token")
-        final void thenReturnsUser() {
-            assertThat(result.getReturnValue()).isNotNull();
-            assertThat(result.getReturnValue().getEmail()).isNotEmpty();
-        }
+        // Assert
+        assertThat(result.getReturnValue()).isNotNull();
+        assertThat(result.getReturnValue().getEmail()).isNotEmpty();
     }
 
-    @Nested
+    @Test
     @DisplayName("Scenario: expired token")
-    class ExpiredToken {
+    void expiredTokenScenario() {
+        // Arrange
         String token = "expired.jwt.token";
-        ScenarioResult<UserDto> result;
 
-        @BeforeEach
-        void act() {
-            result = givenTokenIsExpired(token);
-        }
+        // Act
+        ScenarioResult<UserDto> result = givenTokenIsExpired(token);
 
-        @Test
-        @DisplayName("then it should return an error")
-        final void thenError() {
-            assertThat(result.getError()).isNotNull();
-            assertThat(result.getState().get("errorCode")).isEqualTo("TOKEN_EXPIRED");
-        }
+        // Assert
+        assertThat(result.getError()).isNotNull();
+        assertThat(result.getState().get("errorCode")).isEqualTo("TOKEN_EXPIRED");
+    }
+
+    @Test
+    @DisplayName("Scenario: invalid token")
+    void invalidTokenScenario() {
+        // Arrange
+        String token = "invalid.jwt.token";
+
+        // Act
+        ScenarioResult<UserDto> result = givenTokenIsInvalid(token);
+
+        // Assert
+        assertThat(result.getError()).isNotNull();
+        assertThat(result.getState().get("errorCode")).isEqualTo("INVALID_TOKEN");
     }
 }

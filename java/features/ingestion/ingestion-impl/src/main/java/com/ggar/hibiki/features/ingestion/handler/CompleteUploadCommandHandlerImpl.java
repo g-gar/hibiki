@@ -60,10 +60,11 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
                                     .then(createAndPersistMedia(
                                             item, userId, command.getMimeType(), command.getContentHash()))
                                     .flatMap(media -> runPipelineAndPublishEvents(media, item, session, userId)))
-                            .then(Mono.from(uploadSessionRepository.save(
-                                    session.withPhase(IngestionPhase.COMPLETED).withCompletedAt(Instant.now()))))
+                            .then(Mono.defer(() -> Mono.from(uploadSessionRepository.save(
+                                    session.withPhase(IngestionPhase.COMPLETED).withCompletedAt(Instant.now())))))
                             .map(mediaMapper::toDto);
-                });
+                })
+                .switchIfEmpty(Mono.error(new RuntimeException("Upload session not found")));
     }
 
     private Mono<Media> createAndPersistMedia(UploadItem item, UserId userId, String mimeType, String contentHash) {

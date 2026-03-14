@@ -1,6 +1,6 @@
 package com.ggar.hibiki.test.integration.mocked.identity;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import com.ggar.hibiki.core.identity.dto.UserDto;
 import com.ggar.hibiki.core.identity.dto.ValidateTokenQuery;
@@ -47,7 +47,7 @@ public class ValidateTokenMockedIntegrationTest extends ValidateTokenContractTes
 
         // Map claims to UserDto for the contract
         UserDto userDto = UserDto.builder()
-                .id(java.util.UUID.randomUUID()) // Mock ID
+                .id(java.util.UUID.randomUUID().toString()) // Mock ID
                 .email((String) resultRef.get().get("email"))
                 .build();
 

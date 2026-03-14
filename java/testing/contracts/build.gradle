@@ -13,7 +13,7 @@ dependencies {
     api 'io.projectreactor:reactor-test'
 
     // AssertJ — para aserciones fluidas en los contratos
-    api 'org.assertj:assertj-core'
+    api 'org.assertj:assertj-core:3.26.3'
 
     // Lombok — para builders y reducción de boilerplate en fixtures
     compileOnly 'org.projectlombok:lombok'
@@ -26,4 +26,7 @@ dependencies {
     api project(':core:orchestrator')
     api project(':features:devices:devices-api')
     api project(':features:library:library-api')
+    api project(':features:ingestion:ingestion-api')
+    api project(':features:search:search-api')
+    api project(':features:entitlements:entitlements-api')
 }

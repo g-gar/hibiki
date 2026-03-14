@@ -18,23 +18,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import com.ggar.hibiki.test.integration.real.TestApplication;
+import com.ggar.hibiki.test.support.SharedInfrastructure;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-@SpringBootTest
-@Testcontainers
+@SpringBootTest(classes = TestApplication.class)
+@ActiveProfiles("test")
 public class RemoveMediaFromLibraryRealIntegrationTest {
 
-    @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
-
     @DynamicPropertySource
-    static void neo4jProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
+    static void properties(DynamicPropertyRegistry registry) {
+        SharedInfrastructure.registerProperties(registry);
     }
 
     @TestConfiguration
@@ -67,21 +64,21 @@ public class RemoveMediaFromLibraryRealIntegrationTest {
         UUID mediaId = UUID.randomUUID();
 
         // 1. Add first
-        addHandler
-                .handle(AddMediaToLibraryCommand.builder()
+        StepVerifier.create(addHandler.handle(AddMediaToLibraryCommand.builder()
                         .userId(userId)
                         .mediaId(mediaId)
                         .type(LibraryItemType.SONG)
-                        .build())
-                .as(StepVerifier::create)
+                        .build()))
                 .expectNextCount(1)
                 .verifyComplete();
 
         // 2. Remove
         AtomicReference<UUID> resultRef = new AtomicReference<>();
-        removeHandler
-                .handle(new RemoveMediaFromLibraryCommand(userId, mediaId))
-                .as(StepVerifier::create)
+        StepVerifier.create(removeHandler.handle(RemoveMediaFromLibraryCommand.builder()
+                        .userId(userId)
+                        .type(LibraryItemType.SONG)
+                        .mediaId(mediaId)
+                        .build()))
                 .assertNext(resultRef::set)
                 .verifyComplete();
 

@@ -2,7 +2,9 @@ package com.ggar.hibiki.test.integration.mocked.ingestion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.ggar.hibiki.features.ingestion.dto.CompleteUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
@@ -79,8 +81,10 @@ public class CompleteUploadMockedIntegrationTest {
                 .thenReturn(Mono.just(mock(com.ggar.hibiki.features.ingestion.model.Media.class)));
         when(ingestionPipeline.execute(any()))
                 .thenReturn(Mono.just(mock(com.ggar.hibiki.features.ingestion.pipeline.IngestionContext.class)));
-        when(uploadSessionRepository.save(any())).thenReturn(Mono.just(session));
-        when(mediaMapper.toDto(any())).thenReturn(UploadSessionDto.builder().build());
+        when(uploadSessionRepository.save(any(com.ggar.hibiki.features.ingestion.model.UploadSession.class)))
+                .thenReturn(Mono.just(session));
+        when(mediaMapper.toDto(any(com.ggar.hibiki.features.ingestion.model.UploadSession.class)))
+                .thenReturn(UploadSessionDto.builder().build());
 
         CompleteUploadCommand command = CompleteUploadCommand.builder()
                 .userId(userId)
@@ -90,7 +94,7 @@ public class CompleteUploadMockedIntegrationTest {
                 .build();
 
         // Act & Assert
-        handler.handle(command).as(StepVerifier::create).expectNextCount(1).verifyComplete();
+        StepVerifier.create(handler.handle(command)).expectNextCount(1).verifyComplete();
 
         // Verification
         verify(mediaStorage).completeMultipartUpload(any(), any(), any());

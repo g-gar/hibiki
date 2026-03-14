@@ -1,16 +1,17 @@
 package com.ggar.hibiki.test.integration.mocked.catalog;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import com.ggar.hibiki.core.catalog.dto.DeleteArtistCommand;
-import com.ggar.hibiki.core.catalog.persistence.entity.ArtistEntity;
-import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;
-import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
+import com.ggar.hibiki.core.catalog.model.Artist;
+import com.ggar.hibiki.core.catalog.port.AlbumRepository;
+import com.ggar.hibiki.core.catalog.port.ArtistRepository;
 import com.ggar.hibiki.core.catalog.usecase.handler.command.DeleteArtistCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.DeleteArtistContractTest;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -38,13 +39,13 @@ public class DeleteArtistMockedIntegrationTest extends DeleteArtistContractTest 
     }
 
     @Override
-    protected ScenarioResult<Void> givenArtistIsSoleOwnerOfAlbum(String artistId, String albumId) {
+    protected ScenarioResult<Void> givenArtistIsSoleOwnerOfAlbum(UUID artistId, UUID albumId) {
         // Arrange
-        ArtistEntity artist = new ArtistEntity("Solo Artist");
-        artist.setId(artistId);
+        Artist artist = Artist.builder().id(artistId).name("Solo Artist").build();
 
         when(artistRepository.findById(artistId)).thenReturn(Mono.just(artist));
         when(artistRepository.deleteById(artistId)).thenReturn(Mono.empty());
+        when(albumRepository.deleteByArtistId(artistId)).thenReturn(Mono.empty());
 
         // Act & Assert (Reactive pattern)
         handler.handle(new DeleteArtistCommand(artistId))
@@ -63,13 +64,13 @@ public class DeleteArtistMockedIntegrationTest extends DeleteArtistContractTest 
 
     @Override
     protected ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(
-            String artistId, String albumId, String otherArtistId) {
+            UUID artistId, UUID albumId, UUID otherArtistId) {
         // Arrange
-        ArtistEntity artist = new ArtistEntity("Featured Artist");
-        artist.setId(artistId);
+        Artist artist = Artist.builder().id(artistId).name("Featured Artist").build();
 
         when(artistRepository.findById(artistId)).thenReturn(Mono.just(artist));
         when(artistRepository.deleteById(artistId)).thenReturn(Mono.empty());
+        when(albumRepository.deleteByArtistId(artistId)).thenReturn(Mono.empty());
 
         // Act & Assert
         handler.handle(new DeleteArtistCommand(artistId))

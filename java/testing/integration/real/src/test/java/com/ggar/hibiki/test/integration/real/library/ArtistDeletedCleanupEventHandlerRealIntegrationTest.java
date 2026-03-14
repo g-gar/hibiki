@@ -1,34 +1,29 @@
 package com.ggar.hibiki.test.integration.real.library;
 
 import com.ggar.hibiki.core.catalog.event.ArtistDeletedEvent;
+import com.ggar.hibiki.test.support.SharedInfrastructure;
+
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.infrastructure.event.ArtistDeletedCleanupEventHandler;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
-import com.ggar.hibiki.features.library.port.LibraryRepository;
 import com.ggar.hibiki.features.library.service.AddMediaToLibraryCommandHandler;
 import com.ggar.hibiki.test.contracts.library.ArtistDeletedCleanupEventHandlerContractTest;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import com.ggar.hibiki.test.support.SharedInfrastructure;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
 @SpringBootTest
-@Testcontainers
 public class ArtistDeletedCleanupEventHandlerRealIntegrationTest extends ArtistDeletedCleanupEventHandlerContractTest {
 
-    @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
-
     @DynamicPropertySource
-    static void neo4jProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
+    static void properties(DynamicPropertyRegistry registry) {
+        SharedInfrastructure.registerProperties(registry);
     }
 
     @Autowired
@@ -37,22 +32,17 @@ public class ArtistDeletedCleanupEventHandlerRealIntegrationTest extends ArtistD
     @Autowired
     private ArtistDeletedCleanupEventHandler eventHandler;
 
-    @Autowired
-    private LibraryRepository libraryRepository;
-
     @Override
     protected ScenarioResult<Void> givenEventReceivedAndLibraryHasMatchingMedia(ArtistDeletedEvent event) {
         UUID userId = UUID.randomUUID();
         UUID mediaId = UUID.randomUUID();
 
         // 1. Arrange: add item that SHOULD be removed
-        addHandler
-                .handle(AddMediaToLibraryCommand.builder()
+        StepVerifier.create(addHandler.handle(AddMediaToLibraryCommand.builder()
                         .userId(userId)
                         .mediaId(mediaId)
                         .type(LibraryItemType.SONG)
-                        .build())
-                .as(StepVerifier::create)
+                        .build()))
                 .expectNextCount(1)
                 .verifyComplete();
 
@@ -61,7 +51,7 @@ public class ArtistDeletedCleanupEventHandlerRealIntegrationTest extends ArtistD
         // removeByArtistId mock/impl works for the demonstration of the reactive flow.
 
         // 2. Act
-        eventHandler.handle(event).as(StepVerifier::create).verifyComplete();
+        StepVerifier.create(eventHandler.handle(event)).verifyComplete();
 
         return ScenarioResult.<Void>builder()
                 .state(Map.of(

@@ -4,7 +4,6 @@ import com.ggar.hibiki.core.shared.event.EventBus;
 import com.ggar.hibiki.features.library.dto.PlaylistDto;
 import com.ggar.hibiki.features.library.dto.UpdatePlaylistCommand;
 import com.ggar.hibiki.features.library.event.PlaylistUpdatedEvent;
-import com.ggar.hibiki.features.library.infrastructure.persistence.mapper.LibraryMapper;
 import com.ggar.hibiki.features.library.model.Playlist;
 import com.ggar.hibiki.features.library.model.PlaylistItem;
 import com.ggar.hibiki.features.library.model.PlaylistOperation;
@@ -13,6 +12,7 @@ import com.ggar.hibiki.features.library.model.SongId;
 import com.ggar.hibiki.features.library.model.User;
 import com.ggar.hibiki.features.library.model.UserId;
 import com.ggar.hibiki.features.library.port.PlaylistRepository;
+import com.ggar.hibiki.features.library.service.mapper.LibraryServiceMapper;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import reactor.core.publisher.Mono;
 public class UpdatePlaylistCommandHandlerImpl implements UpdatePlaylistCommandHandler {
 
     private final PlaylistRepository playlistRepository;
-    private final LibraryMapper libraryMapper;
+    private final LibraryServiceMapper libraryServiceMapper;
     private final EventBus eventBus;
 
     @Override
@@ -48,7 +48,7 @@ public class UpdatePlaylistCommandHandlerImpl implements UpdatePlaylistCommandHa
                                 .userId(user.getId())
                                 .playlistId(saved.getId().getValue())
                                 .build())
-                        .thenReturn(libraryMapper.toDto(saved)));
+                        .thenReturn(libraryServiceMapper.toDto(saved)));
     }
 
     private Playlist applyOperations(Playlist playlist, List<PlaylistOperation> operations) {

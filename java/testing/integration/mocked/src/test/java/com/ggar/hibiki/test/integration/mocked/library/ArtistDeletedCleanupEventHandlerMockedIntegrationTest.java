@@ -1,6 +1,7 @@
 package com.ggar.hibiki.test.integration.mocked.library;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.ggar.hibiki.core.catalog.event.ArtistDeletedEvent;
 import com.ggar.hibiki.features.library.infrastructure.event.ArtistDeletedCleanupEventHandler;
@@ -33,7 +34,7 @@ public class ArtistDeletedCleanupEventHandlerMockedIntegrationTest
     @Override
     protected ScenarioResult<Void> givenEventReceivedAndLibraryHasMatchingMedia(ArtistDeletedEvent event) {
         // Arrange
-        UUID artistId = UUID.fromString(event.getArtistId());
+        UUID artistId = event.getArtistId();
         when(libraryRepository.removeByArtistId(artistId)).thenReturn(Mono.empty());
 
         // Act & Assert

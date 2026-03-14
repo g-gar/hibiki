@@ -1,49 +1,38 @@
 package com.ggar.hibiki.test.integration.real.catalog;
 
+import com.ggar.hibiki.core.catalog.CatalogModuleConfig;
 import com.ggar.hibiki.core.catalog.dto.DeleteArtistCommand;
-import com.ggar.hibiki.core.catalog.persistence.entity.AlbumEntity;
-import com.ggar.hibiki.core.catalog.persistence.entity.ArtistEntity;
-import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;
-import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
+import com.ggar.hibiki.core.catalog.model.Album;
+import com.ggar.hibiki.core.catalog.model.Artist;
+import com.ggar.hibiki.core.catalog.port.AlbumRepository;
+import com.ggar.hibiki.core.catalog.port.ArtistRepository;
 import com.ggar.hibiki.core.catalog.usecase.handler.command.DeleteArtistCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.DeleteArtistContractTest;
+import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import com.ggar.hibiki.test.support.SharedInfrastructure;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-@SpringBootTest
-@Testcontainers
+@SpringBootTest(classes = TestApplication.class)
+@ActiveProfiles("test")
 public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
 
-    @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
-
     @DynamicPropertySource
-    static void neo4jProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
-    }
-
-    @TestConfiguration
-    static class Config {
-        @Bean
-        @Primary
-        public CapturingEventBus capturingEventBus() {
-            return new CapturingEventBus();
-        }
+    static void properties(DynamicPropertyRegistry registry) {
+        SharedInfrastructure.registerProperties(registry);
     }
 
     @Autowired
@@ -64,38 +53,33 @@ public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
     }
 
     @Override
-    protected ScenarioResult<Void> givenArtistIsSoleOwnerOfAlbum(String artistId, String albumId) {
+    protected ScenarioResult<Void> givenArtistIsSoleOwnerOfAlbum(UUID artistId, UUID albumId) {
         // Arrange
-        ArtistEntity artist = new ArtistEntity("Solo Artist");
-        artist.setId(artistId);
-        artistRepository
-                .save(artist)
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .verifyComplete();
+        Artist artist = Artist.builder().id(artistId).name("Solo Artist").build();
+        Artist savedArtist = artistRepository.save(artist).block();
+        UUID realArtistId = savedArtist.getId();
 
-        AlbumEntity album = new AlbumEntity("Solo Album", 2024);
-        album.setId(albumId);
-        album.setArtist(artist);
-        albumRepository.save(album).as(StepVerifier::create).expectNextCount(1).verifyComplete();
+        Album album = Album.builder()
+                .id(albumId)
+                .title("Solo Album")
+                .releaseYear(2024)
+                .artist(savedArtist)
+                .build();
+        Album savedAlbum = albumRepository.save(album).block();
+        UUID realAlbumId = savedAlbum.getId();
 
         // Act & Assert
-        handler.handle(new DeleteArtistCommand(artistId))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new DeleteArtistCommand(realArtistId)))
                 .verifyComplete();
 
         // Check effects reactively
         AtomicBoolean artistExists = new AtomicBoolean(true);
-        artistRepository
-                .existsById(artistId)
-                .as(StepVerifier::create)
+        StepVerifier.create(artistRepository.existsById(realArtistId))
                 .assertNext(artistExists::set)
                 .verifyComplete();
 
         AtomicBoolean albumExists = new AtomicBoolean(true);
-        albumRepository
-                .existsById(albumId)
-                .as(StepVerifier::create)
+        StepVerifier.create(albumRepository.existsById(realAlbumId))
                 .assertNext(albumExists::set)
                 .verifyComplete();
 
@@ -109,58 +93,48 @@ public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
 
     @Override
     protected ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(
-            String artistId, String albumId, String otherArtistId) {
+            UUID artistId, UUID albumId, UUID otherArtistId) {
         // Arrange
-        ArtistEntity mainArtist = new ArtistEntity("Main Artist");
-        mainArtist.setId(otherArtistId);
-        artistRepository
-                .save(mainArtist)
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .verifyComplete();
+        Artist otherArtist =
+                Artist.builder().id(otherArtistId).name("Main Artist").build();
+        Artist savedOtherArtist = artistRepository.save(otherArtist).block();
+        UUID realOtherArtistId = savedOtherArtist.getId();
 
-        ArtistEntity collaborator = new ArtistEntity("Collaborator");
-        collaborator.setId(artistId);
-        artistRepository
-                .save(collaborator)
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .verifyComplete();
+        Artist collaborator = Artist.builder().id(artistId).name("Collaborator").build();
+        Artist savedCollaborator = artistRepository.save(collaborator).block();
+        UUID realCollaboratorId = savedCollaborator.getId();
 
-        AlbumEntity album = new AlbumEntity("Main Album", 2024);
-        album.setId(albumId);
-        album.setArtist(mainArtist);
-        albumRepository.save(album).as(StepVerifier::create).expectNextCount(1).verifyComplete();
+        Album album = Album.builder()
+                .id(albumId)
+                .title("Main Album")
+                .releaseYear(2024)
+                .artist(savedOtherArtist) // Linked to the other artist
+                .build();
+        Album savedAlbum = albumRepository.save(album).block();
+        UUID realAlbumId = savedAlbum.getId();
 
         // Act & Assert
-        handler.handle(new DeleteArtistCommand(artistId))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new DeleteArtistCommand(realCollaboratorId)))
                 .verifyComplete();
 
         // Check effects reactively
         AtomicBoolean artistExists = new AtomicBoolean(true);
-        artistRepository
-                .existsById(artistId)
-                .as(StepVerifier::create)
+        StepVerifier.create(artistRepository.existsById(realCollaboratorId))
                 .assertNext(artistExists::set)
                 .verifyComplete();
 
         AtomicBoolean albumExists = new AtomicBoolean(true);
-        albumRepository
-                .existsById(albumId)
-                .as(StepVerifier::create)
+        StepVerifier.create(albumRepository.existsById(realAlbumId))
                 .assertNext(albumExists::set)
                 .verifyComplete();
 
-        AtomicReference<AlbumEntity> reloadedAlbum = new AtomicReference<>();
-        albumRepository
-                .findById(albumId)
-                .as(StepVerifier::create)
+        AtomicReference<Album> reloadedAlbum = new AtomicReference<>();
+        StepVerifier.create(albumRepository.findById(realAlbumId))
                 .assertNext(reloadedAlbum::set)
                 .verifyComplete();
 
         boolean otherArtistLinked = reloadedAlbum.get() != null
-                && reloadedAlbum.get().getArtist().getId().equals(otherArtistId);
+                && reloadedAlbum.get().getArtist().getId().equals(realOtherArtistId);
 
         return ScenarioResult.<Void>builder()
                 .events(eventBus.getPublishedEvents())

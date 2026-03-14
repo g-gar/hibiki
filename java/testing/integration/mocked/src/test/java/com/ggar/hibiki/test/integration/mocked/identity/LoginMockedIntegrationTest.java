@@ -1,7 +1,9 @@
 package com.ggar.hibiki.test.integration.mocked.identity;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import com.ggar.hibiki.core.identity.dto.AuthResponse;
 import com.ggar.hibiki.core.identity.dto.LoginRequest;
@@ -51,8 +53,13 @@ public class LoginMockedIntegrationTest extends LoginContractTest {
 
         // Act & Assert
         AtomicReference<AuthResponse> responseRef = new AtomicReference<>();
-        handler.handle(new LoginRequest(username, password))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(LoginRequest.builder()
+                        .username(username)
+                        .password(password)
+                        .deviceId("test-device")
+                        .ip("127.0.0.1")
+                        .userAgent("mock-agent")
+                        .build()))
                 .assertNext(responseRef::set)
                 .verifyComplete();
 
@@ -74,8 +81,13 @@ public class LoginMockedIntegrationTest extends LoginContractTest {
 
         // Act & Assert
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
-        handler.handle(new LoginRequest(username, password))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(LoginRequest.builder()
+                        .username(username)
+                        .password(password)
+                        .deviceId("test-device")
+                        .ip("127.0.0.1")
+                        .userAgent("mock-agent")
+                        .build()))
                 .consumeErrorWith(errorRef::set)
                 .verify();
 
@@ -93,8 +105,13 @@ public class LoginMockedIntegrationTest extends LoginContractTest {
 
         // Act & Assert
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
-        handler.handle(new LoginRequest(username, password))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(LoginRequest.builder()
+                        .username(username)
+                        .password(password)
+                        .deviceId("test-device")
+                        .ip("127.0.0.1")
+                        .userAgent("mock-agent")
+                        .build()))
                 .consumeErrorWith(errorRef::set)
                 .verify();
 

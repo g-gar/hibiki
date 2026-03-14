@@ -1,8 +1,6 @@
 package com.ggar.hibiki.features.library.infrastructure.persistence.entity;
 
-import com.ggar.hibiki.features.library.infrastructure.persistence.generator.UuidV7IdGenerator;
 import java.time.Instant;
-import java.util.UUID;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Property;
@@ -16,8 +14,8 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 public class PlaylistItemRelationship {
 
     @Id
-    @GeneratedValue(UuidV7IdGenerator.class)
-    private UUID id;
+    @GeneratedValue
+    private String id;
 
     @Property("position")
     private Integer position;
@@ -30,18 +28,18 @@ public class PlaylistItemRelationship {
 
     public PlaylistItemRelationship() {}
 
-    public PlaylistItemRelationship(UUID id, Integer position, Instant addedAt, SongEntity song) {
+    public PlaylistItemRelationship(String id, Integer position, Instant addedAt, SongEntity song) {
         this.id = id;
         this.position = position;
         this.addedAt = addedAt;
         this.song = song;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -74,12 +72,12 @@ public class PlaylistItemRelationship {
     }
 
     public static class PlaylistItemRelationshipBuilder {
-        private UUID id;
+        private String id;
         private Integer position;
         private Instant addedAt;
         private SongEntity song;
 
-        public PlaylistItemRelationshipBuilder id(UUID id) {
+        public PlaylistItemRelationshipBuilder id(String id) {
             this.id = id;
             return this;
         }

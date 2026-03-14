@@ -62,9 +62,9 @@ public class Neo4jLibraryRepository implements LibraryRepository {
 
         return neo4jClient
                 .query(cypher)
-                .bind(user.getId())
+                .bind(user.getId().getValue().toString())
                 .to("userId")
-                .bind(mediaId)
+                .bind(mediaId.toString())
                 .to("mediaId")
                 .run()
                 .then();
@@ -73,7 +73,7 @@ public class Neo4jLibraryRepository implements LibraryRepository {
     @Override
     public Mono<LibraryItem> findById(User user, UUID mediaId) {
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("userId", user.getId().toString());
+        parameters.put("userId", user.getId().getValue().toString());
         parameters.put("mediaId", mediaId.toString());
 
         List<AccessIntent> allIntents = accessContributors.stream()
@@ -131,9 +131,9 @@ public class Neo4jLibraryRepository implements LibraryRepository {
 
         return neo4jClient
                 .query(cypher)
-                .bind(user.getId())
+                .bind(user.getId().getValue().toString())
                 .to("userId")
-                .bind(mediaId)
+                .bind(mediaId.toString())
                 .to("mediaId")
                 .fetchAs(Boolean.class)
                 .one()
@@ -143,7 +143,7 @@ public class Neo4jLibraryRepository implements LibraryRepository {
     @Override
     public Flux<LibraryItem> findAll(User user, LibraryFilter filter, Pagination pagination) {
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("userId", user.getId().toString());
+        parameters.put("userId", user.getId().getValue().toString());
         parameters.put(
                 "types",
                 filter.getTypes() != null
@@ -207,7 +207,7 @@ public class Neo4jLibraryRepository implements LibraryRepository {
     @Override
     public Mono<Long> count(User user, LibraryFilter filter) {
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("userId", user.getId().toString());
+        parameters.put("userId", user.getId().getValue().toString());
         parameters.put(
                 "types",
                 filter.getTypes() != null
@@ -266,6 +266,57 @@ public class Neo4jLibraryRepository implements LibraryRepository {
                 .fetchAs(Long.class)
                 .one()
                 .defaultIfEmpty(0L);
+    }
+
+    @Override
+    public Mono<Void> removeByArtistId(UUID artistId) {
+        String cypher =
+                """
+                MATCH (li:LibraryItem)-[:REFERENCES]->(ref)
+                WHERE (ref:Artist AND ref.id = $artistId)
+                   OR EXISTS { (ref:Album)-[:BY_ARTIST]->(:Artist {id: $artistId}) }
+                   OR EXISTS { (ref:Song)-[:BY_ARTIST]->(:Artist {id: $artistId}) }
+                   OR EXISTS { (ref:Song)-[:PART_OF]->(:Album)-[:BY_ARTIST]->(:Artist {id: $artistId}) }
+                DETACH DELETE li
+                """;
+        return neo4jClient
+                .query(cypher)
+                .bind(artistId.toString())
+                .to("artistId")
+                .run()
+                .then();
+    }
+
+    @Override
+    public Mono<Void> removeBySongId(UUID songId) {
+        String cypher =
+                """
+                MATCH (li:LibraryItem)-[:REFERENCES]->(:Song {id: $songId})
+                DETACH DELETE li
+                """;
+        return neo4jClient
+                .query(cypher)
+                .bind(songId.toString())
+                .to("songId")
+                .run()
+                .then();
+    }
+
+    @Override
+    public Mono<Void> removeByAlbumId(UUID albumId) {
+        String cypher =
+                """
+                MATCH (li:LibraryItem)-[:REFERENCES]->(ref)
+                WHERE (ref:Album AND ref.id = $albumId)
+                   OR EXISTS { (ref:Song)-[:PART_OF]->(:Album {id: $albumId}) }
+                DETACH DELETE li
+                """;
+        return neo4jClient
+                .query(cypher)
+                .bind(albumId.toString())
+                .to("albumId")
+                .run()
+                .then();
     }
 
     private Optional<String> translateIntent(AccessIntent intent, Map<String, Object> parameters) {

@@ -20,71 +20,51 @@ public abstract class LoginUseCaseContractTest {
     protected abstract ScenarioResult<AuthResponse> givenInvalidDevice(
             String username, String password, String deviceId);
 
-    @Nested
+    @Test
     @DisplayName("Scenario: successful login")
-    class Success {
+    void successfulLoginScenario() {
+        // Arrange
         String user = "user";
         String pass = "pass";
         String device = "device-123";
-        ScenarioResult<AuthResponse> result;
 
-        @BeforeEach
-        void act() {
-            result = givenCredentialsAndDeviceAreValid(user, pass, device);
-        }
+        // Act
+        ScenarioResult<AuthResponse> result = givenCredentialsAndDeviceAreValid(user, pass, device);
 
-        @Test
-        @DisplayName("then it should return an AuthResponse with tokens")
-        final void thenReturnsTokens() {
-            assertThat(result.getReturnValue()).isNotNull();
-            assertThat(result.getReturnValue().getToken()).isNotEmpty();
-        }
-
-        @Test
-        @DisplayName("then it should have called both Identity and Device modules")
-        final void thenCalledDependencies() {
-            assertThat(result.getState().get("identityCalled")).isEqualTo(true);
-            assertThat(result.getState().get("deviceValidated")).isEqualTo(true);
-        }
+        // Assert
+        org.assertj.core.api.Assertions.assertThat(result.getReturnValue()).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(result.getReturnValue().getToken()).isNotEmpty();
+        assertThat(result.getState().get("identityCalled")).isEqualTo(true);
+        assertThat(result.getState().get("deviceValidated")).isEqualTo(true);
     }
 
-    @Nested
+    @Test
     @DisplayName("Scenario: wrong password")
-    class WrongPassword {
+    void wrongPasswordScenario() {
+        // Arrange
         String user = "user";
         String pass = "wrong";
         String device = "device-123";
-        ScenarioResult<AuthResponse> result;
 
-        @BeforeEach
-        void act() {
-            result = givenInvalidCredentials(user, pass, device);
-        }
+        // Act
+        ScenarioResult<AuthResponse> result = givenInvalidCredentials(user, pass, device);
 
-        @Test
-        @DisplayName("then it should return an error")
-        final void thenError() {
-            assertThat(result.getError()).isNotNull();
-        }
+        // Assert
+        assertThat(result.getError()).isNotNull();
     }
 
-    @Nested
+    @Test
     @DisplayName("Scenario: valid credentials but unknown/forbidden device")
-    class ForbiddenDevice {
+    void forbiddenDeviceScenario() {
+        // Arrange
         String user = "user";
         String pass = "pass";
         String device = "stolen-device";
-        ScenarioResult<AuthResponse> result;
 
-        @BeforeEach
-        void act() {
-            result = givenInvalidDevice(user, pass, device);
-        }
+        // Act
+        ScenarioResult<AuthResponse> result = givenInvalidDevice(user, pass, device);
 
-        @Test
-        @DisplayName("then it should return an error despite valid credentials")
-        final void thenError() {
-            assertThat(result.getError()).isNotNull();
-        }
+        // Assert
+        assertThat(result.getError()).isNotNull();
     }
 }

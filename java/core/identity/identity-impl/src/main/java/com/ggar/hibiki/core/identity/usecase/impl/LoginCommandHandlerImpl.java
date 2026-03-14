@@ -31,7 +31,8 @@ public class LoginCommandHandlerImpl implements LoginCommandHandler {
         return userRepository
                 .findByUsername(request.getUsername())
                 .filter(user -> user.getPassword().equals(request.getPassword()))
-                .switchIfEmpty(Mono.error(new RuntimeException("Invalid credentials")))
+                .switchIfEmpty(Mono.<com.ggar.hibiki.core.identity.model.User>error(
+                        new RuntimeException("Invalid credentials")))
                 .flatMap(user -> Mono.zip(
                                 jwtSigner.generateToken(user.getId().toString()),
                                 jwtSigner.generateToken(

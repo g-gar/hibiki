@@ -4,12 +4,12 @@ import com.ggar.hibiki.core.shared.event.EventBus;
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.dto.LibraryItemDto;
 import com.ggar.hibiki.features.library.event.MediaAddedToLibraryEvent;
-import com.ggar.hibiki.features.library.infrastructure.persistence.mapper.LibraryMapper;
 import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.User;
 import com.ggar.hibiki.features.library.model.UserId;
 import com.ggar.hibiki.features.library.port.LibraryRepository;
 import com.ggar.hibiki.features.library.service.factory.LibraryItemFactory;
+import com.ggar.hibiki.features.library.service.mapper.LibraryServiceMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -23,7 +23,7 @@ public class AddMediaToLibraryCommandHandlerImpl implements AddMediaToLibraryCom
 
     private final LibraryRepository libraryRepository;
     private final LibraryItemFactory itemFactory;
-    private final LibraryMapper libraryMapper;
+    private final LibraryServiceMapper libraryServiceMapper;
     private final EventBus eventBus;
 
     @Override
@@ -41,6 +41,6 @@ public class AddMediaToLibraryCommandHandlerImpl implements AddMediaToLibraryCom
                                 .mediaId(command.getMediaId())
                                 .type(command.getType())
                                 .build())
-                        .thenReturn(libraryMapper.toDto(item)));
+                        .thenReturn(libraryServiceMapper.toDto(item)));
     }
 }

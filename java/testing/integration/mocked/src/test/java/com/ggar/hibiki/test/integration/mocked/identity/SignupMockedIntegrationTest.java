@@ -1,7 +1,8 @@
 package com.ggar.hibiki.test.integration.mocked.identity;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.ggar.hibiki.core.identity.dto.SignupRequest;
 import com.ggar.hibiki.core.identity.model.User;
@@ -30,7 +31,7 @@ public class SignupMockedIntegrationTest extends SignupContractTest {
 
     @BeforeEach
     void setup() {
-        handler = new SignupCommandHandlerImpl(userRepository);
+        handler = new SignupCommandHandlerImpl(userRepository, eventBus);
         eventBus.clear();
     }
 
@@ -41,11 +42,14 @@ public class SignupMockedIntegrationTest extends SignupContractTest {
         when(userRepository.findByUsername(username)).thenReturn(Mono.empty());
         when(userRepository.findByEmail(email)).thenReturn(Mono.empty());
         when(userRepository.save(any(User.class)))
-                .thenReturn(Mono.just(User.builder().build()));
+                .thenReturn(Mono.just(User.builder()
+                        .id(java.util.UUID.randomUUID())
+                        .username(username)
+                        .email(email)
+                        .build()));
 
         // Act & Assert
-        handler.handle(new SignupRequest(username, email, password))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new SignupRequest(username, email, password)))
                 .verifyComplete();
 
         // Capture
@@ -71,8 +75,7 @@ public class SignupMockedIntegrationTest extends SignupContractTest {
 
         // Act & Assert
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
-        handler.handle(new SignupRequest(username, email, password))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new SignupRequest(username, email, password)))
                 .consumeErrorWith(errorRef::set)
                 .verify();
 

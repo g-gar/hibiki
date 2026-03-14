@@ -1,6 +1,7 @@
 package com.ggar.hibiki.test.integration.real.identity;
 
 import com.ggar.hibiki.core.identity.dto.SignupRequest;
+import com.ggar.hibiki.core.identity.persistence.repository.ReactiveNeo4jUserRepository;
 import com.ggar.hibiki.core.identity.port.UserRepository;
 import com.ggar.hibiki.core.identity.usecase.impl.SignupCommandHandlerImpl;
 import com.ggar.hibiki.test.contracts.identity.SignupContractTest;
@@ -14,23 +15,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import com.ggar.hibiki.test.integration.real.TestApplication;
+import com.ggar.hibiki.test.support.SharedInfrastructure;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-@SpringBootTest
-@Testcontainers
+@SpringBootTest(classes = TestApplication.class)
+@ActiveProfiles("test")
 public class SignupRealIntegrationTest extends SignupContractTest {
 
-    @Container
-    static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
-
     @DynamicPropertySource
-    static void neo4jProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
+    static void properties(DynamicPropertyRegistry registry) {
+        SharedInfrastructure.registerProperties(registry);
     }
 
     @TestConfiguration
@@ -41,6 +41,9 @@ public class SignupRealIntegrationTest extends SignupContractTest {
             return new CapturingEventBus();
         }
     }
+
+    @Autowired
+    private ReactiveNeo4jUserRepository neo4jUserRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -54,7 +57,7 @@ public class SignupRealIntegrationTest extends SignupContractTest {
     @BeforeEach
     void setup() {
         eventBus.clear();
-        // Database cleanup would go here if needed per test
+        neo4jUserRepository.deleteAll().block();
     }
 
     @Override
@@ -62,15 +65,12 @@ public class SignupRealIntegrationTest extends SignupContractTest {
         String username = "realuser" + System.currentTimeMillis();
 
         // Act & Assert
-        handler.handle(new SignupRequest(username, email, password))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new SignupRequest(username, email, password)))
                 .verifyComplete();
 
         // Verify persistence
         AtomicReference<Boolean> persisted = new AtomicReference<>(false);
-        userRepository
-                .findByEmail(email)
-                .as(StepVerifier::create)
+        StepVerifier.create(userRepository.findByEmail(email))
                 .expectNextCount(1)
                 .verifyComplete();
         persisted.set(true);
@@ -91,14 +91,12 @@ public class SignupRealIntegrationTest extends SignupContractTest {
         String username = "taken" + System.currentTimeMillis();
 
         // Arrange: first registration
-        handler.handle(new SignupRequest(username, email, password))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new SignupRequest(username, email, password)))
                 .verifyComplete();
 
         // Act: duplicate registration
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
-        handler.handle(new SignupRequest("another", email, "different"))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new SignupRequest("another", email, "different")))
                 .consumeErrorWith(errorRef::set)
                 .verify();
 
