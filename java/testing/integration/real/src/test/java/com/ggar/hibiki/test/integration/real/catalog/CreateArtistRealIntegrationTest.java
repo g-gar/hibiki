@@ -6,13 +6,11 @@ import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.core.catalog.port.ArtistRepository;
 import com.ggar.hibiki.core.catalog.usecase.handler.command.CreateArtistCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.CreateArtistContractTest;
-import com.ggar.hibiki.test.support.ScenarioResult;
 import com.ggar.hibiki.test.integration.real.TestApplication;
+import com.ggar.hibiki.test.support.ScenarioResult;
 import com.ggar.hibiki.test.support.SharedInfrastructure;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -36,9 +34,7 @@ public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
     @Override
     protected ScenarioResult<ArtistDto> givenArtistDoesNotExist(String name) {
         // Arrange
-        StepVerifier.create(artistRepository.count())
-                .expectNextCount(1)
-                .verifyComplete();
+        StepVerifier.create(artistRepository.count()).expectNextCount(1).verifyComplete();
 
         // Act
         AtomicReference<ArtistDto> resultRef = new AtomicReference<>();
@@ -65,9 +61,7 @@ public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
         Artist existing = Artist.builder().name(name).build();
         StepVerifier.create(artistRepository.save(existing)).expectNextCount(1).verifyComplete();
 
-        StepVerifier.create(artistRepository.count())
-                .expectNextCount(1)
-                .verifyComplete();
+        StepVerifier.create(artistRepository.count()).expectNextCount(1).verifyComplete();
 
         // Act
         AtomicReference<ArtistDto> resultRef = new AtomicReference<>();
@@ -76,9 +70,7 @@ public class CreateArtistRealIntegrationTest extends CreateArtistContractTest {
                 .verifyComplete();
 
         // Post-condition
-        StepVerifier.create(artistRepository.count())
-                .expectNextCount(1)
-                .verifyComplete();
+        StepVerifier.create(artistRepository.count()).expectNextCount(1).verifyComplete();
 
         return ScenarioResult.<ArtistDto>builder()
                 .returnValue(resultRef.get())

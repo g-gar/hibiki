@@ -99,10 +99,7 @@ public class LoginRealIntegrationTest extends LoginContractTest {
 
         return ScenarioResult.<AuthResponse>builder()
                 .error(errorRef.get())
-                .state(Map.of(
-                        "username", username,
-                        "errorCode", "INVALID_CREDENTIALS"
-                ))
+                .state(Map.of("username", username, "errorCode", "INVALID_CREDENTIALS"))
                 .build();
     }
 
@@ -119,10 +116,7 @@ public class LoginRealIntegrationTest extends LoginContractTest {
 
         return ScenarioResult.<AuthResponse>builder()
                 .error(errorRef.get())
-                .state(Map.of(
-                        "username", username,
-                        "errorCode", "INVALID_CREDENTIALS"
-                ))
+                .state(Map.of("username", username, "errorCode", "INVALID_CREDENTIALS"))
                 .build();
     }
 }
