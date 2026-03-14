@@ -31,7 +31,7 @@ public class IdentityModuleConfig {
             ReactiveNeo4jClient neo4jClient,
             @Qualifier("identityNeo4jMappingContext") Neo4jMappingContext identityNeo4jMappingContext,
             ReactiveTransactionManager reactiveTransactionManager) {
-        return new ReactiveNeo4jTemplate(neo4jClient, identityNeo4jMappingContext, (ReactiveNeo4jTransactionManager)
-                reactiveTransactionManager);
+        return new ReactiveNeo4jTemplate(
+                neo4jClient, identityNeo4jMappingContext, (ReactiveNeo4jTransactionManager) reactiveTransactionManager);
     }
 }

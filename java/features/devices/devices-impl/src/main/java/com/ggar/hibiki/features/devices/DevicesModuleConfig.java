@@ -33,7 +33,7 @@ public class DevicesModuleConfig {
             ReactiveNeo4jClient neo4jClient,
             @Qualifier("devicesNeo4jMappingContext") Neo4jMappingContext devicesNeo4jMappingContext,
             ReactiveTransactionManager reactiveTransactionManager) {
-        return new ReactiveNeo4jTemplate(neo4jClient, devicesNeo4jMappingContext, (ReactiveNeo4jTransactionManager)
-                reactiveTransactionManager);
+        return new ReactiveNeo4jTemplate(
+                neo4jClient, devicesNeo4jMappingContext, (ReactiveNeo4jTransactionManager) reactiveTransactionManager);
     }
 }

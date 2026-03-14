@@ -4,10 +4,10 @@ import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.core.catalog.persistence.mapper.ArtistMapper;
 import com.ggar.hibiki.core.catalog.persistence.repository.Neo4jArtistRepository;
 import com.ggar.hibiki.core.catalog.port.ArtistRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor

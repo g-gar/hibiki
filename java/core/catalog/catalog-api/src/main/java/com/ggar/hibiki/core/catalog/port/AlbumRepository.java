@@ -1,8 +1,8 @@
 package com.ggar.hibiki.core.catalog.port;
 
 import com.ggar.hibiki.core.catalog.model.Album;
-import reactor.core.publisher.Mono;
 import java.util.UUID;
+import reactor.core.publisher.Mono;
 
 public interface AlbumRepository {
     Mono<Album> save(Album album);

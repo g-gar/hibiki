@@ -3,7 +3,6 @@ package com.ggar.hibiki.test.integration.real.library;
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.dto.LibraryItemDto;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
-import com.ggar.hibiki.features.library.port.LibraryRepository;
 import com.ggar.hibiki.features.library.service.AddMediaToLibraryCommandHandler;
 import com.ggar.hibiki.test.contracts.library.AddMediaToLibraryContractTest;
 import com.ggar.hibiki.test.integration.real.TestApplication;
@@ -35,7 +34,6 @@ public class AddMediaToLibraryRealIntegrationTest extends AddMediaToLibraryContr
 
     @Autowired
     private CapturingEventBus eventBus;
-
 
     @BeforeEach
     void setup() {

@@ -63,8 +63,7 @@ public class DeleteArtistMockedIntegrationTest extends DeleteArtistContractTest 
     }
 
     @Override
-    protected ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(
-            UUID artistId, UUID albumId, UUID otherArtistId) {
+    protected ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(UUID artistId, UUID albumId, UUID otherArtistId) {
         // Arrange
         Artist artist = Artist.builder().id(artistId).name("Featured Artist").build();
 

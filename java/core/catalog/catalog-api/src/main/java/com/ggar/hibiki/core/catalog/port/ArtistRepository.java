@@ -1,8 +1,8 @@
 package com.ggar.hibiki.core.catalog.port;
 
 import com.ggar.hibiki.core.catalog.model.Artist;
-import reactor.core.publisher.Mono;
 import java.util.UUID;
+import reactor.core.publisher.Mono;
 
 public interface ArtistRepository {
     Mono<Artist> save(Artist artist);

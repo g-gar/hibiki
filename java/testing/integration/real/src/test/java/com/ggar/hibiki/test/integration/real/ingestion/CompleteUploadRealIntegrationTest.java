@@ -2,7 +2,9 @@ package com.ggar.hibiki.test.integration.real.ingestion;
 
 import com.ggar.hibiki.features.ingestion.dto.CompleteUploadCommand;
 import com.ggar.hibiki.features.ingestion.service.CompleteUploadCommandHandler;
+import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.CapturingEventBus;
+import com.ggar.hibiki.test.support.SharedInfrastructure;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import com.ggar.hibiki.test.integration.real.TestApplication;
-import com.ggar.hibiki.test.support.SharedInfrastructure;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;

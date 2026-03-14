@@ -1,8 +1,6 @@
 package com.ggar.hibiki.test.integration.real.library;
 
 import com.ggar.hibiki.core.catalog.event.ArtistDeletedEvent;
-import com.ggar.hibiki.test.support.SharedInfrastructure;
-
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.infrastructure.event.ArtistDeletedCleanupEventHandler;
 import com.ggar.hibiki.features.library.model.LibraryItemType;

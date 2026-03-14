@@ -4,9 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ggar.hibiki.core.identity.dto.AuthResponse;
 import com.ggar.hibiki.test.support.ScenarioResult;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public abstract class LoginContractTest {

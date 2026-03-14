@@ -39,7 +39,7 @@ public class LibraryModuleConfig {
             ReactiveNeo4jClient neo4jClient,
             @Qualifier("libraryNeo4jMappingContext") Neo4jMappingContext libraryNeo4jMappingContext,
             ReactiveTransactionManager reactiveTransactionManager) {
-        return new ReactiveNeo4jTemplate(neo4jClient, libraryNeo4jMappingContext, (ReactiveNeo4jTransactionManager)
-                reactiveTransactionManager);
+        return new ReactiveNeo4jTemplate(
+                neo4jClient, libraryNeo4jMappingContext, (ReactiveNeo4jTransactionManager) reactiveTransactionManager);
     }
 }

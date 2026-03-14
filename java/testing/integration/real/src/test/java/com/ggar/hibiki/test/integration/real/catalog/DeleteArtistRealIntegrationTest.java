@@ -1,6 +1,5 @@
 package com.ggar.hibiki.test.integration.real.catalog;
 
-import com.ggar.hibiki.core.catalog.CatalogModuleConfig;
 import com.ggar.hibiki.core.catalog.dto.DeleteArtistCommand;
 import com.ggar.hibiki.core.catalog.model.Album;
 import com.ggar.hibiki.core.catalog.model.Artist;
@@ -11,14 +10,12 @@ import com.ggar.hibiki.test.contracts.catalog.DeleteArtistContractTest;
 import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.ScenarioResult;
+import com.ggar.hibiki.test.support.SharedInfrastructure;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.ggar.hibiki.test.support.SharedInfrastructure;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -92,8 +89,7 @@ public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
     }
 
     @Override
-    protected ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(
-            UUID artistId, UUID albumId, UUID otherArtistId) {
+    protected ScenarioResult<Void> givenArtistIsCollaboratorOnAlbum(UUID artistId, UUID albumId, UUID otherArtistId) {
         // Arrange
         Artist otherArtist =
                 Artist.builder().id(otherArtistId).name("Main Artist").build();

@@ -9,10 +9,10 @@ public class SharedInfrastructure {
 
     public static final Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5").withoutAuthentication();
 
-    public static final GenericContainer<?> seaweedfs =
-            new GenericContainer<>(DockerImageName.parse("chrislusf/seaweedfs:latest"))
-                    .withCommand("server", "-s3")
-                    .withExposedPorts(8333);
+    public static final GenericContainer<?> seaweedfs = new GenericContainer<>(
+                    DockerImageName.parse("chrislusf/seaweedfs:latest"))
+            .withCommand("server", "-s3")
+            .withExposedPorts(8333);
 
     static {
         neo4j.start();
