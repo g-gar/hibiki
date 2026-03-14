@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot'
+    // dependency-management is already applied in subprojects
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.testcontainers:testcontainers-bom:2.0.3"
+    }
+}
+
+dependencies {
+    // API e Impl de core y features para integración real
+    testImplementation project(':core:identity:identity-api')
+    testImplementation project(':core:identity:identity-impl')
+    testImplementation project(':core:catalog:catalog-api')
+    testImplementation project(':core:catalog:catalog-impl')
+    testImplementation project(':core:orchestrator')
+    testImplementation project(':core:shared')
+    testImplementation project(':features:ingestion:ingestion-api')
+    testImplementation project(':features:ingestion:ingestion-impl')
+    testImplementation project(':features:library:library-api')
+    testImplementation project(':features:library:library-impl')
+    testImplementation project(':features:metadata:metadata-api')
+    testImplementation project(':features:metadata:metadata-impl')
+    testImplementation project(':features:search:search-api')
+    testImplementation project(':features:search:search-impl')
+    testImplementation project(':features:devices:devices-api')
+    testImplementation project(':features:devices:devices-impl')
+    testImplementation project(':features:entitlements:entitlements-api')
+    testImplementation project(':features:entitlements:entitlements-impl')
+    testImplementation project(':packages:jwt')
+    testImplementation project(':packages:uuid')
+
+    // Hereda el contrato
+    testImplementation project(':testing:contracts')
+
+    // Spring Boot Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+
+    // Missing transitives for tests (following mocked module pattern)
+    implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.springframework.boot:spring-boot-test-autoconfigure'
+
+    // Testcontainers
+    testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+    testImplementation 'org.testcontainers:testcontainers-neo4j'
+
+    // JUnit runner
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+    }
+}

@@ -3,7 +3,7 @@ package com.ggar.hibiki.core.catalog.usecase.handler.command;
 import com.ggar.hibiki.core.catalog.dto.ArtistDto;
 import com.ggar.hibiki.core.catalog.dto.UpdateArtistCommand;
 import com.ggar.hibiki.core.catalog.persistence.mapper.ArtistMapper;
-import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
+import com.ggar.hibiki.core.catalog.port.ArtistRepository;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,10 +20,10 @@ public class UpdateArtistCommandHandler implements CommandHandler<UpdateArtistCo
     public Mono<ArtistDto> handle(UpdateArtistCommand command) {
         return artistRepository
                 .findById(command.getId())
-                .flatMap(entity -> {
-                    if (command.getName() != null) entity.setName(command.getName());
-                    if (command.getIsni() != null) entity.setIsni(command.getIsni());
-                    return artistRepository.save(entity);
+                .flatMap(artist -> {
+                    if (command.getName() != null) artist.setName(command.getName());
+                    if (command.getIsni() != null) artist.setIsni(command.getIsni());
+                    return artistRepository.save(artist);
                 })
                 .map(artistMapper::toDto);
     }

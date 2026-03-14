@@ -20,8 +20,5 @@ discoverModules('features')
 discoverModules('features:analysis')
 discoverModules('packages')
 discoverModules('presentation')
-
-include 'testing:contracts'
-include 'testing:unit'
-include 'testing:integration'
-include 'testing:e2e'
+discoverModules('testing')
+discoverModules('testing:integration')

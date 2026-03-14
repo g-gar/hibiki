@@ -157,7 +157,7 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                 })
                 .flatMap(id3Result -> {
                     CreateCatalogItemsCommand catalogCmd = CreateCatalogItemsCommand.builder()
-                            .mediaId(mediaId.getId().toString())
+                            .mediaId(mediaId.getId())
                             .id3Tag(id3Result.getTags())
                             .build();
                     return Mono.from(mediator.send(catalogCmd)).cast(CatalogCreationResult.class);
@@ -178,7 +178,7 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
 
                         AddMediaToLibraryCommand addLibraryCmd = AddMediaToLibraryCommand.builder()
                                 .userId(userId)
-                                .mediaId(UUID.fromString(catalogResult.getSongId()))
+                                .mediaId(catalogResult.getSongId())
                                 .type(LibraryItemType.SONG)
                                 .build();
 

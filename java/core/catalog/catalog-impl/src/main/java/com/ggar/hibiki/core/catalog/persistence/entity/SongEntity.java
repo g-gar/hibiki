@@ -4,6 +4,7 @@ import com.ggar.hibiki.core.catalog.persistence.generator.UuidV7IdGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -14,7 +15,7 @@ public class SongEntity {
 
     @Id
     @GeneratedValue(UuidV7IdGenerator.class)
-    private String id;
+    private UUID id;
 
     private String title;
     private String filePath;
@@ -30,11 +31,11 @@ public class SongEntity {
 
     public SongEntity() {}
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

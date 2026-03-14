@@ -2,6 +2,7 @@ package com.ggar.hibiki.core.catalog.persistence.entity;
 
 import com.ggar.hibiki.core.catalog.persistence.generator.UuidV7IdGenerator;
 import java.util.Objects;
+import java.util.UUID;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -12,7 +13,7 @@ public class AlbumEntity {
 
     @Id
     @GeneratedValue(UuidV7IdGenerator.class)
-    private String id;
+    private UUID id;
 
     private String title;
     private Integer releaseYear;
@@ -29,11 +30,11 @@ public class AlbumEntity {
         this.releaseYear = releaseYear;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

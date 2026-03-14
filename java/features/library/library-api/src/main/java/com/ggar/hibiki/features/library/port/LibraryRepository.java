@@ -39,4 +39,19 @@ public interface LibraryRepository {
      * Counts the total number of items matching the filter.
      */
     Mono<Long> count(User user, LibraryFilter filter);
+
+    /**
+     * Removes all library items related to an artist.
+     */
+    Mono<Void> removeByArtistId(UUID artistId);
+
+    /**
+     * Removes all library items related to a song.
+     */
+    Mono<Void> removeBySongId(UUID songId);
+
+    /**
+     * Removes all library items related to an album.
+     */
+    Mono<Void> removeByAlbumId(UUID albumId);
 }

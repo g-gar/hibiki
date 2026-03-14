@@ -3,7 +3,7 @@ package com.ggar.hibiki.core.catalog.usecase.handler.query;
 import com.ggar.hibiki.core.catalog.dto.FindSongQuery;
 import com.ggar.hibiki.core.catalog.dto.SongDto;
 import com.ggar.hibiki.core.catalog.persistence.mapper.SongMapper;
-import com.ggar.hibiki.core.catalog.persistence.repository.SongRepository;
+import com.ggar.hibiki.core.catalog.port.SongRepository;
 import com.ggar.hibiki.core.shared.mediator.QueryHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

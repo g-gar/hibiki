@@ -1,3 +1,32 @@
+plugins {
+    id 'java-library'
+}
+
 dependencies {
-    // Testing specific dependencies
+    implementation platform('org.springframework.boot:spring-boot-dependencies:4.0.3')
+
+    // JUnit 5 (Jupiter) — API pública de los contratos
+    api 'org.junit.jupiter:junit-jupiter-api'
+    api 'org.junit.jupiter:junit-jupiter-params'
+
+    // Reactor Test — para testear streams reactivos
+    api 'io.projectreactor:reactor-test'
+
+    // AssertJ — para aserciones fluidas en los contratos
+    api 'org.assertj:assertj-core:3.26.3'
+
+    // Lombok — para builders y reducción de boilerplate en fixtures
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Core Shared (contiene DomainEvent, EventBus, etc.)
+    api project(':core:shared')
+    api project(':core:catalog:catalog-api')
+    api project(':core:identity:identity-api')
+    api project(':core:orchestrator')
+    api project(':features:devices:devices-api')
+    api project(':features:library:library-api')
+    api project(':features:ingestion:ingestion-api')
+    api project(':features:search:search-api')
+    api project(':features:entitlements:entitlements-api')
 }

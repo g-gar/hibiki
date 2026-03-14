@@ -4,11 +4,11 @@ import com.ggar.hibiki.core.shared.event.EventBus;
 import com.ggar.hibiki.features.library.dto.CreatePlaylistCommand;
 import com.ggar.hibiki.features.library.dto.PlaylistDto;
 import com.ggar.hibiki.features.library.event.PlaylistCreatedEvent;
-import com.ggar.hibiki.features.library.infrastructure.persistence.mapper.LibraryMapper;
 import com.ggar.hibiki.features.library.model.Playlist;
 import com.ggar.hibiki.features.library.model.User;
 import com.ggar.hibiki.features.library.model.UserId;
 import com.ggar.hibiki.features.library.port.PlaylistRepository;
+import com.ggar.hibiki.features.library.service.mapper.LibraryServiceMapper;
 import java.time.Instant;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
 public class CreatePlaylistCommandHandlerImpl implements CreatePlaylistCommandHandler {
 
     private final PlaylistRepository playlistRepository;
-    private final LibraryMapper libraryMapper;
+    private final LibraryServiceMapper libraryServiceMapper;
     private final EventBus eventBus;
 
     @Override
@@ -46,6 +46,6 @@ public class CreatePlaylistCommandHandlerImpl implements CreatePlaylistCommandHa
                         .playlistId(saved.getId().getValue())
                         .name(saved.getName())
                         .build())
-                .thenReturn(libraryMapper.toDto(saved)));
+                .thenReturn(libraryServiceMapper.toDto(saved)));
     }
 }

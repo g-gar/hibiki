@@ -2,11 +2,11 @@ package com.ggar.hibiki.core.catalog.usecase.handler.command;
 
 import com.ggar.hibiki.core.catalog.dto.CreateSongCommand;
 import com.ggar.hibiki.core.catalog.dto.SongDto;
-import com.ggar.hibiki.core.catalog.persistence.entity.SongEntity;
+import com.ggar.hibiki.core.catalog.model.Song;
 import com.ggar.hibiki.core.catalog.persistence.mapper.SongMapper;
-import com.ggar.hibiki.core.catalog.persistence.repository.AlbumRepository;
-import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
-import com.ggar.hibiki.core.catalog.persistence.repository.SongRepository;
+import com.ggar.hibiki.core.catalog.port.AlbumRepository;
+import com.ggar.hibiki.core.catalog.port.ArtistRepository;
+import com.ggar.hibiki.core.catalog.port.SongRepository;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,20 +30,21 @@ public class CreateSongCommandHandler implements CommandHandler<CreateSongComman
                 .map(songMapper::toDto);
     }
 
-    private Mono<SongEntity> createNewSong(CreateSongCommand command) {
-        SongEntity song = new SongEntity();
-        song.setTitle(command.getTitle());
-        song.setFilePath(command.getFilePath());
-        song.setDurationMs(command.getDurationMs());
-        song.setTrackNumber(command.getTrackNumber());
-        song.setIsrc(command.getIsrc());
+    private Mono<Song> createNewSong(CreateSongCommand command) {
+        Song song = Song.builder()
+                .title(command.getTitle())
+                .filePath(command.getFilePath())
+                .durationMs(command.getDurationMs())
+                .trackNumber(command.getTrackNumber())
+                .isrc(command.getIsrc())
+                .build();
 
         // Resolve Album and Artists sequentially for simplicity
-        Mono<SongEntity> withAlbum = command.getAlbumTitle() != null
+        Mono<Song> withAlbum = command.getAlbumTitle() != null
                         && command.getArtistNames() != null
                         && !command.getArtistNames().isEmpty()
                 ? albumRepository
-                        .findByTitleIgnoreCaseAndArtistNameIgnoreCase(
+                        .findByTitleAndArtist(
                                 command.getAlbumTitle(),
                                 command.getArtistNames().get(0))
                         .doOnNext(song::setAlbum)
@@ -54,7 +55,7 @@ public class CreateSongCommandHandler implements CommandHandler<CreateSongComman
                         command.getArtistNames() != null
                                 ? command.getArtistNames()
                                 : java.util.Collections.<String>emptyList())
-                .flatMap(artistRepository::findByNameIgnoreCase)
+                .flatMap(artistRepository::findByName)
                 .collectList()
                 .doOnNext(song::setArtists)
                 .then(songRepository.save(song)));

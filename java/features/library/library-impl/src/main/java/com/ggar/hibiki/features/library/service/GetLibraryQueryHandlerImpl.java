@@ -2,11 +2,11 @@ package com.ggar.hibiki.features.library.service;
 
 import com.ggar.hibiki.features.library.dto.GetLibraryQuery;
 import com.ggar.hibiki.features.library.dto.LibraryItemDto;
-import com.ggar.hibiki.features.library.infrastructure.persistence.mapper.LibraryMapper;
 import com.ggar.hibiki.features.library.model.Page;
 import com.ggar.hibiki.features.library.model.User;
 import com.ggar.hibiki.features.library.model.UserId;
 import com.ggar.hibiki.features.library.port.LibraryRepository;
+import com.ggar.hibiki.features.library.service.mapper.LibraryServiceMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 public class GetLibraryQueryHandlerImpl implements GetLibraryQueryHandler {
 
     private final LibraryRepository libraryRepository;
-    private final LibraryMapper libraryMapper;
+    private final LibraryServiceMapper libraryServiceMapper;
 
     @Override
     public Mono<Page<LibraryItemDto>> handle(GetLibraryQuery query) {
@@ -27,7 +27,7 @@ public class GetLibraryQueryHandlerImpl implements GetLibraryQueryHandler {
 
         return libraryRepository
                 .findAll(user, query.getFilter(), query.getPagination())
-                .map(libraryMapper::toDto)
+                .map(libraryServiceMapper::toDto)
                 .collectList()
                 .zipWith(libraryRepository.count(user, query.getFilter()))
                 .map(tuple -> Page.<LibraryItemDto>builder()

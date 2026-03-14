@@ -3,7 +3,7 @@ package com.ggar.hibiki.core.catalog.usecase.handler.query;
 import com.ggar.hibiki.core.catalog.dto.ArtistDto;
 import com.ggar.hibiki.core.catalog.dto.FindArtistQuery;
 import com.ggar.hibiki.core.catalog.persistence.mapper.ArtistMapper;
-import com.ggar.hibiki.core.catalog.persistence.repository.ArtistRepository;
+import com.ggar.hibiki.core.catalog.port.ArtistRepository;
 import com.ggar.hibiki.core.shared.mediator.QueryHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class FindArtistQueryHandler implements QueryHandler<FindArtistQuery, Art
         } else if (query.getIsni() != null) {
             return artistRepository.findByIsni(query.getIsni()).map(artistMapper::toDto);
         } else if (query.getName() != null) {
-            return artistRepository.findByNameIgnoreCase(query.getName()).map(artistMapper::toDto);
+            return artistRepository.findByName(query.getName()).map(artistMapper::toDto);
         }
         return Mono.empty();
     }
