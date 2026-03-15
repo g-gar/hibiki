@@ -30,7 +30,7 @@ The following packages are standard in the `-api` module:
 *   `event`: Domain event definitions emitted by the module.
 *   `model`: Domain models and Value Objects.
 *   `port`: Output port interfaces (e.g., repositories).
-*   `service`: Input port interfaces (e.g., command/query handlers).
+*   `service`: Input port interfaces (e.g., command/query handlers). Note: New or refactored handlers should follow the [Action-Based Nested Records](ACTION_BASED_HANDLERS.md) pattern.
 
 ### 4. Package Conventions (`-impl` module)
 
@@ -47,7 +47,7 @@ The following packages are standard in the `-impl` module:
 #### 4.1 Value Objects vs. Primitive Types
 *   **Domain Models:** Identifiers in domain models MUST NOT be raw `UUID`s or `String`s. Use dedicated Value Objects (e.g., `UserId`, `DeviceId`) with Lombok's `@Value` stack.
 *   **DTOs (Commands, Queries, Responses):** DTOs MUST use primitive types (e.g., `UUID`, `String`, `Instant`) for all fields, including identifiers. DTOs are the system's contract and should be as simple and serialization-friendly as possible, without tying external callers to internal domain Value Objects. The mapping from primitive types to Value Objects must happen within the Handlers (implementation layer).
-*   **CQRS Handlers:** Command and Query Handlers (`CommandHandler`, `QueryHandler`) MUST return DTOs, not Domain Models. This ensures that the domain layer's internal representation remains decoupled from external API contracts.
+*   **CQRS Handlers:** Command and Query Handlers (`CommandHandler`, `QueryHandler`) should return **Domain Models** as defined in the [Action-Based Nested Records](ACTION_BASED_HANDLERS.md) guide. This simplifies the API and leverages the rich domain model.
 ```java
 @Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -71,9 +71,10 @@ Standardize on the following annotations for classes in the `-api` module:
     *   `@With`: For modified copies.
 *   Include comprehensive Javadocs for all public classes and fields.
 
-#### 4.3 No Nested Classes
+#### 4.3 No Nested Classes (with Exceptions)
 Nested classes are generally forbidden to maintain a clear and flat class structure.
-*   **Exception**: Nested classes ARE allowed in the `presentation/rest-api` layer (e.g., for simple internal DTOs or request/response structures).
+*   **Exception 1**: Nested classes ARE allowed in the `presentation/rest-api` layer (e.g., for simple internal DTOs or request/response structures).
+*   **Exception 2**: Nested records ARE required for [Action-Based Handlers](ACTION_BASED_HANDLERS.md) in the `service` package.
 
 ## Dependency Management
 

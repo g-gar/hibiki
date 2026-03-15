@@ -1,7 +1,6 @@
 package com.ggar.hibiki.core.orchestrator.usecase;
 
-import com.ggar.hibiki.core.catalog.dto.CatalogCreationResult;
-import com.ggar.hibiki.core.catalog.dto.CreateCatalogItemsCommand;
+import com.ggar.hibiki.core.catalog.handler.command.CreateCatalogItemsCommandHandler;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
 import com.ggar.hibiki.features.ingestion.dto.CompleteUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.GetUploadSessionByIdQuery;
@@ -156,17 +155,15 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                     return Mono.from(mediator.send(mapCmd)).cast(Id3Result.class);
                 })
                 .flatMap(id3Result -> {
-                    CreateCatalogItemsCommand catalogCmd = CreateCatalogItemsCommand.builder()
-                            .mediaId(mediaId.getId())
-                            .id3Tag(id3Result.getTags())
-                            .build();
-                    return Mono.from(mediator.send(catalogCmd)).cast(CatalogCreationResult.class);
+                    CreateCatalogItemsCommandHandler.Command catalogCmd =
+                            new CreateCatalogItemsCommandHandler.Command(mediaId.getId(), id3Result.getTags());
+                    return Mono.from(mediator.send(catalogCmd)).cast(CreateCatalogItemsCommandHandler.Result.class);
                 })
                 .flatMap(catalogResult -> {
                     log.info(
                             "Orchestrator successfully created catalog items: Song {}, Album {}",
-                            catalogResult.getSongId(),
-                            catalogResult.getAlbumId());
+                            catalogResult.songId(),
+                            catalogResult.albumId());
 
                     // We need the User Identity context to add the item to their Library
                     GetUploadSessionByIdQuery sessionQuery = GetUploadSessionByIdQuery.builder()
@@ -178,7 +175,7 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
 
                         AddMediaToLibraryCommand addLibraryCmd = AddMediaToLibraryCommand.builder()
                                 .userId(userId)
-                                .mediaId(catalogResult.getSongId())
+                                .mediaId(catalogResult.songId())
                                 .type(LibraryItemType.SONG)
                                 .build();
 

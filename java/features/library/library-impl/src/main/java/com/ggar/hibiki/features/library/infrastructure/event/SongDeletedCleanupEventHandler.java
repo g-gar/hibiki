@@ -1,6 +1,6 @@
 package com.ggar.hibiki.features.library.infrastructure.event;
 
-import com.ggar.hibiki.core.catalog.event.SongDeletedEvent;
+import com.ggar.hibiki.core.catalog.handler.command.DeleteSongCommandHandler;
 import com.ggar.hibiki.core.shared.event.EventHandler;
 import com.ggar.hibiki.features.library.port.LibraryRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +12,12 @@ import reactor.core.publisher.Mono;
  */
 @Component
 @RequiredArgsConstructor
-public class SongDeletedCleanupEventHandler implements EventHandler<SongDeletedEvent> {
+public class SongDeletedCleanupEventHandler implements EventHandler<DeleteSongCommandHandler.Deleted> {
 
     private final LibraryRepository libraryRepository;
 
     @Override
-    public Mono<Void> handle(SongDeletedEvent event) {
-        return libraryRepository.removeBySongId(event.getSongId());
+    public Mono<Void> handle(DeleteSongCommandHandler.Deleted event) {
+        return libraryRepository.removeBySongId(event.songId());
     }
 }

@@ -1,11 +1,10 @@
 package com.ggar.hibiki.test.integration.real.catalog;
 
-import com.ggar.hibiki.core.catalog.dto.DeleteArtistCommand;
+import com.ggar.hibiki.core.catalog.handler.command.DeleteArtistCommandHandler;
 import com.ggar.hibiki.core.catalog.model.Album;
 import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.core.catalog.port.AlbumRepository;
 import com.ggar.hibiki.core.catalog.port.ArtistRepository;
-import com.ggar.hibiki.core.catalog.usecase.handler.command.DeleteArtistCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.DeleteArtistContractTest;
 import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.CapturingEventBus;
@@ -66,7 +65,7 @@ public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
         UUID realAlbumId = savedAlbum.getId();
 
         // Act & Assert
-        StepVerifier.create(handler.handle(new DeleteArtistCommand(realArtistId)))
+        StepVerifier.create(handler.handle(new DeleteArtistCommandHandler.Delete(realArtistId)))
                 .verifyComplete();
 
         // Check effects reactively
@@ -110,7 +109,7 @@ public class DeleteArtistRealIntegrationTest extends DeleteArtistContractTest {
         UUID realAlbumId = savedAlbum.getId();
 
         // Act & Assert
-        StepVerifier.create(handler.handle(new DeleteArtistCommand(realCollaboratorId)))
+        StepVerifier.create(handler.handle(new DeleteArtistCommandHandler.Delete(realCollaboratorId)))
                 .verifyComplete();
 
         // Check effects reactively

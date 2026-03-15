@@ -2,16 +2,16 @@ package com.ggar.hibiki.test.contracts.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ggar.hibiki.core.catalog.dto.ArtistDto;
+import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public abstract class CreateArtistContractTest {
 
-    protected abstract ScenarioResult<ArtistDto> givenArtistDoesNotExist(String name);
+    protected abstract ScenarioResult<Artist> givenArtistDoesNotExist(String name);
 
-    protected abstract ScenarioResult<ArtistDto> givenArtistAlreadyExists(String name);
+    protected abstract ScenarioResult<Artist> givenArtistAlreadyExists(String name);
 
     @Test
     @DisplayName("Scenario: artist does not exist")
@@ -20,7 +20,7 @@ public abstract class CreateArtistContractTest {
         String name = "New Artist";
 
         // Act
-        ScenarioResult<ArtistDto> result = givenArtistDoesNotExist(name);
+        ScenarioResult<Artist> result = givenArtistDoesNotExist(name);
 
         // Assert
         assertThat(result.getReturnValue()).isNotNull();
@@ -36,7 +36,7 @@ public abstract class CreateArtistContractTest {
         String name = "Existing Artist";
 
         // Act
-        ScenarioResult<ArtistDto> result = givenArtistAlreadyExists(name);
+        ScenarioResult<Artist> result = givenArtistAlreadyExists(name);
 
         // Assert
         assertThat(result.getReturnValue()).isNotNull();

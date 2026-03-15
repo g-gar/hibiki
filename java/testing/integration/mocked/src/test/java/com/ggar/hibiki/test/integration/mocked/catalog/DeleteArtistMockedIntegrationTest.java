@@ -2,11 +2,11 @@ package com.ggar.hibiki.test.integration.mocked.catalog;
 
 import static org.mockito.Mockito.when;
 
-import com.ggar.hibiki.core.catalog.dto.DeleteArtistCommand;
+import com.ggar.hibiki.core.catalog.handler.command.DeleteArtistCommandHandler;
+import com.ggar.hibiki.core.catalog.handler.command.DeleteArtistCommandHandlerImpl;
 import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.core.catalog.port.AlbumRepository;
 import com.ggar.hibiki.core.catalog.port.ArtistRepository;
-import com.ggar.hibiki.core.catalog.usecase.handler.command.DeleteArtistCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.DeleteArtistContractTest;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.ScenarioResult;
@@ -34,7 +34,7 @@ public class DeleteArtistMockedIntegrationTest extends DeleteArtistContractTest 
 
     @BeforeEach
     void setup() {
-        handler = new DeleteArtistCommandHandler(artistRepository, albumRepository, eventBus);
+        handler = new DeleteArtistCommandHandlerImpl(artistRepository, albumRepository, eventBus);
         eventBus.clear();
     }
 
@@ -48,8 +48,7 @@ public class DeleteArtistMockedIntegrationTest extends DeleteArtistContractTest 
         when(albumRepository.deleteByArtistId(artistId)).thenReturn(Mono.empty());
 
         // Act & Assert (Reactive pattern)
-        handler.handle(new DeleteArtistCommand(artistId))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new DeleteArtistCommandHandler.Delete(artistId)))
                 .verifyComplete();
 
         // Capture
@@ -72,8 +71,7 @@ public class DeleteArtistMockedIntegrationTest extends DeleteArtistContractTest 
         when(albumRepository.deleteByArtistId(artistId)).thenReturn(Mono.empty());
 
         // Act & Assert
-        handler.handle(new DeleteArtistCommand(artistId))
-                .as(StepVerifier::create)
+        StepVerifier.create(handler.handle(new DeleteArtistCommandHandler.Delete(artistId)))
                 .verifyComplete();
 
         return ScenarioResult.<Void>builder()

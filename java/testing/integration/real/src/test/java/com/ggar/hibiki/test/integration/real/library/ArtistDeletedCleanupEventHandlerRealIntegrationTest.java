@@ -1,6 +1,6 @@
 package com.ggar.hibiki.test.integration.real.library;
 
-import com.ggar.hibiki.core.catalog.event.ArtistDeletedEvent;
+import com.ggar.hibiki.core.catalog.handler.command.DeleteArtistCommandHandler;
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.infrastructure.event.ArtistDeletedCleanupEventHandler;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
@@ -31,7 +31,8 @@ public class ArtistDeletedCleanupEventHandlerRealIntegrationTest extends ArtistD
     private ArtistDeletedCleanupEventHandler eventHandler;
 
     @Override
-    protected ScenarioResult<Void> givenEventReceivedAndLibraryHasMatchingMedia(ArtistDeletedEvent event) {
+    protected ScenarioResult<Void> givenEventReceivedAndLibraryHasMatchingMedia(
+            DeleteArtistCommandHandler.Deleted event) {
         UUID userId = UUID.randomUUID();
         UUID mediaId = UUID.randomUUID();
 
