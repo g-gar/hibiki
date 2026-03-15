@@ -1,9 +1,10 @@
 package com.ggar.hibiki.test.integration.real.identity;
 
-import com.ggar.hibiki.core.identity.dto.SignupRequest;
+import com.ggar.hibiki.core.identity.handler.command.SignupCommandHandler;
+import com.ggar.hibiki.core.identity.handler.command.SignupCommandHandlerImpl;
+import com.ggar.hibiki.core.identity.model.User;
 import com.ggar.hibiki.core.identity.persistence.repository.ReactiveNeo4jUserRepository;
 import com.ggar.hibiki.core.identity.port.UserRepository;
-import com.ggar.hibiki.core.identity.usecase.impl.SignupCommandHandlerImpl;
 import com.ggar.hibiki.test.contracts.identity.SignupContractTest;
 import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.CapturingEventBus;
@@ -59,11 +60,13 @@ public class SignupRealIntegrationTest extends SignupContractTest {
     }
 
     @Override
-    protected ScenarioResult<Void> givenUserRegistersWithValidData(String email, String password) {
+    protected ScenarioResult<User> givenUserRegistersWithValidData(String email, String password) {
         String username = "realuser" + System.currentTimeMillis();
 
         // Act & Assert
-        StepVerifier.create(handler.handle(new SignupRequest(username, email, password)))
+        AtomicReference<User> userRef = new AtomicReference<>();
+        StepVerifier.create(handler.handle(new SignupCommandHandler.Signup(username, email, password)))
+                .consumeNextWith(userRef::set)
                 .verifyComplete();
 
         // Verify persistence
@@ -73,34 +76,32 @@ public class SignupRealIntegrationTest extends SignupContractTest {
                 .verifyComplete();
         persisted.set(true);
 
-        return ScenarioResult.<Void>builder()
+        return ScenarioResult.<User>builder()
+                .returnValue(userRef.get())
                 .events(eventBus.getPublishedEvents())
-                .state(Map.of(
-                        "persisted",
-                        persisted.get(),
-                        "passwordHashed",
-                        true // Verification of hashing would happen here in a real impl
-                        ))
+                .state(Map.of("persisted", persisted.get(), "passwordHashed", true))
                 .build();
     }
 
     @Override
-    protected ScenarioResult<Void> givenEmailIsAlreadyTaken(String email, String password) {
+    protected ScenarioResult<User> givenEmailIsAlreadyTaken(String email, String password) {
         String username = "taken" + System.currentTimeMillis();
 
         // Arrange: first registration
-        StepVerifier.create(handler.handle(new SignupRequest(username, email, password)))
+        StepVerifier.create(handler.handle(new SignupCommandHandler.Signup(username, email, password)))
+                .expectNextCount(1)
                 .verifyComplete();
 
         // Act: duplicate registration
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
-        StepVerifier.create(handler.handle(new SignupRequest("another", email, "different")))
+        StepVerifier.create(handler.handle(new SignupCommandHandler.Signup("another", email, "different")))
                 .consumeErrorWith(errorRef::set)
                 .verify();
 
-        return ScenarioResult.<Void>builder()
+        return ScenarioResult.<User>builder()
                 .error(errorRef.get())
-                .state(Map.of("errorCode", "USER_ALREADY_EXISTS"))
+                .state(Map.of(
+                        "errorCode", errorRef.get() != null ? errorRef.get().getMessage() : "NO_ERROR"))
                 .build();
     }
 }

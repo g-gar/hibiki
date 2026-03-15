@@ -1,7 +1,7 @@
 package com.ggar.hibiki.core.orchestrator.usecase;
 
-import com.ggar.hibiki.core.identity.dto.AuthResponse;
-import com.ggar.hibiki.core.identity.dto.LoginRequest;
+import com.ggar.hibiki.core.identity.handler.command.LoginCommandHandler;
+import com.ggar.hibiki.core.identity.model.User;
 import com.ggar.hibiki.core.orchestrator.dto.LoginRequestDTO;
 import com.ggar.hibiki.core.orchestrator.mapper.LoginRequestMapper;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
@@ -24,15 +24,15 @@ public class LoginUseCase extends BaseOrchestratorUseCase {
         this.mapper = mapper;
     }
 
-    public Mono<AuthResponse> execute(LoginRequestDTO requestDto, String ip, String userAgent) {
+    public Mono<User> execute(LoginRequestDTO requestDto, String ip, String userAgent) {
         // Map DTO to Domain Command
-        LoginRequest loginCommand = mapper.toCommand(requestDto, ip, userAgent);
+        LoginCommandHandler.Login loginCommand = mapper.toCommand(requestDto, ip, userAgent);
 
         // Step 1: Execute Login Command (Validates credentials and generates tokens)
         return Mono.from(mediator.send(loginCommand)).flatMap(authResponse -> {
             // Step 2: Validate Device (Requires user ID from the response)
             ValidateDeviceLoginQuery deviceQuery = ValidateDeviceLoginQuery.builder()
-                    .userId(authResponse.getUserId())
+                    .userId(authResponse.getId())
                     .deviceId(requestDto.getDeviceId())
                     .ip(ip)
                     .userAgent(userAgent)

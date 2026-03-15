@@ -18,4 +18,5 @@ public class User {
     private String password;
     private Set<String> roles;
     private boolean twoFactorEnabled;
+    private AuthContext authContext;
 }

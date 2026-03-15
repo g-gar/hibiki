@@ -2,18 +2,18 @@ package com.ggar.hibiki.test.contracts.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ggar.hibiki.core.identity.dto.UserDto;
+import com.ggar.hibiki.core.identity.model.User;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public abstract class ValidateTokenContractTest {
 
-    protected abstract ScenarioResult<UserDto> givenTokenIsValid(String token);
+    protected abstract ScenarioResult<User> givenTokenIsValid(String token);
 
-    protected abstract ScenarioResult<UserDto> givenTokenIsExpired(String token);
+    protected abstract ScenarioResult<User> givenTokenIsExpired(String token);
 
-    protected abstract ScenarioResult<UserDto> givenTokenIsInvalid(String token);
+    protected abstract ScenarioResult<User> givenTokenIsInvalid(String token);
 
     @Test
     @DisplayName("Scenario: valid token")
@@ -22,7 +22,7 @@ public abstract class ValidateTokenContractTest {
         String token = "valid.jwt.token";
 
         // Act
-        ScenarioResult<UserDto> result = givenTokenIsValid(token);
+        ScenarioResult<User> result = givenTokenIsValid(token);
 
         // Assert
         assertThat(result.getReturnValue()).isNotNull();
@@ -36,7 +36,7 @@ public abstract class ValidateTokenContractTest {
         String token = "expired.jwt.token";
 
         // Act
-        ScenarioResult<UserDto> result = givenTokenIsExpired(token);
+        ScenarioResult<User> result = givenTokenIsExpired(token);
 
         // Assert
         assertThat(result.getError()).isNotNull();
@@ -50,7 +50,7 @@ public abstract class ValidateTokenContractTest {
         String token = "invalid.jwt.token";
 
         // Act
-        ScenarioResult<UserDto> result = givenTokenIsInvalid(token);
+        ScenarioResult<User> result = givenTokenIsInvalid(token);
 
         // Assert
         assertThat(result.getError()).isNotNull();

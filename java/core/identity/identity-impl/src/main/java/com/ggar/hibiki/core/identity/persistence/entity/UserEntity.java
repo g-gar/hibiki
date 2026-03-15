@@ -7,6 +7,7 @@ import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
+import org.springframework.data.neo4j.core.schema.Relationship;
 
 @Node("User")
 public class UserEntity {
@@ -29,6 +30,9 @@ public class UserEntity {
 
     @Property("twoFactorEnabled")
     private boolean twoFactorEnabled;
+
+    @Relationship(type = "AUTHENTICATED_WITH", direction = Relationship.Direction.OUTGOING)
+    private AuthContextEntity authContext;
 
     public UserEntity() {}
 
@@ -88,5 +92,13 @@ public class UserEntity {
 
     public void setTwoFactorEnabled(boolean twoFactorEnabled) {
         this.twoFactorEnabled = twoFactorEnabled;
+    }
+
+    public AuthContextEntity getAuthContext() {
+        return authContext;
+    }
+
+    public void setAuthContext(AuthContextEntity authContext) {
+        this.authContext = authContext;
     }
 }

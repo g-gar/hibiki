@@ -1,6 +1,8 @@
 package com.ggar.hibiki.core.identity.persistence.mapper;
 
+import com.ggar.hibiki.core.identity.model.AuthContext;
 import com.ggar.hibiki.core.identity.model.User;
+import com.ggar.hibiki.core.identity.persistence.entity.AuthContextEntity;
 import com.ggar.hibiki.core.identity.persistence.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -10,4 +12,8 @@ public interface UserMapper {
     User toDomain(UserEntity entity);
 
     UserEntity toEntity(User user);
+
+    AuthContext toDomain(AuthContextEntity entity);
+
+    AuthContextEntity toEntity(AuthContext model);
 }

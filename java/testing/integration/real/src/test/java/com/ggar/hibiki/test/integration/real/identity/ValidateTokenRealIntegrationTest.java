@@ -1,14 +1,10 @@
 package com.ggar.hibiki.test.integration.real.identity;
 
-import com.ggar.hibiki.core.identity.dto.AuthResponse;
-import com.ggar.hibiki.core.identity.dto.LoginRequest;
-import com.ggar.hibiki.core.identity.dto.SignupRequest;
-import com.ggar.hibiki.core.identity.dto.UserDto;
-import com.ggar.hibiki.core.identity.dto.ValidateTokenQuery;
+import com.ggar.hibiki.core.identity.handler.command.LoginCommandHandler;
+import com.ggar.hibiki.core.identity.handler.command.SignupCommandHandler;
+import com.ggar.hibiki.core.identity.handler.query.ValidateTokenQueryHandler;
+import com.ggar.hibiki.core.identity.model.User;
 import com.ggar.hibiki.core.identity.persistence.repository.ReactiveNeo4jUserRepository;
-import com.ggar.hibiki.core.identity.service.LoginCommandHandler;
-import com.ggar.hibiki.core.identity.service.SignupCommandHandler;
-import com.ggar.hibiki.core.identity.service.ValidateTokenQueryHandler;
 import com.ggar.hibiki.test.contracts.identity.ValidateTokenContractTest;
 import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.ScenarioResult;
@@ -50,55 +46,56 @@ public class ValidateTokenRealIntegrationTest extends ValidateTokenContractTest 
     }
 
     @Override
-    protected ScenarioResult<UserDto> givenTokenIsValid(String token) {
+    protected ScenarioResult<User> givenTokenIsValid(String token) {
         // En un test real, 'token' viene del contrato pero queremos uno vÃ¡lido real
         String email = "token_valid_" + System.currentTimeMillis() + "@example.com";
         String password = "password";
         String username = "user_" + System.currentTimeMillis();
 
         // 1. Signup
-        StepVerifier.create(signupHandler.handle(new SignupRequest(username, email, password)))
+        StepVerifier.create(signupHandler.handle(new SignupCommandHandler.Signup(username, email, password)))
+                .expectNextCount(1)
                 .verifyComplete();
 
         // 2. Login to get token
-        AtomicReference<AuthResponse> authRef = new AtomicReference<>();
+        AtomicReference<User> authRef = new AtomicReference<>();
         StepVerifier.create(loginHandler.handle(
-                        new LoginRequest(username, password, "test-device", "127.0.0.1", "test-agent")))
+                        new LoginCommandHandler.Login(username, password, "test-device", "127.0.0.1", "test-agent")))
                 .assertNext(authRef::set)
                 .verifyComplete();
 
-        String realToken = authRef.get().getToken();
+        String realToken = authRef.get().getAuthContext().accessToken();
 
         // 3. Act: Validate
-        AtomicReference<Map<String, Object>> resultRef = new AtomicReference<>();
-        StepVerifier.create(validateTokenHandler.handle(new ValidateTokenQuery(realToken)))
+        AtomicReference<User> resultRef = new AtomicReference<>();
+        StepVerifier.create(validateTokenHandler.handle(new ValidateTokenQueryHandler.Validate(realToken)))
                 .assertNext(resultRef::set)
                 .verifyComplete();
 
-        UserDto userDto = UserDto.builder().email(email).build();
+        User user = User.builder().email(email).build();
 
-        return ScenarioResult.<UserDto>builder().returnValue(userDto).build();
+        return ScenarioResult.<User>builder().returnValue(user).build();
     }
 
     @Override
-    protected ScenarioResult<UserDto> givenTokenIsExpired(String token) {
+    protected ScenarioResult<User> givenTokenIsExpired(String token) {
         // No tenemos forma fÃ¡cil de generar un token expirado sin mockear el tiempo
         // Por ahora devolvemos un error simulado para cumplir el contrato reactivamente
-        return ScenarioResult.<UserDto>builder()
+        return ScenarioResult.<User>builder()
                 .error(new RuntimeException("Token expired"))
                 .state(Map.of("errorCode", "TOKEN_EXPIRED"))
                 .build();
     }
 
     @Override
-    protected ScenarioResult<UserDto> givenTokenIsInvalid(String token) {
+    protected ScenarioResult<User> givenTokenIsInvalid(String token) {
         // Act & Assert
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
-        StepVerifier.create(validateTokenHandler.handle(new ValidateTokenQuery("invalid-token")))
+        StepVerifier.create(validateTokenHandler.handle(new ValidateTokenQueryHandler.Validate("invalid-token")))
                 .consumeErrorWith(errorRef::set)
                 .verify();
 
-        return ScenarioResult.<UserDto>builder()
+        return ScenarioResult.<User>builder()
                 .error(errorRef.get())
                 .state(Map.of("errorCode", "INVALID_TOKEN"))
                 .build();
