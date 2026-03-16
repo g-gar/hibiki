@@ -2,11 +2,9 @@ package com.ggar.hibiki.test.integration.real.library;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
-import com.ggar.hibiki.features.library.dto.RemoveMediaFromLibraryCommand;
+import com.ggar.hibiki.features.library.handler.command.AddMediaToLibraryCommandHandler;
+import com.ggar.hibiki.features.library.handler.command.RemoveMediaFromLibraryCommandHandler;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
-import com.ggar.hibiki.features.library.service.AddMediaToLibraryCommandHandler;
-import com.ggar.hibiki.features.library.service.RemoveMediaFromLibraryCommandHandler;
 import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.SharedInfrastructure;
@@ -64,21 +62,15 @@ public class RemoveMediaFromLibraryRealIntegrationTest {
         UUID mediaId = UUID.randomUUID();
 
         // 1. Add first
-        StepVerifier.create(addHandler.handle(AddMediaToLibraryCommand.builder()
-                        .userId(userId)
-                        .mediaId(mediaId)
-                        .type(LibraryItemType.SONG)
-                        .build()))
+        StepVerifier.create(addHandler.handle(
+                        new AddMediaToLibraryCommandHandler.Add(userId, LibraryItemType.SONG, mediaId)))
                 .expectNextCount(1)
                 .verifyComplete();
 
         // 2. Remove
         AtomicReference<UUID> resultRef = new AtomicReference<>();
-        StepVerifier.create(removeHandler.handle(RemoveMediaFromLibraryCommand.builder()
-                        .userId(userId)
-                        .type(LibraryItemType.SONG)
-                        .mediaId(mediaId)
-                        .build()))
+        StepVerifier.create(removeHandler.handle(
+                        new RemoveMediaFromLibraryCommandHandler.Remove(userId, LibraryItemType.SONG, mediaId)))
                 .assertNext(resultRef::set)
                 .verifyComplete();
 

@@ -1,9 +1,8 @@
 package com.ggar.hibiki.test.integration.real.library;
 
-import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
-import com.ggar.hibiki.features.library.dto.LibraryItemDto;
+import com.ggar.hibiki.features.library.handler.command.AddMediaToLibraryCommandHandler;
+import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
-import com.ggar.hibiki.features.library.service.AddMediaToLibraryCommandHandler;
 import com.ggar.hibiki.test.contracts.library.AddMediaToLibraryContractTest;
 import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.CapturingEventBus;
@@ -41,20 +40,17 @@ public class AddMediaToLibraryRealIntegrationTest extends AddMediaToLibraryContr
     }
 
     @Override
-    protected ScenarioResult<LibraryItemDto> givenUserAddsSongToLibrary(UUID userId, UUID songId) {
+    protected ScenarioResult<LibraryItem> givenUserAddsSongToLibrary(UUID userId, UUID songId) {
         // Act & Assert
-        AtomicReference<LibraryItemDto> responseRef = new AtomicReference<>();
-        AddMediaToLibraryCommand command = AddMediaToLibraryCommand.builder()
-                .userId(userId)
-                .mediaId(songId)
-                .type(LibraryItemType.SONG)
-                .build();
+        AtomicReference<LibraryItem> responseRef = new AtomicReference<>();
+        AddMediaToLibraryCommandHandler.Add command =
+                new AddMediaToLibraryCommandHandler.Add(userId, LibraryItemType.SONG, songId);
 
         StepVerifier.create(handler.handle(command))
                 .assertNext(responseRef::set)
                 .verifyComplete();
 
-        return ScenarioResult.<LibraryItemDto>builder()
+        return ScenarioResult.<LibraryItem>builder()
                 .returnValue(responseRef.get())
                 .events(eventBus.getPublishedEvents())
                 .state(Map.of("persisted", true))
@@ -62,23 +58,20 @@ public class AddMediaToLibraryRealIntegrationTest extends AddMediaToLibraryContr
     }
 
     @Override
-    protected ScenarioResult<LibraryItemDto> givenSongIsAlreadyInLibrary(UUID userId, UUID songId) {
-        AddMediaToLibraryCommand command = AddMediaToLibraryCommand.builder()
-                .userId(userId)
-                .mediaId(songId)
-                .type(LibraryItemType.SONG)
-                .build();
+    protected ScenarioResult<LibraryItem> givenSongIsAlreadyInLibrary(UUID userId, UUID songId) {
+        AddMediaToLibraryCommandHandler.Add command =
+                new AddMediaToLibraryCommandHandler.Add(userId, LibraryItemType.SONG, songId);
 
         // 1. First addition
         StepVerifier.create(handler.handle(command)).expectNextCount(1).verifyComplete();
 
         // 2. Second addition (idempotency)
-        AtomicReference<LibraryItemDto> responseRef = new AtomicReference<>();
+        AtomicReference<LibraryItem> responseRef = new AtomicReference<>();
         StepVerifier.create(handler.handle(command))
                 .assertNext(responseRef::set)
                 .verifyComplete();
 
-        return ScenarioResult.<LibraryItemDto>builder()
+        return ScenarioResult.<LibraryItem>builder()
                 .returnValue(responseRef.get())
                 .state(Map.of("countBefore", 1, "countAfter", 1))
                 .build();

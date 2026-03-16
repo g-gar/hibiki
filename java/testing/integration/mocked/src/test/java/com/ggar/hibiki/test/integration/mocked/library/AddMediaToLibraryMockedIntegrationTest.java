@@ -7,16 +7,16 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
-import com.ggar.hibiki.features.library.dto.LibraryItemDto;
+import com.ggar.hibiki.features.library.factory.LibraryItemFactory;
+import com.ggar.hibiki.features.library.handler.command.AddMediaToLibraryCommandHandler;
+import com.ggar.hibiki.features.library.handler.command.AddMediaToLibraryCommandHandlerImpl;
 import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
+import com.ggar.hibiki.features.library.model.Song;
+import com.ggar.hibiki.features.library.model.SongId;
 import com.ggar.hibiki.features.library.model.SongLibraryItem;
 import com.ggar.hibiki.features.library.model.User;
 import com.ggar.hibiki.features.library.port.LibraryRepository;
-import com.ggar.hibiki.features.library.service.AddMediaToLibraryCommandHandlerImpl;
-import com.ggar.hibiki.features.library.service.factory.LibraryItemFactory;
-import com.ggar.hibiki.features.library.service.mapper.LibraryServiceMapper;
 import com.ggar.hibiki.test.contracts.library.AddMediaToLibraryContractTest;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.ScenarioResult;
@@ -39,73 +39,61 @@ public class AddMediaToLibraryMockedIntegrationTest extends AddMediaToLibraryCon
     @Mock
     private LibraryItemFactory itemFactory;
 
-    @Mock
-    private LibraryServiceMapper libraryServiceMapper;
-
     private final CapturingEventBus eventBus = new CapturingEventBus();
     private AddMediaToLibraryCommandHandlerImpl handler;
 
     @BeforeEach
     void setup() {
-        handler =
-                new AddMediaToLibraryCommandHandlerImpl(libraryRepository, itemFactory, libraryServiceMapper, eventBus);
+        handler = new AddMediaToLibraryCommandHandlerImpl(libraryRepository, itemFactory, eventBus);
         eventBus.clear();
     }
 
     @Override
-    protected ScenarioResult<LibraryItemDto> givenUserAddsSongToLibrary(UUID userId, UUID songId) {
+    protected ScenarioResult<LibraryItem> givenUserAddsSongToLibrary(UUID userId, UUID songId) {
         // Arrange
         LibraryItem item = mock(SongLibraryItem.class);
 
-        LibraryItemDto dto =
-                LibraryItemDto.builder().songId(songId).userId(userId).build();
+        Song song = Song.builder().id(SongId.of(songId)).build();
+        when(((SongLibraryItem) item).getSong()).thenReturn(song);
 
         when(libraryRepository.findById(any(User.class), eq(songId))).thenReturn(Mono.empty());
         when(itemFactory.create(eq(LibraryItemType.SONG), any(User.class), eq(songId)))
                 .thenReturn(item);
         when(libraryRepository.save(any(User.class), eq(item))).thenReturn(Mono.just(item));
-        when(libraryServiceMapper.toDto(any(LibraryItem.class))).thenReturn(dto);
 
         // Act & Assert
-        AtomicReference<LibraryItemDto> responseRef = new AtomicReference<>();
-        StepVerifier.create(handler.handle(AddMediaToLibraryCommand.builder()
-                        .userId(userId)
-                        .type(LibraryItemType.SONG)
-                        .mediaId(songId)
-                        .build()))
+        AtomicReference<LibraryItem> responseRef = new AtomicReference<>();
+        StepVerifier.create(
+                        handler.handle(new AddMediaToLibraryCommandHandler.Add(userId, LibraryItemType.SONG, songId)))
                 .assertNext(responseRef::set)
                 .verifyComplete();
 
-        return ScenarioResult.<LibraryItemDto>builder()
+        return ScenarioResult.<LibraryItem>builder()
                 .returnValue(responseRef.get())
                 .state(Map.of("persisted", true))
                 .build();
     }
 
     @Override
-    protected ScenarioResult<LibraryItemDto> givenSongIsAlreadyInLibrary(UUID userId, UUID songId) {
+    protected ScenarioResult<LibraryItem> givenSongIsAlreadyInLibrary(UUID userId, UUID songId) {
         // Arrange
         LibraryItem item = mock(SongLibraryItem.class);
 
-        LibraryItemDto dto =
-                LibraryItemDto.builder().songId(songId).userId(userId).build();
+        Song song = Song.builder().id(SongId.of(songId)).build();
+        when(((SongLibraryItem) item).getSong()).thenReturn(song);
 
         when(libraryRepository.findById(any(User.class), eq(songId))).thenReturn(Mono.just(item));
-        when(libraryServiceMapper.toDto(any(LibraryItem.class))).thenReturn(dto);
 
         // Act & Assert
-        AtomicReference<LibraryItemDto> responseRef = new AtomicReference<>();
-        StepVerifier.create(handler.handle(AddMediaToLibraryCommand.builder()
-                        .userId(userId)
-                        .type(LibraryItemType.SONG)
-                        .mediaId(songId)
-                        .build()))
+        AtomicReference<LibraryItem> responseRef = new AtomicReference<>();
+        StepVerifier.create(
+                        handler.handle(new AddMediaToLibraryCommandHandler.Add(userId, LibraryItemType.SONG, songId)))
                 .assertNext(responseRef::set)
                 .verifyComplete();
 
         verify(libraryRepository, never()).save(any(), any());
 
-        return ScenarioResult.<LibraryItemDto>builder()
+        return ScenarioResult.<LibraryItem>builder()
                 .returnValue(responseRef.get())
                 .state(Map.of("countBefore", 1, "countAfter", 1))
                 .build();

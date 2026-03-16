@@ -2,15 +2,17 @@ package com.ggar.hibiki.core.orchestrator.usecase;
 
 import com.ggar.hibiki.core.catalog.handler.command.CreateCatalogItemsCommandHandler;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
-import com.ggar.hibiki.features.ingestion.dto.ItemDescriptor;
-import com.ggar.hibiki.features.ingestion.dto.UploadProgressDto;
-import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
 import com.ggar.hibiki.features.ingestion.handler.command.CompleteUploadCommandHandler;
 import com.ggar.hibiki.features.ingestion.handler.command.InitiateUploadCommandHandler;
 import com.ggar.hibiki.features.ingestion.handler.command.UploadChunkCommandHandler;
 import com.ggar.hibiki.features.ingestion.handler.query.GetUploadSessionByIdQueryHandler;
 import com.ggar.hibiki.features.ingestion.model.IdentityContext;
-import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
+import com.ggar.hibiki.features.ingestion.model.ItemDescriptor;
+import com.ggar.hibiki.features.ingestion.model.UploadItem;
+import com.ggar.hibiki.features.ingestion.model.UploadProgress;
+import com.ggar.hibiki.features.ingestion.model.UploadSession;
+import com.ggar.hibiki.features.library.handler.command.AddMediaToLibraryCommandHandler;
+import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
 import com.ggar.hibiki.features.metadata.dto.FetchMetadataCommand;
 import com.ggar.hibiki.features.metadata.dto.MapToId3Command;
@@ -68,17 +70,20 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                 identityContext.getUser().getId().getId(), List.of(itemDescriptor));
 
         return Mono.from(mediator.send(initiateCmd))
+                .cast(UploadSession.class)
                 .flatMap(session -> {
-                    UploadSessionDto.UploadItemDto item = session.getItems().get(0);
+                    UploadItem item = session.getItems().get(0);
 
                     AtomicReference<String> resolvedMimeType = new AtomicReference<>(null);
                     AtomicReference<ContentHasher.HashState> hashState = new AtomicReference<>(contentHasher.init());
                     AtomicInteger chunkCount = new AtomicInteger(0);
 
-                    Runnable onStart =
-                            () -> log.info("Upload stream started in Orchestrator for session {}", session.getId());
-                    Runnable onComplete =
-                            () -> log.info("Upload stream completed in Orchestrator for session {}", session.getId());
+                    Runnable onStart = () -> log.info(
+                            "Upload stream started in Orchestrator for session {}",
+                            session.getId().getId());
+                    Runnable onComplete = () -> log.info(
+                            "Upload stream completed in Orchestrator for session {}",
+                            session.getId().getId());
                     Consumer<byte[]> onChunk = bytes -> {
                         if (chunkCount.getAndIncrement() == 0) {
                             mediaTypeResolver
@@ -91,23 +96,25 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
 
                     UploadChunkCommandHandler.Upload chunkCmd = new UploadChunkCommandHandler.Upload(
                             identityContext.getUser().getId().getId(),
-                            UUID.fromString(session.getId()),
-                            UUID.fromString(item.getId()),
+                            session.getId().getId(),
+                            item.getId().getId(),
                             0, // Logical single chunk mapping the whole flux
                             content,
                             onStart,
                             onComplete,
                             onChunk);
 
-                    return Mono.from(mediator.send(chunkCmd)).map(r -> {
-                        UploadProgressDto progress = (UploadProgressDto) r;
-                        String mimeTypeStr =
-                                resolvedMimeType.get() != null ? resolvedMimeType.get() : "application/octet-stream";
-                        return Tuples.of(
-                                UUID.fromString(progress.getUploadSessionId()),
-                                mimeTypeStr,
-                                contentHasher.finalize(hashState.get()));
-                    });
+                    return Mono.from(mediator.send(chunkCmd))
+                            .cast(UploadProgress.class)
+                            .map(progress -> {
+                                String mimeTypeStr = resolvedMimeType.get() != null
+                                        ? resolvedMimeType.get()
+                                        : "application/octet-stream";
+                                return Tuples.of(
+                                        progress.getUploadSessionId(),
+                                        mimeTypeStr,
+                                        contentHasher.finalize(hashState.get()));
+                            });
                 })
                 .flatMap(tuple -> {
                     UUID sessionId = tuple.getT1();
@@ -163,19 +170,21 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                             new GetUploadSessionByIdQueryHandler.Get(mediaId.getId());
 
                     return Mono.from(mediator.send(sessionQuery)).flatMap(uploadSession -> {
-                        UUID userId = UUID.fromString(uploadSession.getUserId());
+                        UUID userId = ((UploadSession) uploadSession)
+                                .getUserId()
+                                .getId()
+                                .getId();
 
-                        AddMediaToLibraryCommand addLibraryCmd = AddMediaToLibraryCommand.builder()
-                                .userId(userId)
-                                .mediaId(catalogResult.songId())
-                                .type(LibraryItemType.SONG)
-                                .build();
+                        AddMediaToLibraryCommandHandler.Add addLibraryCmd = new AddMediaToLibraryCommandHandler.Add(
+                                userId, LibraryItemType.SONG, catalogResult.songId());
 
                         return Mono.from(mediator.send(addLibraryCmd));
                     });
                 })
                 .flatMap(libraryItem -> {
-                    log.info("Orchestrator successfully added song to user library: {}", libraryItem.getId());
+                    log.info(
+                            "Orchestrator successfully added song to user library: {}",
+                            ((LibraryItem) libraryItem).getId().getValue());
                     // Placeholder for future steps:
                     // mediator.send(new NotifyFollowersCommand(...))
                     // mediator.send(new InitializeMetricsCommand(...))

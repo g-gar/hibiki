@@ -1,9 +1,8 @@
 package com.ggar.hibiki.features.ingestion.handler.command;
 
 import com.ggar.hibiki.core.shared.event.EventBus;
-import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
-import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
+import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.UserId;
 import com.ggar.hibiki.features.ingestion.port.MediaStorage;
@@ -22,11 +21,10 @@ public class CancelUploadCommandHandlerImpl implements CancelUploadCommandHandle
 
     private final UploadSessionRepository uploadSessionRepository;
     private final MediaStorage mediaStorage;
-    private final MediaMapper mediaMapper;
     private final EventBus eventBus;
 
     @Override
-    public Publisher<UploadSessionDto> handle(CancelUploadCommandHandler.Cancel command) {
+    public Publisher<UploadSession> handle(CancelUploadCommandHandler.Cancel command) {
         var userId = UserId.of(command.userId());
 
         return uploadSessionRepository
@@ -45,7 +43,7 @@ public class CancelUploadCommandHandlerImpl implements CancelUploadCommandHandle
                                         log.error("Failed to publish Cancelled event", e);
                                         return Mono.empty();
                                     })
-                                    .thenReturn(mediaMapper.toDto(s)));
+                                    .thenReturn(s));
                 });
     }
 }

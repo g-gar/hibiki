@@ -3,7 +3,7 @@ package com.ggar.hibiki.features.ingestion.handler.command;
 import com.ggar.hibiki.core.shared.event.DomainEvent;
 import com.ggar.hibiki.core.shared.mediator.Command;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;
-import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
+import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.UserId;
 import java.util.UUID;
@@ -11,13 +11,12 @@ import java.util.UUID;
 /**
  * Interface for the handler responsible for cancelling an upload session.
  */
-public interface CancelUploadCommandHandler
-        extends CommandHandler<CancelUploadCommandHandler.Cancel, UploadSessionDto> {
+public interface CancelUploadCommandHandler extends CommandHandler<CancelUploadCommandHandler.Cancel, UploadSession> {
 
     /**
      * Command to cancel an active upload session.
      */
-    record Cancel(UUID userId, UUID uploadSessionId) implements Command<UploadSessionDto> {}
+    record Cancel(UUID userId, UUID uploadSessionId) implements Command<UploadSession> {}
 
     /**
      * Event published when an upload session is successfully cancelled.

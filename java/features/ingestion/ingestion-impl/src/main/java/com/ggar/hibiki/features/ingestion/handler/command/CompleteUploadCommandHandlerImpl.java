@@ -1,9 +1,7 @@
 package com.ggar.hibiki.features.ingestion.handler.command;
 
 import com.ggar.hibiki.core.shared.event.EventBus;
-import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
 import com.ggar.hibiki.features.ingestion.event.MediaIngestedEvent;
-import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.Media;
 import com.ggar.hibiki.features.ingestion.model.MediaId;
@@ -36,11 +34,10 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
     private final MediaStorage mediaStorage;
     private final MediaRepository mediaRepository;
     private final IngestionPipeline ingestionPipeline;
-    private final MediaMapper mediaMapper;
     private final EventBus eventBus;
 
     @Override
-    public Publisher<UploadSessionDto> handle(CompleteUploadCommandHandler.Complete command) {
+    public Publisher<UploadSession> handle(CompleteUploadCommandHandler.Complete command) {
         var userId = UserId.of(command.userId());
 
         return uploadSessionRepository
@@ -58,8 +55,7 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
                                             item, userId, command.mimeType(), command.contentHash()))
                                     .flatMap(media -> runPipelineAndPublishEvents(media, item, session, userId)))
                             .then(Mono.defer(() -> Mono.from(uploadSessionRepository.save(
-                                    session.withPhase(IngestionPhase.COMPLETED).withCompletedAt(Instant.now())))))
-                            .map(mediaMapper::toDto);
+                                    session.withPhase(IngestionPhase.COMPLETED).withCompletedAt(Instant.now())))));
                 })
                 .switchIfEmpty(Mono.error(new RuntimeException("Upload session not found")));
     }

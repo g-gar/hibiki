@@ -6,14 +6,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
 import com.ggar.hibiki.features.ingestion.handler.command.CompleteUploadCommandHandler;
 import com.ggar.hibiki.features.ingestion.handler.command.CompleteUploadCommandHandlerImpl;
-import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
+import com.ggar.hibiki.features.ingestion.model.Media;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadItemId;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
+import com.ggar.hibiki.features.ingestion.pipeline.IngestionContext;
 import com.ggar.hibiki.features.ingestion.pipeline.IngestionPipeline;
 import com.ggar.hibiki.features.ingestion.port.MediaRepository;
 import com.ggar.hibiki.features.ingestion.port.MediaStorage;
@@ -45,16 +45,13 @@ public class CompleteUploadMockedIntegrationTest {
     @Mock
     private IngestionPipeline ingestionPipeline;
 
-    @Mock
-    private MediaMapper mediaMapper;
-
     private final CapturingEventBus eventBus = new CapturingEventBus();
     private CompleteUploadCommandHandlerImpl handler;
 
     @BeforeEach
     void setup() {
         handler = new CompleteUploadCommandHandlerImpl(
-                uploadSessionRepository, mediaStorage, mediaRepository, ingestionPipeline, mediaMapper, eventBus);
+                uploadSessionRepository, mediaStorage, mediaRepository, ingestionPipeline, eventBus);
         eventBus.clear();
     }
 
@@ -77,20 +74,20 @@ public class CompleteUploadMockedIntegrationTest {
 
         when(uploadSessionRepository.findById(any())).thenReturn(Mono.just(session));
         when(mediaStorage.completeMultipartUpload(any(), any(), any())).thenReturn(Mono.empty());
-        when(mediaRepository.save(any()))
-                .thenReturn(Mono.just(mock(com.ggar.hibiki.features.ingestion.model.Media.class)));
-        when(ingestionPipeline.execute(any()))
-                .thenReturn(Mono.just(mock(com.ggar.hibiki.features.ingestion.pipeline.IngestionContext.class)));
-        when(uploadSessionRepository.save(any(com.ggar.hibiki.features.ingestion.model.UploadSession.class)))
-                .thenReturn(Mono.just(session));
-        when(mediaMapper.toDto(any(com.ggar.hibiki.features.ingestion.model.UploadSession.class)))
-                .thenReturn(UploadSessionDto.builder().build());
+        when(mediaRepository.save(any())).thenReturn(Mono.just(mock(Media.class)));
+        when(ingestionPipeline.execute(any())).thenReturn(Mono.just(mock(IngestionContext.class)));
+        when(uploadSessionRepository.save(any(UploadSession.class))).thenReturn(Mono.just(session));
 
         CompleteUploadCommandHandler.Complete command =
                 new CompleteUploadCommandHandler.Complete(userId, sessionId, "audio/mpeg", "hash123");
 
         // Act & Assert
-        StepVerifier.create(handler.handle(command)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(handler.handle(command))
+                .assertNext(result -> {
+                    assertThat(result).isInstanceOf(UploadSession.class);
+                    assertThat(result.getId().getId()).isEqualTo(sessionId);
+                })
+                .verifyComplete();
 
         // Verification
         verify(mediaStorage).completeMultipartUpload(any(), any(), any());

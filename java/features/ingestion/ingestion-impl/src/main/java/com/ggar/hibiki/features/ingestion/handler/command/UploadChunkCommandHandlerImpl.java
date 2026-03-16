@@ -1,8 +1,6 @@
 package com.ggar.hibiki.features.ingestion.handler.command;
 
 import com.ggar.hibiki.core.shared.event.EventBus;
-import com.ggar.hibiki.features.ingestion.dto.UploadProgressDto;
-import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadItemId;
@@ -28,11 +26,10 @@ public class UploadChunkCommandHandlerImpl implements UploadChunkCommandHandler 
 
     private final UploadSessionRepository uploadSessionRepository;
     private final MediaStorage mediaStorage;
-    private final MediaMapper mediaMapper;
     private final EventBus eventBus;
 
     @Override
-    public Publisher<UploadProgressDto> handle(UploadChunkCommandHandler.Upload command) {
+    public Publisher<UploadProgress> handle(UploadChunkCommandHandler.Upload command) {
         return uploadSessionRepository
                 .findById(UploadSessionId.of(command.uploadSessionId()))
                 .flatMap(session -> {
@@ -101,13 +98,13 @@ public class UploadChunkCommandHandlerImpl implements UploadChunkCommandHandler 
                                                 int progress = (int) ((double) updatedItem.getReceivedChunks()
                                                         / updatedItem.getTotalChunks()
                                                         * 100);
-                                                return mediaMapper.toDto(UploadProgress.builder()
+                                                return UploadProgress.builder()
                                                         .uploadSessionId(
                                                                 session.getId().getId())
                                                         .itemId(item.getId().getId())
                                                         .phase(updatedItem.getPhase())
                                                         .progress(progress)
-                                                        .build());
+                                                        .build();
                                             });
                                 })
                                 .doOnSuccess(progress -> {

@@ -3,8 +3,8 @@ package com.ggar.hibiki.features.ingestion.handler.command;
 import com.ggar.hibiki.core.shared.event.DomainEvent;
 import com.ggar.hibiki.core.shared.mediator.Command;
 import com.ggar.hibiki.core.shared.mediator.CommandHandler;
-import com.ggar.hibiki.features.ingestion.dto.UploadProgressDto;
 import com.ggar.hibiki.features.ingestion.model.UploadItemId;
+import com.ggar.hibiki.features.ingestion.model.UploadProgress;
 import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.UserId;
 import java.util.UUID;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
 /**
  * Interface for the handler responsible for uploading a single chunk of an item.
  */
-public interface UploadChunkCommandHandler extends CommandHandler<UploadChunkCommandHandler.Upload, UploadProgressDto> {
+public interface UploadChunkCommandHandler extends CommandHandler<UploadChunkCommandHandler.Upload, UploadProgress> {
 
     /**
      * Command to upload a single chunk of an item.
@@ -29,7 +29,7 @@ public interface UploadChunkCommandHandler extends CommandHandler<UploadChunkCom
             Runnable onUploadStarted,
             Runnable onUploadCompleted,
             Consumer<byte[]> onChunkProcessed)
-            implements Command<UploadProgressDto> {}
+            implements Command<UploadProgress> {}
 
     /**
      * Event published after each chunk is successfully uploaded.

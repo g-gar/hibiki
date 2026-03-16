@@ -1,7 +1,6 @@
 package com.ggar.hibiki.features.ingestion.handler.query;
 
-import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
-import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
+import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +14,9 @@ import org.springframework.stereotype.Service;
 public class GetUploadStatusQueryHandlerImpl implements GetUploadStatusQueryHandler {
 
     private final UploadSessionRepository uploadSessionRepository;
-    private final MediaMapper mediaMapper;
 
     @Override
-    public Publisher<UploadSessionDto> handle(GetUploadStatusQueryHandler.Get query) {
-        return uploadSessionRepository
-                .findById(UploadSessionId.of(query.uploadSessionId()))
-                .map(mediaMapper::toDto);
+    public Publisher<UploadSession> handle(GetUploadStatusQueryHandler.Get query) {
+        return uploadSessionRepository.findById(UploadSessionId.of(query.uploadSessionId()));
     }
 }

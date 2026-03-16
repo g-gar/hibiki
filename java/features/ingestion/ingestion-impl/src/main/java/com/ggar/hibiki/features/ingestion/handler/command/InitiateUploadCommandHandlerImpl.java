@@ -1,10 +1,8 @@
 package com.ggar.hibiki.features.ingestion.handler.command;
 
 import com.ggar.hibiki.core.shared.event.EventBus;
-import com.ggar.hibiki.features.ingestion.dto.ItemDescriptor;
-import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
-import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
+import com.ggar.hibiki.features.ingestion.model.ItemDescriptor;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadItemId;
 import com.ggar.hibiki.features.ingestion.model.UploadSession;
@@ -33,12 +31,11 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
 
     private final UploadSessionRepository uploadSessionRepository;
     private final MediaStorage mediaStorage;
-    private final MediaMapper mediaMapper;
     private final UuidV7Generator idGenerator;
     private final EventBus eventBus;
 
     @Override
-    public Publisher<UploadSessionDto> handle(InitiateUploadCommandHandler.Initiate command) {
+    public Publisher<UploadSession> handle(InitiateUploadCommandHandler.Initiate command) {
         var sessionId = idGenerator.generate();
         var userId = UserId.of(command.userId());
 
@@ -69,10 +66,10 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
                 .flatMap(item -> mediaStorage.initiateMultipartUpload(
                         item.getId().getId().toString()))
                 .then(Mono.from(uploadSessionRepository.save(session)))
-                .map(mediaMapper::toDto)
-                .doOnSuccess(saved -> {
+                .flatMap(saved -> {
                     log.info("Upload session {} created with {} items", sessionId, items.size());
-                    eventBus.publish(new InitiateUploadCommandHandler.Initiated(command.userId(), sessionId));
+                    return eventBus.publish(new InitiateUploadCommandHandler.Initiated(command.userId(), sessionId))
+                            .thenReturn(saved);
                 });
     }
 }

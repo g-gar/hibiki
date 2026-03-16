@@ -1,10 +1,9 @@
 package com.ggar.hibiki.test.integration.real.library;
 
 import com.ggar.hibiki.core.catalog.handler.command.DeleteArtistCommandHandler;
-import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
+import com.ggar.hibiki.features.library.handler.command.AddMediaToLibraryCommandHandler;
 import com.ggar.hibiki.features.library.infrastructure.event.ArtistDeletedCleanupEventHandler;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
-import com.ggar.hibiki.features.library.service.AddMediaToLibraryCommandHandler;
 import com.ggar.hibiki.test.contracts.library.ArtistDeletedCleanupEventHandlerContractTest;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import com.ggar.hibiki.test.support.SharedInfrastructure;
@@ -37,11 +36,8 @@ public class ArtistDeletedCleanupEventHandlerRealIntegrationTest extends ArtistD
         UUID mediaId = UUID.randomUUID();
 
         // 1. Arrange: add item that SHOULD be removed
-        StepVerifier.create(addHandler.handle(AddMediaToLibraryCommand.builder()
-                        .userId(userId)
-                        .mediaId(mediaId)
-                        .type(LibraryItemType.SONG)
-                        .build()))
+        StepVerifier.create(addHandler.handle(
+                        new AddMediaToLibraryCommandHandler.Add(userId, LibraryItemType.SONG, mediaId)))
                 .expectNextCount(1)
                 .verifyComplete();
 
