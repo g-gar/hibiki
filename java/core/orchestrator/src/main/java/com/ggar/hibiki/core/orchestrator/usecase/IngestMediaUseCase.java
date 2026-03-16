@@ -2,13 +2,13 @@ package com.ggar.hibiki.core.orchestrator.usecase;
 
 import com.ggar.hibiki.core.catalog.handler.command.CreateCatalogItemsCommandHandler;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
-import com.ggar.hibiki.features.ingestion.dto.CompleteUploadCommand;
-import com.ggar.hibiki.features.ingestion.dto.GetUploadSessionByIdQuery;
-import com.ggar.hibiki.features.ingestion.dto.InitiateUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.ItemDescriptor;
-import com.ggar.hibiki.features.ingestion.dto.UploadChunkCommand;
 import com.ggar.hibiki.features.ingestion.dto.UploadProgressDto;
 import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
+import com.ggar.hibiki.features.ingestion.handler.command.CompleteUploadCommandHandler;
+import com.ggar.hibiki.features.ingestion.handler.command.InitiateUploadCommandHandler;
+import com.ggar.hibiki.features.ingestion.handler.command.UploadChunkCommandHandler;
+import com.ggar.hibiki.features.ingestion.handler.query.GetUploadSessionByIdQueryHandler;
 import com.ggar.hibiki.features.ingestion.model.IdentityContext;
 import com.ggar.hibiki.features.library.dto.AddMediaToLibraryCommand;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
@@ -64,10 +64,8 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                 .expectedSize(expectedSize)
                 .build();
 
-        InitiateUploadCommand initiateCmd = InitiateUploadCommand.builder()
-                .userId(identityContext.getUser().getId().getId())
-                .items(List.of(itemDescriptor))
-                .build();
+        InitiateUploadCommandHandler.Initiate initiateCmd = new InitiateUploadCommandHandler.Initiate(
+                identityContext.getUser().getId().getId(), List.of(itemDescriptor));
 
         return Mono.from(mediator.send(initiateCmd))
                 .flatMap(session -> {
@@ -91,16 +89,15 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                         log.debug("Orchestrator processed chunk of {} bytes in-flight", bytes.length);
                     };
 
-                    UploadChunkCommand chunkCmd = UploadChunkCommand.builder()
-                            .userId(identityContext.getUser().getId().getId())
-                            .uploadSessionId(UUID.fromString(session.getId()))
-                            .itemId(UUID.fromString(item.getId()))
-                            .chunkIndex(0) // Logical single chunk mapping the whole flux
-                            .content(content)
-                            .onUploadStarted(onStart)
-                            .onChunkProcessed(onChunk)
-                            .onUploadCompleted(onComplete)
-                            .build();
+                    UploadChunkCommandHandler.Upload chunkCmd = new UploadChunkCommandHandler.Upload(
+                            identityContext.getUser().getId().getId(),
+                            UUID.fromString(session.getId()),
+                            UUID.fromString(item.getId()),
+                            0, // Logical single chunk mapping the whole flux
+                            content,
+                            onStart,
+                            onComplete,
+                            onChunk);
 
                     return Mono.from(mediator.send(chunkCmd)).map(r -> {
                         UploadProgressDto progress = (UploadProgressDto) r;
@@ -117,12 +114,8 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                     String mimeType = tuple.getT2();
                     String finalHash = tuple.getT3();
 
-                    CompleteUploadCommand completeCmd = CompleteUploadCommand.builder()
-                            .userId(identityContext.getUser().getId().getId())
-                            .uploadSessionId(sessionId)
-                            .mimeType(mimeType)
-                            .contentHash(finalHash)
-                            .build();
+                    CompleteUploadCommandHandler.Complete completeCmd = new CompleteUploadCommandHandler.Complete(
+                            identityContext.getUser().getId().getId(), sessionId, mimeType, finalHash);
 
                     return Mono.from(mediator.send(completeCmd)).thenReturn(sessionId.toString());
                 });
@@ -166,9 +159,8 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                             catalogResult.albumId());
 
                     // We need the User Identity context to add the item to their Library
-                    GetUploadSessionByIdQuery sessionQuery = GetUploadSessionByIdQuery.builder()
-                            .uploadSessionId(mediaId.getId())
-                            .build();
+                    GetUploadSessionByIdQueryHandler.Get sessionQuery =
+                            new GetUploadSessionByIdQueryHandler.Get(mediaId.getId());
 
                     return Mono.from(mediator.send(sessionQuery)).flatMap(uploadSession -> {
                         UUID userId = UUID.fromString(uploadSession.getUserId());

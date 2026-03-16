@@ -1,12 +1,12 @@
 package com.ggar.hibiki.features.devices.infrastructure.handler;
 
-import com.ggar.hibiki.features.devices.dto.RegisterDeviceCommand;
+import com.ggar.hibiki.core.shared.event.EventBus;
+import com.ggar.hibiki.features.devices.handler.command.RegisterDeviceCommandHandler;
 import com.ggar.hibiki.features.devices.model.Device;
 import com.ggar.hibiki.features.devices.model.DeviceId;
 import com.ggar.hibiki.features.devices.model.DeviceStatus;
 import com.ggar.hibiki.features.devices.model.UserId;
 import com.ggar.hibiki.features.devices.port.DeviceRepository;
-import com.ggar.hibiki.features.devices.service.RegisterDeviceCommandHandler;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,14 +22,16 @@ import reactor.core.publisher.Mono;
 public class RegisterDeviceCommandHandlerImpl implements RegisterDeviceCommandHandler {
 
     private final DeviceRepository deviceRepository;
+    private final EventBus eventBus;
 
-    public RegisterDeviceCommandHandlerImpl(DeviceRepository deviceRepository) {
+    public RegisterDeviceCommandHandlerImpl(DeviceRepository deviceRepository, EventBus eventBus) {
         this.deviceRepository = deviceRepository;
+        this.eventBus = eventBus;
     }
 
     @Override
-    public Mono<Device> handle(RegisterDeviceCommand command) {
-        DeviceId deviceId = command.getId() != null ? DeviceId.of(command.getId()) : null;
+    public Mono<Device> handle(RegisterDeviceCommandHandler.Register command) {
+        DeviceId deviceId = command.id() != null ? DeviceId.of(command.id()) : null;
         Mono<Device> deviceMono = deviceId != null ? deviceRepository.findById(deviceId) : Mono.empty();
 
         return deviceMono
@@ -39,25 +41,35 @@ public class RegisterDeviceCommandHandlerImpl implements RegisterDeviceCommandHa
                                 "Cannot register a revoked device ID. Please generate a new ID on the client."));
                     }
                     var updated = existingDevice.toBuilder()
-                            .lastIp(command.getIp())
-                            .userAgent(command.getUserAgent())
+                            .lastIp(command.ip())
+                            .userAgent(command.userAgent())
                             .lastSeenAt(Instant.now())
                             .build();
-                    return deviceRepository.save(updated);
+                    return deviceRepository
+                            .save(updated)
+                            .doOnNext(device -> eventBus.publish(new RegisterDeviceCommandHandler.Registered(
+                                    device.getId().getValue(),
+                                    device.getUserId().getValue(),
+                                    device.getName())));
                 })
                 .switchIfEmpty(Mono.defer(() -> {
                     Device newDevice = Device.builder()
                             .id(deviceId != null ? deviceId : DeviceId.of(java.util.UUID.randomUUID()))
-                            .userId(UserId.of(command.getUserId()))
-                            .name(command.getName())
-                            .type(command.getType())
+                            .userId(UserId.of(command.userId()))
+                            .name(command.name())
+                            .type(command.type())
                             .status(DeviceStatus.ACTIVE)
-                            .lastIp(command.getIp())
-                            .userAgent(command.getUserAgent())
+                            .lastIp(command.ip())
+                            .userAgent(command.userAgent())
                             .createdAt(Instant.now())
                             .lastSeenAt(Instant.now())
                             .build();
-                    return deviceRepository.save(newDevice);
+                    return deviceRepository
+                            .save(newDevice)
+                            .doOnNext(device -> eventBus.publish(new RegisterDeviceCommandHandler.Registered(
+                                    device.getId().getValue(),
+                                    device.getUserId().getValue(),
+                                    device.getName())));
                 }));
     }
 }

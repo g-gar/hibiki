@@ -1,16 +1,13 @@
-package com.ggar.hibiki.features.ingestion.handler;
+package com.ggar.hibiki.features.ingestion.handler.command;
 
 import com.ggar.hibiki.core.shared.event.EventBus;
-import com.ggar.hibiki.features.ingestion.dto.CancelUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
-import com.ggar.hibiki.features.ingestion.event.UploadCancelledEvent;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.UserId;
 import com.ggar.hibiki.features.ingestion.port.MediaStorage;
 import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
-import com.ggar.hibiki.features.ingestion.service.CancelUploadCommandHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
@@ -29,11 +26,11 @@ public class CancelUploadCommandHandlerImpl implements CancelUploadCommandHandle
     private final EventBus eventBus;
 
     @Override
-    public Publisher<UploadSessionDto> handle(CancelUploadCommand command) {
-        var userId = UserId.of(command.getUserId());
+    public Publisher<UploadSessionDto> handle(CancelUploadCommandHandler.Cancel command) {
+        var userId = UserId.of(command.userId());
 
         return uploadSessionRepository
-                .findById(UploadSessionId.of(command.getUploadSessionId()))
+                .findById(UploadSessionId.of(command.uploadSessionId()))
                 .flatMap(session -> {
                     log.info("Cancelling upload session {} for user {}", session.getId(), userId);
 
@@ -42,12 +39,10 @@ public class CancelUploadCommandHandlerImpl implements CancelUploadCommandHandle
                                     item.getId().getId().toString(),
                                     session.getId().getId().toString()))
                             .then(Mono.from(uploadSessionRepository.save(session.withPhase(IngestionPhase.CANCELLED))))
-                            .flatMap(s -> eventBus.publish(UploadCancelledEvent.builder()
-                                            .userId(userId)
-                                            .uploadSessionId(session.getId())
-                                            .build())
+                            .flatMap(s -> eventBus.publish(
+                                            new CancelUploadCommandHandler.Cancelled(userId, session.getId()))
                                     .onErrorResume(e -> {
-                                        log.error("Failed to publish UploadCancelledEvent", e);
+                                        log.error("Failed to publish Cancelled event", e);
                                         return Mono.empty();
                                     })
                                     .thenReturn(mediaMapper.toDto(s)));

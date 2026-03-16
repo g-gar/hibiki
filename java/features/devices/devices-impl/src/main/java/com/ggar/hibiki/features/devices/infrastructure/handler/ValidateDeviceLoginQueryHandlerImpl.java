@@ -1,11 +1,10 @@
 package com.ggar.hibiki.features.devices.infrastructure.handler;
 
-import com.ggar.hibiki.features.devices.dto.ValidateDeviceLoginQuery;
+import com.ggar.hibiki.features.devices.handler.query.ValidateDeviceLoginQueryHandler;
 import com.ggar.hibiki.features.devices.model.DeviceId;
 import com.ggar.hibiki.features.devices.model.DeviceStatus;
 import com.ggar.hibiki.features.devices.model.UserId;
 import com.ggar.hibiki.features.devices.port.DeviceRepository;
-import com.ggar.hibiki.features.devices.service.ValidateDeviceLoginQueryHandler;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,9 +27,9 @@ public class ValidateDeviceLoginQueryHandlerImpl implements ValidateDeviceLoginQ
     }
 
     @Override
-    public Mono<Boolean> handle(ValidateDeviceLoginQuery query) {
-        UserId userId = UserId.of(query.getUserId());
-        DeviceId deviceId = DeviceId.of(query.getDeviceId());
+    public Mono<Boolean> handle(ValidateDeviceLoginQueryHandler.Validate query) {
+        UserId userId = UserId.of(query.userId());
+        DeviceId deviceId = DeviceId.of(query.deviceId());
 
         log.info("Validating device login for user {} and device {}", userId, deviceId);
 
@@ -49,8 +48,8 @@ public class ValidateDeviceLoginQueryHandlerImpl implements ValidateDeviceLoginQ
 
                     var updatedDevice = device.toBuilder()
                             .lastSeenAt(Instant.now())
-                            .lastIp(query.getIp())
-                            .userAgent(query.getUserAgent())
+                            .lastIp(query.ip())
+                            .userAgent(query.userAgent())
                             .build();
 
                     return deviceRepository.save(updatedDevice).thenReturn(true);

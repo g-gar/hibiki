@@ -2,46 +2,61 @@ package com.ggar.hibiki.test.contracts.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ggar.hibiki.core.catalog.model.Artist;
-import com.ggar.hibiki.test.support.ScenarioResult;
+import com.ggar.hibiki.core.catalog.handler.command.CreateArtistCommandHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import reactor.test.StepVerifier;
 
 public abstract class CreateArtistContractTest {
 
-    protected abstract ScenarioResult<Artist> givenArtistDoesNotExist(String name);
+    protected abstract CreateArtistCommandHandler getHandler();
 
-    protected abstract ScenarioResult<Artist> givenArtistAlreadyExists(String name);
+    protected abstract void setupArtistDoesNotExist(String name);
+
+    protected abstract void setupArtistAlreadyExists(String name);
+
+    protected abstract void verifyArtistWasPersisted(String name);
+
+    protected abstract void verifyArtistWasNotPersisted(String name);
 
     @Test
     @DisplayName("Scenario: artist does not exist")
     void newArtistScenario() {
-        // Arrange
         String name = "New Artist";
 
-        // Act
-        ScenarioResult<Artist> result = givenArtistDoesNotExist(name);
+        // Arrange
+        setupArtistDoesNotExist(name);
 
-        // Assert
-        assertThat(result.getReturnValue()).isNotNull();
-        assertThat(result.getReturnValue().getId()).isNotNull();
-        assertThat(result.getReturnValue().getName()).isEqualTo(name);
-        assertThat(result.getState().get("persisted")).isEqualTo(true);
+        // Act & Assert
+        StepVerifier.create(getHandler().handle(new CreateArtistCommandHandler.Create(name)))
+                .assertNext(result -> {
+                    assertThat(result).isNotNull();
+                    assertThat(result.getId()).isNotNull();
+                    assertThat(result.getName()).isEqualTo(name);
+                })
+                .verifyComplete();
+
+        // Post-condition
+        verifyArtistWasPersisted(name);
     }
 
     @Test
     @DisplayName("Scenario: artist already exists")
     void existingArtistScenario() {
-        // Arrange
         String name = "Existing Artist";
 
-        // Act
-        ScenarioResult<Artist> result = givenArtistAlreadyExists(name);
+        // Arrange
+        setupArtistAlreadyExists(name);
 
-        // Assert
-        assertThat(result.getReturnValue()).isNotNull();
-        assertThat(result.getReturnValue().getName()).isEqualTo(name);
-        assertThat(result.getState().get("countAfter"))
-                .isEqualTo(result.getState().get("countBefore"));
+        // Act & Assert
+        StepVerifier.create(getHandler().handle(new CreateArtistCommandHandler.Create(name)))
+                .assertNext(result -> {
+                    assertThat(result).isNotNull();
+                    assertThat(result.getName()).isEqualTo(name);
+                })
+                .verifyComplete();
+
+        // Post-condition
+        verifyArtistWasNotPersisted(name);
     }
 }

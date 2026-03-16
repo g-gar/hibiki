@@ -1,10 +1,9 @@
 package com.ggar.hibiki.features.devices.infrastructure.handler;
 
-import com.ggar.hibiki.features.devices.dto.GetDevicesQuery;
+import com.ggar.hibiki.features.devices.handler.query.GetDevicesQueryHandler;
 import com.ggar.hibiki.features.devices.model.Device;
 import com.ggar.hibiki.features.devices.model.UserId;
 import com.ggar.hibiki.features.devices.port.DeviceRepository;
-import com.ggar.hibiki.features.devices.service.GetDevicesQueryHandler;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,8 @@ public class GetDevicesQueryHandlerImpl implements GetDevicesQueryHandler {
     }
 
     @Override
-    public Mono<List<Device>> handle(GetDevicesQuery query) {
-        UserId userId = UserId.of(query.getUserId());
+    public Mono<List<Device>> handle(GetDevicesQueryHandler.Get query) {
+        UserId userId = UserId.of(query.userId());
         log.info("Fetching devices for user {}", userId);
 
         return deviceRepository.findByUserId(userId).collectList();

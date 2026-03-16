@@ -5,7 +5,7 @@ import com.ggar.hibiki.core.identity.model.User;
 import com.ggar.hibiki.core.orchestrator.dto.LoginRequestDTO;
 import com.ggar.hibiki.core.orchestrator.mapper.LoginRequestMapper;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
-import com.ggar.hibiki.features.devices.dto.ValidateDeviceLoginQuery;
+import com.ggar.hibiki.features.devices.handler.query.ValidateDeviceLoginQueryHandler;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -31,12 +31,8 @@ public class LoginUseCase extends BaseOrchestratorUseCase {
         // Step 1: Execute Login Command (Validates credentials and generates tokens)
         return Mono.from(mediator.send(loginCommand)).flatMap(authResponse -> {
             // Step 2: Validate Device (Requires user ID from the response)
-            ValidateDeviceLoginQuery deviceQuery = ValidateDeviceLoginQuery.builder()
-                    .userId(authResponse.getId())
-                    .deviceId(requestDto.getDeviceId())
-                    .ip(ip)
-                    .userAgent(userAgent)
-                    .build();
+            ValidateDeviceLoginQueryHandler.Validate deviceQuery = new ValidateDeviceLoginQueryHandler.Validate(
+                    authResponse.getId(), requestDto.getDeviceId(), ip, userAgent);
 
             // Chain the checks: if device validation passes, return the original
             // authResponse

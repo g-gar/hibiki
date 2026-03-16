@@ -6,9 +6,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ggar.hibiki.features.ingestion.dto.CompleteUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
-import com.ggar.hibiki.features.ingestion.handler.CompleteUploadCommandHandlerImpl;
+import com.ggar.hibiki.features.ingestion.handler.command.CompleteUploadCommandHandler;
+import com.ggar.hibiki.features.ingestion.handler.command.CompleteUploadCommandHandlerImpl;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
 import com.ggar.hibiki.features.ingestion.model.UploadItemId;
@@ -86,12 +86,8 @@ public class CompleteUploadMockedIntegrationTest {
         when(mediaMapper.toDto(any(com.ggar.hibiki.features.ingestion.model.UploadSession.class)))
                 .thenReturn(UploadSessionDto.builder().build());
 
-        CompleteUploadCommand command = CompleteUploadCommand.builder()
-                .userId(userId)
-                .uploadSessionId(sessionId)
-                .mimeType("audio/mpeg")
-                .contentHash("hash123")
-                .build();
+        CompleteUploadCommandHandler.Complete command =
+                new CompleteUploadCommandHandler.Complete(userId, sessionId, "audio/mpeg", "hash123");
 
         // Act & Assert
         StepVerifier.create(handler.handle(command)).expectNextCount(1).verifyComplete();

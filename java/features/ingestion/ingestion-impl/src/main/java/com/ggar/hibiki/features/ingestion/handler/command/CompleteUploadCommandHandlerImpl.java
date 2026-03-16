@@ -1,10 +1,8 @@
-package com.ggar.hibiki.features.ingestion.handler;
+package com.ggar.hibiki.features.ingestion.handler.command;
 
 import com.ggar.hibiki.core.shared.event.EventBus;
-import com.ggar.hibiki.features.ingestion.dto.CompleteUploadCommand;
 import com.ggar.hibiki.features.ingestion.dto.UploadSessionDto;
 import com.ggar.hibiki.features.ingestion.event.MediaIngestedEvent;
-import com.ggar.hibiki.features.ingestion.event.UploadCompletedEvent;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.Media;
@@ -20,7 +18,6 @@ import com.ggar.hibiki.features.ingestion.pipeline.IngestionPipeline;
 import com.ggar.hibiki.features.ingestion.port.MediaRepository;
 import com.ggar.hibiki.features.ingestion.port.MediaStorage;
 import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
-import com.ggar.hibiki.features.ingestion.service.CompleteUploadCommandHandler;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -43,11 +40,11 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
     private final EventBus eventBus;
 
     @Override
-    public Publisher<UploadSessionDto> handle(CompleteUploadCommand command) {
-        var userId = UserId.of(command.getUserId());
+    public Publisher<UploadSessionDto> handle(CompleteUploadCommandHandler.Complete command) {
+        var userId = UserId.of(command.userId());
 
         return uploadSessionRepository
-                .findById(UploadSessionId.of(command.getUploadSessionId()))
+                .findById(UploadSessionId.of(command.uploadSessionId()))
                 .flatMap(session -> {
                     log.info("Completing upload session {} for user {}", session.getId(), userId);
 
@@ -58,7 +55,7 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
                                             session.getId().getId().toString(),
                                             List.of())
                                     .then(createAndPersistMedia(
-                                            item, userId, command.getMimeType(), command.getContentHash()))
+                                            item, userId, command.mimeType(), command.contentHash()))
                                     .flatMap(media -> runPipelineAndPublishEvents(media, item, session, userId)))
                             .then(Mono.defer(() -> Mono.from(uploadSessionRepository.save(
                                     session.withPhase(IngestionPhase.COMPLETED).withCompletedAt(Instant.now())))))
@@ -93,16 +90,15 @@ public class CompleteUploadCommandHandlerImpl implements CompleteUploadCommandHa
 
         return ingestionPipeline
                 .execute(context)
-                .flatMap(ctx -> eventBus.publish(UploadCompletedEvent.builder()
-                                .userId(userId)
-                                .uploadSessionId(session.getId())
-                                .itemId(item.getId())
-                                .s3Key(item.getId().getId().toString())
-                                .mimeType(media.getMimeType())
-                                .totalSize(item.getExpectedSize())
-                                .build())
+                .flatMap(ctx -> eventBus.publish(new CompleteUploadCommandHandler.Completed(
+                                userId,
+                                session.getId(),
+                                item.getId(),
+                                item.getId().getId().toString(),
+                                media.getMimeType(),
+                                item.getExpectedSize()))
                         .onErrorResume(e -> {
-                            log.error("Failed to publish UploadCompletedEvent", e);
+                            log.error("Failed to publish Completed event", e);
                             return Mono.empty();
                         })
                         .then(eventBus.publish(MediaIngestedEvent.builder()

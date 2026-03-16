@@ -1,9 +1,7 @@
-package com.ggar.hibiki.features.ingestion.handler;
+package com.ggar.hibiki.features.ingestion.handler.command;
 
 import com.ggar.hibiki.core.shared.event.EventBus;
-import com.ggar.hibiki.features.ingestion.dto.UploadChunkCommand;
 import com.ggar.hibiki.features.ingestion.dto.UploadProgressDto;
-import com.ggar.hibiki.features.ingestion.event.ChunkUploadedEvent;
 import com.ggar.hibiki.features.ingestion.infrastructure.persistence.mapper.MediaMapper;
 import com.ggar.hibiki.features.ingestion.model.IngestionPhase;
 import com.ggar.hibiki.features.ingestion.model.UploadItem;
@@ -14,7 +12,6 @@ import com.ggar.hibiki.features.ingestion.model.UploadSessionId;
 import com.ggar.hibiki.features.ingestion.model.UserId;
 import com.ggar.hibiki.features.ingestion.port.MediaStorage;
 import com.ggar.hibiki.features.ingestion.port.UploadSessionRepository;
-import com.ggar.hibiki.features.ingestion.service.UploadChunkCommandHandler;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -35,33 +32,33 @@ public class UploadChunkCommandHandlerImpl implements UploadChunkCommandHandler 
     private final EventBus eventBus;
 
     @Override
-    public Publisher<UploadProgressDto> handle(UploadChunkCommand command) {
+    public Publisher<UploadProgressDto> handle(UploadChunkCommandHandler.Upload command) {
         return uploadSessionRepository
-                .findById(UploadSessionId.of(command.getUploadSessionId()))
+                .findById(UploadSessionId.of(command.uploadSessionId()))
                 .flatMap(session -> {
                     UploadItem item = session.getItems().stream()
-                            .filter(i -> i.getId().equals(UploadItemId.of(command.getItemId())))
+                            .filter(i -> i.getId().equals(UploadItemId.of(command.itemId())))
                             .findFirst()
-                            .orElseThrow(() -> new IllegalArgumentException("Item not found: " + command.getItemId()));
+                            .orElseThrow(() -> new IllegalArgumentException("Item not found: " + command.itemId()));
 
                     if (session.getPhase() == IngestionPhase.CANCELLED) {
                         return Mono.error(new IllegalStateException("Upload session is cancelled"));
                     }
 
-                    if (command.getOnUploadStarted() != null) {
-                        command.getOnUploadStarted().run();
+                    if (command.onUploadStarted() != null) {
+                        command.onUploadStarted().run();
                     }
 
                     // Collect chunk bytes
-                    return DataBufferUtils.join(command.getContent()).flatMap(dataBuffer -> {
+                    return DataBufferUtils.join(command.content()).flatMap(dataBuffer -> {
                         byte[] bytes = new byte[dataBuffer.readableByteCount()];
                         dataBuffer.read(bytes);
 
                         // Release buffer as we don't need it internally beyond this point
                         DataBufferUtils.release(dataBuffer);
 
-                        if (command.getOnChunkProcessed() != null) {
-                            command.getOnChunkProcessed().accept(bytes);
+                        if (command.onChunkProcessed() != null) {
+                            command.onChunkProcessed().accept(bytes);
                         }
 
                         // Upload part to S3
@@ -69,7 +66,7 @@ public class UploadChunkCommandHandlerImpl implements UploadChunkCommandHandler 
                                 .uploadPart(
                                         item.getId().toString(),
                                         session.getId().toString(),
-                                        command.getChunkIndex() + 1,
+                                        command.chunkIndex() + 1,
                                         bytes)
                                 .flatMap(etag -> {
                                     // Update item state
@@ -86,16 +83,16 @@ public class UploadChunkCommandHandlerImpl implements UploadChunkCommandHandler 
                                     return uploadSessionRepository
                                             .save(updatedSession)
                                             .flatMap(s -> {
-                                                var userId = UserId.of(command.getUserId());
-                                                return eventBus.publish(ChunkUploadedEvent.builder()
-                                                                .userId(userId)
-                                                                .uploadSessionId(session.getId())
-                                                                .itemId(item.getId())
-                                                                .chunkIndex(command.getChunkIndex())
-                                                                .chunkSize(bytes.length)
-                                                                .build())
+                                                var userId = UserId.of(command.userId());
+                                                return eventBus.publish(new UploadChunkCommandHandler.ChunkUploaded(
+                                                                userId,
+                                                                session.getId(),
+                                                                item.getId(),
+                                                                command.chunkIndex(),
+                                                                bytes.length,
+                                                                null))
                                                         .onErrorResume(e -> {
-                                                            log.error("Failed to publish ChunkUploadedEvent", e);
+                                                            log.error("Failed to publish ChunkUploaded", e);
                                                             return Mono.empty();
                                                         })
                                                         .thenReturn(s);
@@ -114,8 +111,8 @@ public class UploadChunkCommandHandlerImpl implements UploadChunkCommandHandler 
                                             });
                                 })
                                 .doOnSuccess(progress -> {
-                                    if (command.getOnUploadCompleted() != null) {
-                                        command.getOnUploadCompleted().run();
+                                    if (command.onUploadCompleted() != null) {
+                                        command.onUploadCompleted().run();
                                     }
                                 });
                     });

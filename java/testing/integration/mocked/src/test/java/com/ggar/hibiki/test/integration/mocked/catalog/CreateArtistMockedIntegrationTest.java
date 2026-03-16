@@ -11,16 +11,12 @@ import com.ggar.hibiki.core.catalog.model.Artist;
 import com.ggar.hibiki.core.catalog.port.ArtistRepository;
 import com.ggar.hibiki.test.contracts.catalog.CreateArtistContractTest;
 import com.ggar.hibiki.test.support.CapturingEventBus;
-import com.ggar.hibiki.test.support.ScenarioResult;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateArtistMockedIntegrationTest extends CreateArtistContractTest {
@@ -38,51 +34,34 @@ public class CreateArtistMockedIntegrationTest extends CreateArtistContractTest 
     }
 
     @Override
-    protected ScenarioResult<Artist> givenArtistDoesNotExist(String name) {
-        // Arrange
+    protected CreateArtistCommandHandler getHandler() {
+        return handler;
+    }
+
+    @Override
+    protected void setupArtistDoesNotExist(String name) {
         UUID generatedId = UUID.randomUUID();
         Artist savedArtist = Artist.builder().id(generatedId).name(name).build();
 
         when(artistRepository.findByName(name)).thenReturn(Mono.empty());
         when(artistRepository.save(any(Artist.class))).thenReturn(Mono.just(savedArtist));
-
-        // Act & Assert (Reactive pattern without .block())
-        AtomicReference<Artist> resultRef = new AtomicReference<>();
-        StepVerifier.create(handler.handle(new CreateArtistCommandHandler.Create(name)))
-                .assertNext(resultRef::set)
-                .verifyComplete();
-
-        // Capture
-        verify(artistRepository).save(any(Artist.class));
-
-        return ScenarioResult.<Artist>builder()
-                .returnValue(resultRef.get())
-                .events(eventBus.getPublishedEvents())
-                .state(Map.of("persisted", true))
-                .build();
     }
 
     @Override
-    protected ScenarioResult<Artist> givenArtistAlreadyExists(String name) {
-        // Arrange
+    protected void setupArtistAlreadyExists(String name) {
         UUID existingId = UUID.randomUUID();
         Artist existingArtist = Artist.builder().id(existingId).name(name).build();
 
         when(artistRepository.findByName(name)).thenReturn(Mono.just(existingArtist));
+    }
 
-        // Act & Assert
-        AtomicReference<Artist> resultRef = new AtomicReference<>();
-        StepVerifier.create(handler.handle(new CreateArtistCommandHandler.Create(name)))
-                .assertNext(resultRef::set)
-                .verifyComplete();
+    @Override
+    protected void verifyArtistWasPersisted(String name) {
+        verify(artistRepository).save(any(Artist.class));
+    }
 
-        // Capture
+    @Override
+    protected void verifyArtistWasNotPersisted(String name) {
         verify(artistRepository, never()).save(any(Artist.class));
-
-        return ScenarioResult.<Artist>builder()
-                .returnValue(resultRef.get())
-                .events(eventBus.getPublishedEvents())
-                .state(Map.of("countBefore", 1, "countAfter", 1))
-                .build();
     }
 }
