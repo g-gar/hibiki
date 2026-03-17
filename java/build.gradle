@@ -9,9 +9,17 @@ allprojects {
     group = 'com.ggar.hibiki'
     version = '0.0.1-SNAPSHOT'
 
+    ext {
+        versions = [
+            lombok: '1.18.44',
+            mapstruct: '1.6.3',
+            checkstyle: '11.1.0',
+            lombokMapstructBinding: '0.2.0'
+        ]
+    }
+
     repositories {
         mavenCentral()
-        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -36,7 +44,7 @@ subprojects {
     }
 
     checkstyle {
-        toolVersion = '10.12.4'
+        toolVersion = "${rootProject.ext.versions.checkstyle}"
         configFile = rootProject.file("../config/checkstyle/checkstyle.xml")
         showViolations = true
         maxWarnings = 0
@@ -50,8 +58,8 @@ subprojects {
 
     dependencies {
         compileOnly 'org.slf4j:slf4j-api'
-        compileOnly 'org.projectlombok:lombok'
-        annotationProcessor 'org.projectlombok:lombok'
+        compileOnly "org.projectlombok:lombok:${rootProject.ext.versions.lombok}"
+        annotationProcessor "org.projectlombok:lombok:${rootProject.ext.versions.lombok}"
     }
 }
 
