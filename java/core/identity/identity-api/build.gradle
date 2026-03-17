@@ -5,7 +5,4 @@ plugins {
 dependencies {
     api project(':core:shared')
     api 'io.projectreactor:reactor-core'
-
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
 }

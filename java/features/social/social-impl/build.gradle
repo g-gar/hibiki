@@ -1,5 +1,5 @@
 dependencies {
     implementation project(':features:social:social-api')
     implementation project(':core:shared')
-    // Feature specific dependencies
+
 }

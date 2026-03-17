@@ -12,15 +12,11 @@ dependencies {
     implementation project(':core:shared')
     implementation 'org.apache.tika:tika-core:2.9.1'
 
-    implementation 'org.springframework:spring-web'
     implementation 'org.springframework:spring-context'
     implementation 'io.projectreactor:reactor-core'
     implementation 'com.jayway.jsonpath:json-path:2.9.0'
     implementation 'org.yaml:snakeyaml:2.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
-
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
 }
 
 bootJar {

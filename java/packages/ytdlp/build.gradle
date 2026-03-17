@@ -8,9 +8,8 @@ dependencies {
     implementation 'io.projectreactor:reactor-core'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     
-    compileOnly 'org.springframework.boot:spring-boot-starter'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.springframework.boot:spring-boot'
+    compileOnly 'org.springframework:spring-context'
 }
 
 jar {

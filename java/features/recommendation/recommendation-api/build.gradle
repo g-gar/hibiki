@@ -5,6 +5,4 @@ plugins {
 dependencies {
     implementation project(':core:shared')
     
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
 }

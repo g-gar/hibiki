@@ -2,10 +2,6 @@ plugins {
     id 'java'
 }
 
-ext {
-    mapstructVersion = "1.5.5.Final"
-}
-
 dependencies {
     testImplementation project(":core:identity:identity-api")
     testImplementation project(":core:identity:identity-impl")
@@ -27,26 +23,22 @@ dependencies {
     testImplementation project(":features:entitlements:entitlements-impl")
     testImplementation project(":packages:jwt")
     testImplementation project(":packages:uuid")
-    // Hereda el contrato
+
     testImplementation project(':testing:contracts')
 
-    // Missing transitives for tests
     testImplementation 'org.springframework.data:spring-data-neo4j'
-    testImplementation 'org.mapstruct:mapstruct'
     testImplementation 'io.projectreactor:reactor-test'
 
-    // Mockito para mocks
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.mockito:mockito-junit-jupiter'
     testImplementation 'org.assertj:assertj-core'
 
-    // JUnit runner
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    testImplementation "org.mapstruct:mapstruct:${mapstructVersion}"
-    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-    testAnnotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+    testImplementation "org.mapstruct:mapstruct:${rootProject.ext.versions.mapstruct}"
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${rootProject.ext.versions.mapstruct}"
+    testAnnotationProcessor "org.projectlombok:lombok-mapstruct-binding:${rootProject.ext.versions.lombokMapstructBinding}"
 }
 
 test {

@@ -16,12 +16,11 @@ dependencies {
     implementation project(':core:shared')
     implementation project(':features:metadata:metadata-api')
     implementation project(':features:ingestion:ingestion-api')
-    implementation project(':core:identity:identity-api') // Keeping identity temporarily for AuthResponse model until moved
+    implementation project(':core:identity:identity-api')
     implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
-    
-    // Mapping & Lombok
-    implementation 'org.mapstruct:mapstruct:1.6.3'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-    compileOnly 'org.projectlombok:lombok:1.18.42'
-    annotationProcessor 'org.projectlombok:lombok:1.18.42'
+
+    implementation "org.mapstruct:mapstruct:${rootProject.ext.versions.mapstruct}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${rootProject.ext.versions.mapstruct}"
+    compileOnly "org.projectlombok:lombok:${rootProject.ext.versions.lombok}"
+    annotationProcessor "org.projectlombok:lombok:${rootProject.ext.versions.lombok}"
 }
