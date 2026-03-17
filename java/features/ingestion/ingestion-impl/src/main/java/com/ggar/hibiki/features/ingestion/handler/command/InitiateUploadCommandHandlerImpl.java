@@ -31,12 +31,11 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
 
     private final UploadSessionRepository uploadSessionRepository;
     private final MediaStorage mediaStorage;
-    private final UuidV7Generator idGenerator;
     private final EventBus eventBus;
 
     @Override
     public Publisher<UploadSession> handle(InitiateUploadCommandHandler.Initiate command) {
-        var sessionId = idGenerator.generate();
+        var sessionId = UuidV7Generator.generate();
         var userId = UserId.of(command.userId());
 
         log.info("Initiating upload session {} for user {}", sessionId, userId);
@@ -45,7 +44,7 @@ public class InitiateUploadCommandHandlerImpl implements InitiateUploadCommandHa
         for (ItemDescriptor descriptor : command.items()) {
             int totalChunks = (int) Math.ceil((double) descriptor.getExpectedSize() / DEFAULT_CHUNK_SIZE);
             items.add(UploadItem.builder()
-                    .id(UploadItemId.of(idGenerator.generate()))
+                    .id(UploadItemId.of(UuidV7Generator.generate()))
                     .originalFilename(descriptor.getOriginalFilename())
                     .expectedSize(descriptor.getExpectedSize())
                     .totalChunks(totalChunks)

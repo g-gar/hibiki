@@ -6,14 +6,8 @@ import org.springframework.data.neo4j.core.schema.IdGenerator;
 
 public class UuidV7IdGenerator implements IdGenerator<UUID> {
 
-    private final UuidV7Generator generator;
-
-    public UuidV7IdGenerator() {
-        this.generator = new UuidV7Generator();
-    }
-
     @Override
     public UUID generateId(String primaryLabel, Object entity) {
-        return generator.generate();
+        return UuidV7Generator.generate();
     }
 }

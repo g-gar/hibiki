@@ -11,47 +11,41 @@ import java.util.concurrent.atomic.AtomicLong;
  * This implementation generates a timestamp based on 100-ns intervals since
  * the Gregorian epoch (1582-10-15). To prevent disclosing hardware MAC
  * addresses,
- * a random 48-bit multicast node ID is generated once per instance.
+ * a random 48-bit multicast node ID is generated once.
  */
-public class UuidV1Generator implements UuidGenerator {
+public final class UuidV1Generator {
 
     // Offset from Unix epoch (1970-01-01) to UUID epoch (1582-10-15) in 100-ns
     // intervals.
     private static final long EPOCH_OFFSET = 122192928000000000L;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final long NODE;
+    private static final int CLOCK_SEQUENCE;
+    private static final AtomicLong LAST_TIMESTAMP = new AtomicLong();
 
-    private final SecureRandom secureRandom;
-    private final long node;
-    private final int clockSequence;
-
-    // To ensure uniqueness within the same millisecond
-    private final AtomicLong lastTimestamp = new AtomicLong();
-
-    public UuidV1Generator() {
-        this(new SecureRandom());
-    }
-
-    public UuidV1Generator(SecureRandom secureRandom) {
-        this.secureRandom = secureRandom;
-
-        // Generate random 48-bit node ID with multicast bit (least significant bit of
-        // first octet) set to 1
-        // Avoids MAC address exposure as per RFC 4122 Section 4.5
+    static {
         byte[] nodeBytes = new byte[6];
-        secureRandom.nextBytes(nodeBytes);
+        SECURE_RANDOM.nextBytes(nodeBytes);
         nodeBytes[0] |= 0x01;
 
         long n = 0;
         for (int i = 0; i < 6; i++) {
             n = (n << 8) | (nodeBytes[i] & 0xff);
         }
-        this.node = n;
-
-        // Random 14-bit clock sequence
-        this.clockSequence = secureRandom.nextInt() & 0x3FFF;
+        NODE = n;
+        CLOCK_SEQUENCE = SECURE_RANDOM.nextInt() & 0x3FFF;
     }
 
-    @Override
-    public UUID generate() {
+    private UuidV1Generator() {
+        // Utility class
+    }
+
+    /**
+     * Generates a new UUID v1.
+     *
+     * @return A newly generated UUID v1.
+     */
+    public static UUID generate() {
         long timestamp = getUniqueTimestamp();
 
         // 60-bit timestamp
@@ -65,33 +59,29 @@ public class UuidV1Generator implements UuidGenerator {
         long msb = (timeLow << 32) | (timeMid << 16) | timeHiAndVersion;
 
         // 14-bit clock sequence + 2-bit variant
-        long clockSeqHiAndReserved = (clockSequence >>> 8) & 0x3FL;
-        long clockSeqLow = clockSequence & 0xFFL;
+        long clockSeqHiAndReserved = (CLOCK_SEQUENCE >>> 8) & 0x3FL;
+        long clockSeqLow = CLOCK_SEQUENCE & 0xFFL;
 
         // Set Variant RFC 4122
         clockSeqHiAndReserved |= 0x80L;
 
-        long lsb = (clockSeqHiAndReserved << 56) | (clockSeqLow << 48) | node;
+        long lsb = (clockSeqHiAndReserved << 56) | (clockSeqLow << 48) | NODE;
 
         return new UUID(msb, lsb);
     }
 
-    private synchronized long getUniqueTimestamp() {
+    private static synchronized long getUniqueTimestamp() {
         while (true) {
             Instant now = Instant.now();
-            // Convert to 100-ns intervals since 1582-10-15
-            // 1 ms = 10,000 * 100-ns intervals
-            // 1 ns = 1/100 of a 100-ns interval
             long currentTimestamp = (now.getEpochSecond() * 10000000L) + (now.getNano() / 100) + EPOCH_OFFSET;
 
-            long last = lastTimestamp.get();
+            long last = LAST_TIMESTAMP.get();
             if (currentTimestamp > last) {
-                if (lastTimestamp.compareAndSet(last, currentTimestamp)) {
+                if (LAST_TIMESTAMP.compareAndSet(last, currentTimestamp)) {
                     return currentTimestamp;
                 }
             } else {
-                // Time didn't advance or went backwards, just increment the last timestamp
-                if (lastTimestamp.compareAndSet(last, last + 1)) {
+                if (LAST_TIMESTAMP.compareAndSet(last, last + 1)) {
                     return last + 1;
                 }
             }

@@ -13,26 +13,26 @@ import java.util.UUID;
  * databases
  * while maintaining the collision resistance of UUIDv4.
  */
-public class UuidV7Generator implements UuidGenerator {
+public final class UuidV7Generator {
 
-    private final SecureRandom secureRandom;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-    public UuidV7Generator() {
-        this.secureRandom = new SecureRandom();
+    private UuidV7Generator() {
+        // Utility class
     }
 
-    public UuidV7Generator(SecureRandom secureRandom) {
-        this.secureRandom = secureRandom;
-    }
-
-    @Override
-    public UUID generate() {
+    /**
+     * Generates a new UUID v7.
+     *
+     * @return A newly generated UUID v7.
+     */
+    public static UUID generate() {
         // 48-bit Unix timestamp in milliseconds
         long timestampMs = Instant.now().toEpochMilli() & 0xFFFFFFFFFFFFL;
 
         // Generate 10 random bytes for the random part
         byte[] randomBytes = new byte[10];
-        secureRandom.nextBytes(randomBytes);
+        SECURE_RANDOM.nextBytes(randomBytes);
 
         // Build most significant bits (MSB)
         // 48 bits timestamp | 4 bits version | 12 bits random_a
