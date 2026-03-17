@@ -1,11 +1,11 @@
-package com.ggar.hibiki.packages.otp.config;
+package com.ggar.hibiki.packages.totp.config;
 
-import com.ggar.hibiki.packages.otp.generator.StandardTotpGenerator;
-import com.ggar.hibiki.packages.otp.generator.TotpGenerator;
-import com.ggar.hibiki.packages.otp.util.Base32SecretEncoder;
-import com.ggar.hibiki.packages.otp.util.SecretEncoder;
-import com.ggar.hibiki.packages.otp.verifier.StandardTotpVerifier;
-import com.ggar.hibiki.packages.otp.verifier.TotpVerifier;
+import com.ggar.hibiki.packages.totp.generator.StandardTotpGenerator;
+import com.ggar.hibiki.packages.totp.generator.TotpGenerator;
+import com.ggar.hibiki.packages.totp.util.Base32SecretEncoder;
+import com.ggar.hibiki.packages.totp.util.SecretEncoder;
+import com.ggar.hibiki.packages.totp.verifier.StandardTotpVerifier;
+import com.ggar.hibiki.packages.totp.verifier.TotpVerifier;
 import java.security.SecureRandom;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
  * and logger beans automatically.
  */
 @Configuration
-public class OtpConfiguration {
+public class TotpConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(SecureRandom.class)

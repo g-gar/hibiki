@@ -1,7 +1,7 @@
-package com.ggar.hibiki.packages.otp.generator;
+package com.ggar.hibiki.packages.totp.generator;
 
-import com.ggar.hibiki.packages.otp.exception.OtpException;
-import com.ggar.hibiki.packages.otp.util.SecretEncoder;
+import com.ggar.hibiki.packages.totp.exception.TotpException;
+import com.ggar.hibiki.packages.totp.util.SecretEncoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -62,7 +62,7 @@ public class StandardTotpGenerator implements TotpGenerator {
                 return secretEncoder.encode(secretBytes);
             } catch (Exception e) {
                 log.error("Failed to generate TOTP secret", e);
-                throw new OtpException("Failed to generate TOTP secret", e);
+                throw new TotpException("Failed to generate TOTP secret", e);
             }
         });
     }
@@ -82,7 +82,7 @@ public class StandardTotpGenerator implements TotpGenerator {
                         encodedIssuer, encodedAccount, secret, encodedIssuer, algorithm, digits, period);
             } catch (Exception e) {
                 log.error("Failed to generate OTP URI", e);
-                throw new OtpException("Failed to generate OTP URI", e);
+                throw new TotpException("Failed to generate OTP URI", e);
             }
         });
     }

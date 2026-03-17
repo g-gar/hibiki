@@ -1,4 +1,4 @@
-package com.ggar.hibiki.packages.otp.util;
+package com.ggar.hibiki.packages.totp.util;
 
 /**
  * A configurable Base32 encoder and decoder according to RFC 4648.

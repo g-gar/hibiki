@@ -1,7 +1,7 @@
-package com.ggar.hibiki.packages.otp.verifier;
+package com.ggar.hibiki.packages.totp.verifier;
 
-import com.ggar.hibiki.packages.otp.exception.OtpException;
-import com.ggar.hibiki.packages.otp.util.SecretEncoder;
+import com.ggar.hibiki.packages.totp.exception.TotpException;
+import com.ggar.hibiki.packages.totp.util.SecretEncoder;
 import java.nio.ByteBuffer;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.Mac;
@@ -70,7 +70,7 @@ public class StandardTotpVerifier implements TotpVerifier {
                 return false;
             } catch (Exception e) {
                 log.error("Failed to verify TOTP code", e);
-                throw new OtpException("Failed to verify TOTP code", e);
+                throw new TotpException("Failed to verify TOTP code", e);
             }
         });
     }
