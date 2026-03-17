@@ -1,4 +1,4 @@
-package com.ggar.hibiki.packages.otp.verifier;
+package com.ggar.hibiki.packages.totp.verifier;
 
 import reactor.core.publisher.Mono;
 

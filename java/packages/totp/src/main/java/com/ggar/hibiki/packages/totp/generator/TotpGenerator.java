@@ -1,4 +1,4 @@
-package com.ggar.hibiki.packages.otp.generator;
+package com.ggar.hibiki.packages.totp.generator;
 
 import reactor.core.publisher.Mono;
 

@@ -1,4 +1,4 @@
-package com.ggar.hibiki.packages.otp.util;
+package com.ggar.hibiki.packages.totp.util;
 
 /**
  * Interface defining the contract for encoding and decoding TOTP secrets.
