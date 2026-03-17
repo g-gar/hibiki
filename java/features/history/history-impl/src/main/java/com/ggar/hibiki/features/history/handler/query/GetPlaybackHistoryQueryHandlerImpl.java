@@ -1,14 +1,13 @@
-package com.ggar.hibiki.features.history.infrastructure.handler;
+package com.ggar.hibiki.features.history.handler.query;
 
-import com.ggar.hibiki.features.history.dto.GetPlaybackHistoryQuery;
 import com.ggar.hibiki.features.history.model.PlaybackHistoryEntry;
 import com.ggar.hibiki.features.history.model.UserId;
 import com.ggar.hibiki.features.history.port.PlaybackHistoryRepository;
-import com.ggar.hibiki.features.history.service.GetPlaybackHistoryQueryHandler;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Implementation of the {@link GetPlaybackHistoryQueryHandler}.
@@ -21,20 +20,25 @@ public class GetPlaybackHistoryQueryHandlerImpl implements GetPlaybackHistoryQue
     private final PlaybackHistoryRepository repository;
 
     @Override
-    public Flux<PlaybackHistoryEntry> handle(GetPlaybackHistoryQuery query) {
+    public Mono<List<PlaybackHistoryEntry>> handle(GetPlaybackHistoryQueryHandler.Get query) {
         log.debug(
                 "Retrieving playback history for user: {}, page: {}, size: {}",
-                query.getUserId(),
-                query.getPage(),
-                query.getSize());
+                query.userId(),
+                query.page(),
+                query.size());
 
-        if (query.getUserId() == null) {
+        if (query.userId() == null) {
             log.warn("Attempted to retrieve history with null userId");
-            return Flux.empty();
+            return Mono.just(List.of());
         }
+
+        int page = query.page() != null ? query.page() : 0;
+        int size = query.size() != null ? query.size() : 20;
+
         return repository
-                .findByUserId(UserId.of(query.getUserId()))
-                .skip((long) query.getPage() * query.getSize())
-                .take(query.getSize());
+                .findByUserId(UserId.of(query.userId()))
+                .skip((long) page * size)
+                .take(size)
+                .collectList();
     }
 }
