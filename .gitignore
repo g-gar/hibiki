@@ -7,3 +7,4 @@ java/**/.gradle
 **/out/
 **/local.properties
 **/gradle.properties.local
+**/bin/
