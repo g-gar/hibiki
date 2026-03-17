@@ -1,7 +1,6 @@
-package com.ggar.hibiki.features.metadata.service;
+package com.ggar.hibiki.features.metadata.handler.command;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ggar.hibiki.features.metadata.dto.MapToId3Command;
+import com.ggar.hibiki.core.shared.event.EventBus;
 import com.ggar.hibiki.features.metadata.model.Id3Result;
 import com.ggar.hibiki.features.metadata.model.MediaId;
 import com.ggar.hibiki.packages.id3v2.model.Id3v2Frame;
@@ -16,7 +15,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
 import reactor.core.publisher.Mono;
@@ -27,8 +25,10 @@ public class MapToId3CommandHandlerImpl implements MapToId3CommandHandler {
 
     private final Map<String, String> mappings;
     private final Configuration jsonPathConfig;
+    private final EventBus eventBus;
 
-    public MapToId3CommandHandlerImpl(ObjectMapper objectMapper) {
+    public MapToId3CommandHandlerImpl(com.fasterxml.jackson.databind.ObjectMapper objectMapper, EventBus eventBus) {
+        this.eventBus = eventBus;
         this.jsonPathConfig = Configuration.builder()
                 .mappingProvider(new JacksonMappingProvider(objectMapper))
                 .jsonProvider(new JacksonJsonProvider(objectMapper))
@@ -48,40 +48,43 @@ public class MapToId3CommandHandlerImpl implements MapToId3CommandHandler {
     }
 
     @Override
-    public Publisher<Id3Result> handle(MapToId3Command command) {
-        log.info("Mapping metadata to ID3 tags for mediaId: {}", command.getMediaId());
+    public Mono<Id3Result> handle(MapToId3CommandHandler.MapMetadata command) {
+        log.info("Mapping metadata to ID3 tags for mediaId: {}", command.mediaId());
 
         return Mono.fromCallable(() -> {
-            Id3v2Tag tag = new Id3v2Tag();
+                    Id3v2Tag tag = new Id3v2Tag();
 
-            if (command.getRawMetadata() == null) {
-                return Id3Result.builder()
-                        .mediaId(MediaId.of(command.getMediaId()))
-                        .tags(tag)
-                        .build();
-            }
-
-            DocumentContext context = JsonPath.using(jsonPathConfig).parse(command.getRawMetadata());
-
-            mappings.forEach((frameId, jsonPath) -> {
-                try {
-                    Object value = context.read(jsonPath);
-                    if (value != null) {
-                        String textValue = String.valueOf(value);
-                        if (!textValue.isEmpty()) {
-                            tag.addFrame(createTextFrame(frameId, textValue));
-                        }
+                    if (command.rawMetadata() == null) {
+                        return tag;
                     }
-                } catch (Exception e) {
-                    log.debug("Could not resolve path {} for frame {}", jsonPath, frameId, e);
-                }
-            });
 
-            return Id3Result.builder()
-                    .mediaId(MediaId.of(command.getMediaId()))
-                    .tags(tag)
-                    .build();
-        });
+                    DocumentContext context = JsonPath.using(jsonPathConfig).parse(command.rawMetadata());
+
+                    mappings.forEach((frameId, jsonPath) -> {
+                        try {
+                            Object value = context.read(jsonPath);
+                            if (value != null) {
+                                String textValue = String.valueOf(value);
+                                if (!textValue.isEmpty()) {
+                                    tag.addFrame(createTextFrame(frameId, textValue));
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.debug("Could not resolve path {} for frame {}", jsonPath, frameId, e);
+                        }
+                    });
+
+                    return tag;
+                })
+                .flatMap(tag -> {
+                    Id3Result result = Id3Result.builder()
+                            .mediaId(MediaId.of(command.mediaId()))
+                            .tags(tag)
+                            .build();
+
+                    return eventBus.publish(new MapToId3CommandHandler.Mapped(command.mediaId(), tag))
+                            .thenReturn(result);
+                });
     }
 
     private Id3v2Frame createTextFrame(String frameIdName, String text) {

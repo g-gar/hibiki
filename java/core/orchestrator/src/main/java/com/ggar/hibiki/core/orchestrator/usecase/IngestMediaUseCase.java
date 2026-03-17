@@ -14,8 +14,8 @@ import com.ggar.hibiki.features.ingestion.model.UploadSession;
 import com.ggar.hibiki.features.library.handler.command.AddMediaToLibraryCommandHandler;
 import com.ggar.hibiki.features.library.model.LibraryItem;
 import com.ggar.hibiki.features.library.model.LibraryItemType;
-import com.ggar.hibiki.features.metadata.dto.FetchMetadataCommand;
-import com.ggar.hibiki.features.metadata.dto.MapToId3Command;
+import com.ggar.hibiki.features.metadata.handler.command.FetchMetadataCommandHandler;
+import com.ggar.hibiki.features.metadata.handler.command.MapToId3CommandHandler;
 import com.ggar.hibiki.features.metadata.model.FetchMetadataResult;
 import com.ggar.hibiki.features.metadata.model.FingerprintId;
 import com.ggar.hibiki.features.metadata.model.Id3Result;
@@ -139,19 +139,14 @@ public class IngestMediaUseCase extends BaseOrchestratorUseCase {
                 mediaId,
                 fingerprintId);
 
-        FetchMetadataCommand fetchCmd = FetchMetadataCommand.builder()
-                .mediaId(mediaId.getId())
-                .acoustId(fingerprintId.getValue())
-                .mimeType("audio/mpeg") // Safe fallback, assuming audio for fingerprinting
-                .build();
+        FetchMetadataCommandHandler.Fetch fetchCmd =
+                new FetchMetadataCommandHandler.Fetch(mediaId.getId(), fingerprintId.getValue(), "audio/mpeg");
 
         return Mono.from(mediator.send(fetchCmd))
                 .cast(FetchMetadataResult.class)
                 .flatMap(metadataResult -> {
-                    MapToId3Command mapCmd = MapToId3Command.builder()
-                            .mediaId(mediaId.getId())
-                            .rawMetadata(metadataResult.getMetadata())
-                            .build();
+                    MapToId3CommandHandler.MapMetadata mapCmd =
+                            new MapToId3CommandHandler.MapMetadata(mediaId.getId(), metadataResult.getMetadata());
                     return Mono.from(mediator.send(mapCmd)).cast(Id3Result.class);
                 })
                 .flatMap(id3Result -> {
