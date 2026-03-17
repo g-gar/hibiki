@@ -10,22 +10,22 @@ import java.util.UUID;
  * It manually sets the version (4) and variant (2) bits according to RFC 4122,
  * avoiding reliance on the default java.util.UUID.randomUUID() algorithm.
  */
-public class UuidV4Generator implements UuidGenerator {
+public final class UuidV4Generator {
 
-    private final SecureRandom secureRandom;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-    public UuidV4Generator() {
-        this.secureRandom = new SecureRandom();
+    private UuidV4Generator() {
+        // Utility class
     }
 
-    public UuidV4Generator(SecureRandom secureRandom) {
-        this.secureRandom = secureRandom;
-    }
-
-    @Override
-    public UUID generate() {
+    /**
+     * Generates a new UUID v4.
+     *
+     * @return A newly generated UUID v4.
+     */
+    public static UUID generate() {
         byte[] randomBytes = new byte[16];
-        secureRandom.nextBytes(randomBytes);
+        SECURE_RANDOM.nextBytes(randomBytes);
 
         // Set version to 4 (0100)
         randomBytes[6] &= 0x0f; // clear version

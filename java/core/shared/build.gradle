@@ -5,5 +5,4 @@ plugins {
 dependencies {
     api 'io.projectreactor:reactor-core'
     api 'org.springframework:spring-context'
-    api project(':packages:uuid')
 }
