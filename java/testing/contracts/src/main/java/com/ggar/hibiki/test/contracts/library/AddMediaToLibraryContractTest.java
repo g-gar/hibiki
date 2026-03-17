@@ -2,7 +2,8 @@ package com.ggar.hibiki.test.contracts.library;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ggar.hibiki.features.library.dto.LibraryItemDto;
+import com.ggar.hibiki.features.library.model.LibraryItem;
+import com.ggar.hibiki.features.library.model.SongLibraryItem;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -10,9 +11,9 @@ import org.junit.jupiter.api.Test;
 
 public abstract class AddMediaToLibraryContractTest {
 
-    protected abstract ScenarioResult<LibraryItemDto> givenUserAddsSongToLibrary(UUID userId, UUID songId);
+    protected abstract ScenarioResult<LibraryItem> givenUserAddsSongToLibrary(UUID userId, UUID songId);
 
-    protected abstract ScenarioResult<LibraryItemDto> givenSongIsAlreadyInLibrary(UUID userId, UUID songId);
+    protected abstract ScenarioResult<LibraryItem> givenSongIsAlreadyInLibrary(UUID userId, UUID songId);
 
     @Test
     @DisplayName("Scenario: add song for the first time")
@@ -22,11 +23,12 @@ public abstract class AddMediaToLibraryContractTest {
         UUID songId = UUID.randomUUID();
 
         // Act
-        ScenarioResult<LibraryItemDto> result = givenUserAddsSongToLibrary(userId, songId);
+        ScenarioResult<LibraryItem> result = givenUserAddsSongToLibrary(userId, songId);
 
         // Assert
         assertThat(result.getReturnValue()).isNotNull();
-        assertThat(result.getReturnValue().getSongId()).isEqualTo(songId);
+        assertThat(((SongLibraryItem) result.getReturnValue()).getSong().getId().getValue())
+                .isEqualTo(songId);
         assertThat(result.getState().get("persisted")).isEqualTo(true);
     }
 
@@ -38,10 +40,12 @@ public abstract class AddMediaToLibraryContractTest {
         UUID songId = UUID.randomUUID();
 
         // Act
-        ScenarioResult<LibraryItemDto> result = givenSongIsAlreadyInLibrary(userId, songId);
+        ScenarioResult<LibraryItem> result = givenSongIsAlreadyInLibrary(userId, songId);
 
         // Assert
         assertThat(result.getReturnValue()).isNotNull();
+        assertThat(((SongLibraryItem) result.getReturnValue()).getSong().getId().getValue())
+                .isEqualTo(songId);
         assertThat(result.getState().get("countBefore"))
                 .isEqualTo(result.getState().get("countAfter"));
     }

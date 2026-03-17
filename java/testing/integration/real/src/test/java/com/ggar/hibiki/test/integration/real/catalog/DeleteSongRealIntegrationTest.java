@@ -1,9 +1,8 @@
 package com.ggar.hibiki.test.integration.real.catalog;
 
-import com.ggar.hibiki.core.catalog.dto.DeleteSongCommand;
+import com.ggar.hibiki.core.catalog.handler.command.DeleteSongCommandHandler;
 import com.ggar.hibiki.core.catalog.model.Song;
 import com.ggar.hibiki.core.catalog.port.SongRepository;
-import com.ggar.hibiki.core.catalog.usecase.handler.command.DeleteSongCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.DeleteSongContractTest;
 import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.ScenarioResult;
@@ -39,7 +38,8 @@ public class DeleteSongRealIntegrationTest extends DeleteSongContractTest {
         StepVerifier.create(songRepository.save(song)).expectNextCount(1).verifyComplete();
 
         // Act & Assert
-        StepVerifier.create(handler.handle(new DeleteSongCommand(songId))).verifyComplete();
+        StepVerifier.create(handler.handle(new DeleteSongCommandHandler.Delete(songId)))
+                .verifyComplete();
 
         // Check persistence
         AtomicBoolean exists = new AtomicBoolean(true);
@@ -55,7 +55,8 @@ public class DeleteSongRealIntegrationTest extends DeleteSongContractTest {
     @Override
     protected ScenarioResult<Void> givenSongDoesNotExist(UUID songId) {
         // Act & Assert
-        StepVerifier.create(handler.handle(new DeleteSongCommand(songId))).verifyComplete();
+        StepVerifier.create(handler.handle(new DeleteSongCommandHandler.Delete(songId)))
+                .verifyComplete();
 
         return ScenarioResult.<Void>builder().build();
     }

@@ -2,7 +2,7 @@ package com.ggar.hibiki.core.orchestrator.usecase;
 
 import com.ggar.hibiki.core.orchestrator.dto.RevokeDeviceRequestDTO;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
-import com.ggar.hibiki.features.devices.dto.RevokeDeviceCommand;
+import com.ggar.hibiki.features.devices.handler.command.RevokeDeviceCommandHandler;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -14,10 +14,8 @@ public class RevokeDeviceUseCase extends BaseOrchestratorUseCase {
     }
 
     public Mono<Void> execute(RevokeDeviceRequestDTO request) {
-        RevokeDeviceCommand command = RevokeDeviceCommand.builder()
-                .userId(request.getUserId())
-                .deviceId(request.getDeviceId())
-                .build();
+        RevokeDeviceCommandHandler.Revoke command =
+                new RevokeDeviceCommandHandler.Revoke(request.getUserId(), request.getDeviceId());
         return Mono.from(mediator.send(command));
     }
 }

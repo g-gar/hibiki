@@ -2,7 +2,7 @@ package com.ggar.hibiki.test.contracts.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ggar.hibiki.core.catalog.event.ArtistDeletedEvent;
+import com.ggar.hibiki.core.catalog.handler.command.DeleteArtistCommandHandler;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -29,10 +29,11 @@ public abstract class DeleteArtistContractTest {
         assertThat(result.getState().get("artistExists")).isEqualTo(false);
         assertThat(result.getState().get("albumExists")).isEqualTo(false);
         assertThat(result.getEvents())
-                .filteredOn(e -> e instanceof ArtistDeletedEvent)
+                .filteredOn(e -> e instanceof DeleteArtistCommandHandler.Deleted)
                 .hasSize(1);
-        ArtistDeletedEvent event = (ArtistDeletedEvent) result.getEvents().get(0);
-        assertThat(event.getArtistId()).isEqualTo(artistId);
+        DeleteArtistCommandHandler.Deleted event =
+                (DeleteArtistCommandHandler.Deleted) result.getEvents().get(0);
+        assertThat(event.artistId()).isEqualTo(artistId);
     }
 
     @Test
@@ -51,7 +52,7 @@ public abstract class DeleteArtistContractTest {
         assertThat(result.getState().get("albumExists")).isEqualTo(true);
         assertThat(result.getState().get("otherArtistLinked")).isEqualTo(true);
         assertThat(result.getEvents())
-                .filteredOn(e -> e instanceof ArtistDeletedEvent)
+                .filteredOn(e -> e instanceof DeleteArtistCommandHandler.Deleted)
                 .hasSize(1);
     }
 }

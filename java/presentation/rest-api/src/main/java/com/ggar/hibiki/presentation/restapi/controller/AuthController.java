@@ -1,6 +1,6 @@
 package com.ggar.hibiki.presentation.restapi.controller;
 
-import com.ggar.hibiki.core.identity.dto.AuthResponse;
+import com.ggar.hibiki.core.identity.model.User;
 import com.ggar.hibiki.core.orchestrator.dto.LoginRequestDTO;
 import com.ggar.hibiki.core.orchestrator.dto.RefreshRequestDTO;
 import com.ggar.hibiki.core.orchestrator.dto.SignupRequestDTO;
@@ -36,12 +36,12 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public Mono<Void> signup(@RequestBody SignupRequestDTO request) {
+    public Mono<User> signup(@RequestBody SignupRequestDTO request) {
         return Mono.from(mediator.send(authMapper.toDomain(request)));
     }
 
     @PostMapping("/login")
-    public Mono<AuthResponse> login(
+    public Mono<User> login(
             @RequestBody LoginRequestDTO request,
             @RequestHeader(value = "X-Forwarded-For", defaultValue = "unknown") String ip,
             @RequestHeader(value = "User-Agent", defaultValue = "unknown") String userAgent) {
@@ -49,7 +49,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public Mono<AuthResponse> refresh(
+    public Mono<User> refresh(
             @RequestBody RefreshRequestDTO request,
             @RequestHeader(value = "X-Forwarded-For", defaultValue = "unknown") String ip,
             @RequestHeader(value = "User-Agent", defaultValue = "unknown") String userAgent) {

@@ -1,11 +1,11 @@
 package com.ggar.hibiki.test.integration.real.identity;
 
-import com.ggar.hibiki.core.identity.dto.AuthResponse;
-import com.ggar.hibiki.core.identity.dto.LoginRequest;
-import com.ggar.hibiki.core.identity.dto.SignupRequest;
+import com.ggar.hibiki.core.identity.handler.command.LoginCommandHandler;
+import com.ggar.hibiki.core.identity.handler.command.LoginCommandHandlerImpl;
+import com.ggar.hibiki.core.identity.handler.command.SignupCommandHandler;
+import com.ggar.hibiki.core.identity.handler.command.SignupCommandHandlerImpl;
+import com.ggar.hibiki.core.identity.model.User;
 import com.ggar.hibiki.core.identity.persistence.repository.ReactiveNeo4jUserRepository;
-import com.ggar.hibiki.core.identity.usecase.impl.LoginCommandHandlerImpl;
-import com.ggar.hibiki.core.identity.usecase.impl.SignupCommandHandlerImpl;
 import com.ggar.hibiki.test.contracts.identity.LoginContractTest;
 import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.CapturingEventBus;
@@ -61,21 +61,22 @@ public class LoginRealIntegrationTest extends LoginContractTest {
     }
 
     @Override
-    protected ScenarioResult<AuthResponse> givenCredentialsAreValid(String email, String password) {
+    protected ScenarioResult<User> givenCredentialsAreValid(String email, String password) {
         String username = "login_success_" + System.currentTimeMillis();
 
         // Arrange: first register
-        StepVerifier.create(signupHandler.handle(new SignupRequest(username, email, password)))
+        StepVerifier.create(signupHandler.handle(new SignupCommandHandler.Signup(username, email, password)))
+                .expectNextCount(1)
                 .verifyComplete();
 
         // Act: then login
-        AtomicReference<AuthResponse> responseRef = new AtomicReference<>();
+        AtomicReference<User> responseRef = new AtomicReference<>();
         StepVerifier.create(loginHandler.handle(
-                        new LoginRequest(username, password, "test-device", "127.0.0.1", "test-agent")))
+                        new LoginCommandHandler.Login(username, password, "test-device", "127.0.0.1", "test-agent")))
                 .assertNext(responseRef::set)
                 .verifyComplete();
 
-        return ScenarioResult.<AuthResponse>builder()
+        return ScenarioResult.<User>builder()
                 .events(eventBus.getPublishedEvents())
                 .returnValue(responseRef.get())
                 .state(Map.of("username", username))
@@ -83,38 +84,39 @@ public class LoginRealIntegrationTest extends LoginContractTest {
     }
 
     @Override
-    protected ScenarioResult<AuthResponse> givenPasswordIsIncorrect(String email, String password) {
+    protected ScenarioResult<User> givenPasswordIsIncorrect(String email, String password) {
         String username = "login_wrong_pass_" + System.currentTimeMillis();
 
         // Arrange: first register
-        StepVerifier.create(signupHandler.handle(new SignupRequest(username, email, "correct_password")))
+        StepVerifier.create(signupHandler.handle(new SignupCommandHandler.Signup(username, email, "correct_password")))
+                .expectNextCount(1)
                 .verifyComplete();
 
         // Act: then login with wrong password
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
         StepVerifier.create(loginHandler.handle(
-                        new LoginRequest(username, password, "test-device", "127.0.0.1", "test-agent")))
+                        new LoginCommandHandler.Login(username, password, "test-device", "127.0.0.1", "test-agent")))
                 .consumeErrorWith(errorRef::set)
                 .verify();
 
-        return ScenarioResult.<AuthResponse>builder()
+        return ScenarioResult.<User>builder()
                 .error(errorRef.get())
                 .state(Map.of("username", username, "errorCode", "INVALID_CREDENTIALS"))
                 .build();
     }
 
     @Override
-    protected ScenarioResult<AuthResponse> givenUserDoesNotExist(String email, String password) {
+    protected ScenarioResult<User> givenUserDoesNotExist(String email, String password) {
         String username = "login_no_user_" + System.currentTimeMillis();
 
         // Act: login directly
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
         StepVerifier.create(loginHandler.handle(
-                        new LoginRequest(username, password, "test-device", "127.0.0.1", "test-agent")))
+                        new LoginCommandHandler.Login(username, password, "test-device", "127.0.0.1", "test-agent")))
                 .consumeErrorWith(errorRef::set)
                 .verify();
 
-        return ScenarioResult.<AuthResponse>builder()
+        return ScenarioResult.<User>builder()
                 .error(errorRef.get())
                 .state(Map.of("username", username, "errorCode", "INVALID_CREDENTIALS"))
                 .build();

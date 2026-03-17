@@ -1,6 +1,6 @@
 package com.ggar.hibiki.core.orchestrator.mapper;
 
-import com.ggar.hibiki.core.identity.dto.LoginRequest;
+import com.ggar.hibiki.core.identity.handler.command.LoginCommandHandler;
 import com.ggar.hibiki.core.orchestrator.dto.LoginRequestDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,5 +14,5 @@ public interface LoginRequestMapper {
     @Mapping(target = "ip", source = "ip")
     @Mapping(target = "userAgent", source = "userAgent")
     @Mapping(target = "deviceId", ignore = true)
-    LoginRequest toCommand(LoginRequestDTO dto, String ip, String userAgent);
+    LoginCommandHandler.Login toCommand(LoginRequestDTO dto, String ip, String userAgent);
 }

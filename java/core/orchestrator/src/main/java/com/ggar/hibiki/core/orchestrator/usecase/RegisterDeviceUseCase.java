@@ -4,7 +4,7 @@ import com.ggar.hibiki.core.orchestrator.dto.DeviceDTO;
 import com.ggar.hibiki.core.orchestrator.dto.RegisterDeviceRequestDTO;
 import com.ggar.hibiki.core.orchestrator.mapper.DeviceOrchestratorMapper;
 import com.ggar.hibiki.core.shared.mediator.Mediator;
-import com.ggar.hibiki.features.devices.dto.RegisterDeviceCommand;
+import com.ggar.hibiki.features.devices.handler.command.RegisterDeviceCommandHandler;
 import com.ggar.hibiki.features.devices.model.DeviceType;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -29,12 +29,13 @@ public class RegisterDeviceUseCase extends BaseOrchestratorUseCase {
             }
         }
 
-        RegisterDeviceCommand command = RegisterDeviceCommand.builder()
-                .id(request.getDeviceId())
-                .userId(request.getUserId())
-                .name(request.getFriendlyName())
-                .type(type)
-                .build();
+        RegisterDeviceCommandHandler.Register command = new RegisterDeviceCommandHandler.Register(
+                request.getDeviceId(),
+                request.getUserId(),
+                request.getFriendlyName(),
+                type,
+                null, // userAgent (if available in request)
+                null); // ip (if available in request)
 
         return Mono.from(mediator.send(command)).map(mapper::toDto);
     }

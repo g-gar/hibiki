@@ -1,7 +1,6 @@
 package com.ggar.hibiki.test.integration.real.ingestion;
 
-import com.ggar.hibiki.features.ingestion.dto.CompleteUploadCommand;
-import com.ggar.hibiki.features.ingestion.service.CompleteUploadCommandHandler;
+import com.ggar.hibiki.features.ingestion.handler.command.CompleteUploadCommandHandler;
 import com.ggar.hibiki.test.integration.real.TestApplication;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.SharedInfrastructure;
@@ -51,22 +50,20 @@ public class CompleteUploadRealIntegrationTest {
     @Test
     @DisplayName("Scenario: successful upload completion (Real)")
     void shouldCompleteUploadEndToEnd() {
-        // En un test real aquÃ­ tendrÃ­amos que:
-        // 1. Crear una sesiÃ³n en Neo4j
+        // En un test real aquí tendríamos que:
+        // 1. Crear una sesión en Neo4j
         // 2. Ejecutar el handler
-        // 3. Verificar eventos y el estado de la sesiÃ³n
+        // 3. Verificar eventos y el estado de la sesión
 
         // Dado que esto es parte de un refactor de patrones reactivos:
         UUID userId = UUID.randomUUID();
         UUID sessionId = UUID.randomUUID();
-        CompleteUploadCommand command = CompleteUploadCommand.builder()
-                .userId(userId)
-                .uploadSessionId(sessionId)
-                .build();
+        CompleteUploadCommandHandler.Complete command =
+                new CompleteUploadCommandHandler.Complete(userId, sessionId, "audio/mpeg", "hash123");
 
         // Act & Assert (Reactive flow check)
         StepVerifier.create(handler.handle(command))
-                .expectError() // Esperamos error porque no hay sesiÃ³n real en DB
+                .expectError() // Esperamos error porque no hay sesión real en DB
                 .verify();
     }
 }

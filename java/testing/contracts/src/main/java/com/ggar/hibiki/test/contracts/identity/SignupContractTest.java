@@ -2,15 +2,16 @@ package com.ggar.hibiki.test.contracts.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ggar.hibiki.core.identity.model.User;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public abstract class SignupContractTest {
 
-    protected abstract ScenarioResult<Void> givenUserRegistersWithValidData(String email, String password);
+    protected abstract ScenarioResult<User> givenUserRegistersWithValidData(String email, String password);
 
-    protected abstract ScenarioResult<Void> givenEmailIsAlreadyTaken(String email, String password);
+    protected abstract ScenarioResult<User> givenEmailIsAlreadyTaken(String email, String password);
 
     @Test
     @DisplayName("Scenario: successful registration")
@@ -20,10 +21,11 @@ public abstract class SignupContractTest {
         String pass = "securePass123";
 
         // Act
-        ScenarioResult<Void> result = givenUserRegistersWithValidData(email, pass);
+        ScenarioResult<User> result = givenUserRegistersWithValidData(email, pass);
 
         // Assert
         assertThat(result.getError()).isNull();
+        assertThat(result.getReturnValue()).isNotNull();
         assertThat(result.getState().get("persisted")).isEqualTo(true);
         assertThat(result.getState().get("passwordHashed")).isEqualTo(true);
         assertThat(result.getEvents()).hasSize(1);
@@ -37,10 +39,10 @@ public abstract class SignupContractTest {
         String pass = "password";
 
         // Act
-        ScenarioResult<Void> result = givenEmailIsAlreadyTaken(email, pass);
+        ScenarioResult<User> result = givenEmailIsAlreadyTaken(email, pass);
 
         // Assert
         assertThat(result.getError()).isNotNull();
-        assertThat(result.getState().get("errorCode")).isEqualTo("USER_ALREADY_EXISTS");
+        assertThat(result.getState().get("errorCode")).isEqualTo("Email already exists");
     }
 }

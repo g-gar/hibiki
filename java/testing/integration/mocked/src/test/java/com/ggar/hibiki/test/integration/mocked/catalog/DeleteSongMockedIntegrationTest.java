@@ -3,10 +3,10 @@ package com.ggar.hibiki.test.integration.mocked.catalog;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ggar.hibiki.core.catalog.dto.DeleteSongCommand;
+import com.ggar.hibiki.core.catalog.handler.command.DeleteSongCommandHandler;
+import com.ggar.hibiki.core.catalog.handler.command.DeleteSongCommandHandlerImpl;
 import com.ggar.hibiki.core.catalog.model.Song;
 import com.ggar.hibiki.core.catalog.port.SongRepository;
-import com.ggar.hibiki.core.catalog.usecase.handler.command.DeleteSongCommandHandler;
 import com.ggar.hibiki.test.contracts.catalog.DeleteSongContractTest;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import com.ggar.hibiki.test.support.ScenarioResult;
@@ -30,7 +30,7 @@ public class DeleteSongMockedIntegrationTest extends DeleteSongContractTest {
 
     @BeforeEach
     void setup() {
-        handler = new DeleteSongCommandHandler(songRepository, eventBus);
+        handler = new DeleteSongCommandHandlerImpl(songRepository, eventBus);
         eventBus.clear();
     }
 
@@ -43,7 +43,8 @@ public class DeleteSongMockedIntegrationTest extends DeleteSongContractTest {
         when(songRepository.deleteById(songId)).thenReturn(Mono.empty());
 
         // Act & Assert
-        StepVerifier.create(handler.handle(new DeleteSongCommand(songId))).verifyComplete();
+        StepVerifier.create(handler.handle(new DeleteSongCommandHandler.Delete(songId)))
+                .verifyComplete();
 
         // Capture
         verify(songRepository).deleteById(songId);
@@ -60,7 +61,8 @@ public class DeleteSongMockedIntegrationTest extends DeleteSongContractTest {
         when(songRepository.findById(songId)).thenReturn(Mono.empty());
 
         // Act & Assert
-        StepVerifier.create(handler.handle(new DeleteSongCommand(songId))).verifyComplete();
+        StepVerifier.create(handler.handle(new DeleteSongCommandHandler.Delete(songId)))
+                .verifyComplete();
 
         return ScenarioResult.<Void>builder().build();
     }

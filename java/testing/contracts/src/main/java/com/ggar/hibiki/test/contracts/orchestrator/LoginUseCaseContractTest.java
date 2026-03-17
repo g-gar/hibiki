@@ -2,21 +2,19 @@ package com.ggar.hibiki.test.contracts.orchestrator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ggar.hibiki.core.identity.dto.AuthResponse;
+import com.ggar.hibiki.core.identity.model.User;
 import com.ggar.hibiki.test.support.ScenarioResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public abstract class LoginUseCaseContractTest {
 
-    protected abstract ScenarioResult<AuthResponse> givenCredentialsAndDeviceAreValid(
+    protected abstract ScenarioResult<User> givenCredentialsAndDeviceAreValid(
             String username, String password, String deviceId);
 
-    protected abstract ScenarioResult<AuthResponse> givenInvalidCredentials(
-            String username, String password, String deviceId);
+    protected abstract ScenarioResult<User> givenInvalidCredentials(String username, String password, String deviceId);
 
-    protected abstract ScenarioResult<AuthResponse> givenInvalidDevice(
-            String username, String password, String deviceId);
+    protected abstract ScenarioResult<User> givenInvalidDevice(String username, String password, String deviceId);
 
     @Test
     @DisplayName("Scenario: successful login")
@@ -27,11 +25,12 @@ public abstract class LoginUseCaseContractTest {
         String device = "device-123";
 
         // Act
-        ScenarioResult<AuthResponse> result = givenCredentialsAndDeviceAreValid(user, pass, device);
+        ScenarioResult<User> result = givenCredentialsAndDeviceAreValid(user, pass, device);
 
         // Assert
         org.assertj.core.api.Assertions.assertThat(result.getReturnValue()).isNotNull();
-        org.assertj.core.api.Assertions.assertThat(result.getReturnValue().getToken())
+        org.assertj.core.api.Assertions.assertThat(
+                        result.getReturnValue().getAuthContext().accessToken())
                 .isNotEmpty();
         assertThat(result.getState().get("identityCalled")).isEqualTo(true);
         assertThat(result.getState().get("deviceValidated")).isEqualTo(true);
@@ -46,7 +45,7 @@ public abstract class LoginUseCaseContractTest {
         String device = "device-123";
 
         // Act
-        ScenarioResult<AuthResponse> result = givenInvalidCredentials(user, pass, device);
+        ScenarioResult<User> result = givenInvalidCredentials(user, pass, device);
 
         // Assert
         assertThat(result.getError()).isNotNull();
@@ -61,7 +60,7 @@ public abstract class LoginUseCaseContractTest {
         String device = "stolen-device";
 
         // Act
-        ScenarioResult<AuthResponse> result = givenInvalidDevice(user, pass, device);
+        ScenarioResult<User> result = givenInvalidDevice(user, pass, device);
 
         // Assert
         assertThat(result.getError()).isNotNull();

@@ -6,9 +6,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ggar.hibiki.features.library.dto.RemoveMediaFromLibraryCommand;
+import com.ggar.hibiki.features.library.handler.command.RemoveMediaFromLibraryCommandHandler;
+import com.ggar.hibiki.features.library.handler.command.RemoveMediaFromLibraryCommandHandlerImpl;
+import com.ggar.hibiki.features.library.model.LibraryItemType;
 import com.ggar.hibiki.features.library.port.LibraryRepository;
-import com.ggar.hibiki.features.library.service.RemoveMediaFromLibraryCommandHandlerImpl;
 import com.ggar.hibiki.test.support.CapturingEventBus;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -46,11 +47,7 @@ public class RemoveMediaFromLibraryMockedIntegrationTest {
 
         // Act & Assert
         AtomicReference<UUID> resultRef = new AtomicReference<>();
-        handler.handle(RemoveMediaFromLibraryCommand.builder()
-                        .userId(userId)
-                        .type(com.ggar.hibiki.features.library.model.LibraryItemType.SONG)
-                        .mediaId(mediaId)
-                        .build())
+        handler.handle(new RemoveMediaFromLibraryCommandHandler.Remove(userId, LibraryItemType.SONG, mediaId))
                 .as(StepVerifier::create)
                 .assertNext(resultRef::set)
                 .verifyComplete();
@@ -70,12 +67,7 @@ public class RemoveMediaFromLibraryMockedIntegrationTest {
         when(libraryRepository.remove(any(), eq(mediaId))).thenReturn(Mono.empty());
 
         // Act & Assert
-        // Act & Assert
-        handler.handle(RemoveMediaFromLibraryCommand.builder()
-                        .userId(userId)
-                        .type(com.ggar.hibiki.features.library.model.LibraryItemType.SONG)
-                        .mediaId(mediaId)
-                        .build())
+        handler.handle(new RemoveMediaFromLibraryCommandHandler.Remove(userId, LibraryItemType.SONG, mediaId))
                 .as(StepVerifier::create)
                 .expectNext(mediaId)
                 .verifyComplete();
