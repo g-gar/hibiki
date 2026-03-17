@@ -68,3 +68,9 @@ defaultTasks 'runApi'
 task runApi {
     dependsOn ':presentation:rest-api:bootRun'
 }
+
+task cleanBin(type: Delete) {
+    delete fileTree(dir: '.', include: '**/bin/')
+}
+
+clean.dependsOn cleanBin
