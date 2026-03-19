@@ -45,7 +45,7 @@ subprojects {
 
     checkstyle {
         toolVersion = "${rootProject.ext.versions.checkstyle}"
-        configFile = rootProject.file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
+        configFile = rootProject.file("../config/checkstyle/checkstyle.xml")
         showViolations = true
         maxWarnings = 0
     }
