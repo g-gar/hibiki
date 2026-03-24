@@ -1,0 +1,13 @@
+dependencies {
+    implementation project(':core:queue:queue-api')
+    implementation project(':core:shared')
+
+    implementation 'org.springframework:spring-context'
+    implementation 'io.projectreactor:reactor-core'
+    implementation 'org.springframework.data:spring-data-redis'
+    implementation 'io.lettuce:lettuce-core'
+    
+    implementation "org.mapstruct:mapstruct:${rootProject.ext.versions.mapstruct}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${rootProject.ext.versions.mapstruct}"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${rootProject.ext.versions.lombokMapstructBinding}"
+}
