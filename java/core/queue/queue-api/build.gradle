@@ -1,0 +1,8 @@
+dependencies {
+    implementation project(':core:shared')
+
+    compileOnly 'org.springframework:spring-context'
+    compileOnly 'io.projectreactor:reactor-core'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}
